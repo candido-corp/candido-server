@@ -1,0 +1,22 @@
+app:
+  datasource:
+    common:
+      show-sql: true
+    mariadb:
+      candido:
+        jdbc-url: jdbc:mariadb://localhost:3306/candidodb
+        username: root
+        password: root
+        driver-class-name: org.mariadb.jdbc.Driver
+        read-only: false
+        jta-platform: none
+
+        # Milliseconds (MS)
+        connection-timeout: 30000
+        # Milliseconds (MS)
+        idle-timeout: 30000
+        minimum-idle: 1
+        minimum-pool-size: 5
+        # Milliseconds (MS)
+        max-lifetime: 1800000
+        pool-name: CandidoDBHikariPool

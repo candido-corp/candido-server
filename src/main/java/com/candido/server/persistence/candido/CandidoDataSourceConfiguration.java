@@ -1,0 +1,64 @@
+package com.candido.server.persistence.candido;
+
+import com.zaxxer.hikari.HikariDataSource;
+import jakarta.persistence.EntityManagerFactory;
+import org.hibernate.jpa.HibernatePersistenceProvider;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.core.annotation.Order;
+import org.springframework.core.env.Environment;
+import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
+import org.springframework.orm.jpa.JpaTransactionManager;
+import org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean;
+import org.springframework.transaction.PlatformTransactionManager;
+import org.springframework.transaction.annotation.EnableTransactionManagement;
+
+import java.util.HashMap;
+
+import static com.candido.server.persistence._common.CommonDataSourceConfigurationConstant.*;
+import static com.candido.server.persistence.candido.CandidoDataSourceConfigurationConstant.*;
+
+@Configuration
+@ConfigurationProperties(CONFIGURATION_PROPERTIES)
+@EnableTransactionManagement
+@EnableJpaRepositories(
+        basePackages = REPOSITORY_BASE_PACKAGES,
+        entityManagerFactoryRef = ENTITY_MANAGER,
+        transactionManagerRef = TRANSACTION_MANAGER
+)
+@Order(ORDER_CANDIDODB)
+public class CandidoDataSourceConfiguration extends HikariDataSource {
+
+    @Autowired
+    Environment environment;
+
+    @Bean(name = DATASOURCE)
+    public HikariDataSource candidoDataSource() {
+        return new HikariDataSource(this);
+    }
+
+    @Bean(name = ENTITY_MANAGER)
+    public LocalContainerEntityManagerFactoryBean candidoEntityManager(
+            @Qualifier(DATASOURCE) final HikariDataSource hikariDataSource
+    ) {
+        return new LocalContainerEntityManagerFactoryBean() {{
+            setDataSource(hikariDataSource);
+            setPersistenceProviderClass(HibernatePersistenceProvider.class);
+            setPersistenceUnitName(PERSISTENCE_UNIT_NAME);
+            setPackagesToScan(MODEL_PACKAGE);
+            HashMap<String, String> MAP_PROPERTIES = new HashMap<>();
+            MAP_PROPERTIES.put(HIBERNATE_SHOW_SQL, environment.getProperty(COMMON_PROPERTIES_SHOW_SQL));
+            MAP_PROPERTIES.put(HIBERNATE_JTA_PLATFORM, environment.getProperty(CONFIGURATION_PROPERTIES +  ".jta-platform"));
+            setJpaPropertyMap(MAP_PROPERTIES);
+        }};
+    }
+
+    @Bean(name = TRANSACTION_MANAGER)
+    public PlatformTransactionManager candidoTransactionManager(@Qualifier(ENTITY_MANAGER) EntityManagerFactory candidoEntityManager) {
+        return new JpaTransactionManager(candidoEntityManager);
+    }
+
+}
