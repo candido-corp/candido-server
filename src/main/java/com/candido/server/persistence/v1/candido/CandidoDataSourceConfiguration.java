@@ -1,5 +1,6 @@
-package com.candido.server.persistence.candido;
+package com.candido.server.persistence.v1.candido;
 
+import com.candido.server.persistence.v1._common.CommonDataSourceConfigurationConstant;
 import com.zaxxer.hikari.HikariDataSource;
 import jakarta.persistence.EntityManagerFactory;
 import org.hibernate.jpa.HibernatePersistenceProvider;
@@ -18,8 +19,7 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
 
 import java.util.HashMap;
 
-import static com.candido.server.persistence._common.CommonDataSourceConfigurationConstant.*;
-import static com.candido.server.persistence.candido.CandidoDataSourceConfigurationConstant.*;
+import static com.candido.server.persistence.v1.candido.CandidoDataSourceConfigurationConstant.*;
 
 @Configuration
 @ConfigurationProperties(CONFIGURATION_PROPERTIES)
@@ -29,7 +29,7 @@ import static com.candido.server.persistence.candido.CandidoDataSourceConfigurat
         entityManagerFactoryRef = ENTITY_MANAGER,
         transactionManagerRef = TRANSACTION_MANAGER
 )
-@Order(ORDER_CANDIDODB)
+@Order(CommonDataSourceConfigurationConstant.ORDER_CANDIDODB)
 public class CandidoDataSourceConfiguration extends HikariDataSource {
 
     @Autowired
@@ -50,8 +50,8 @@ public class CandidoDataSourceConfiguration extends HikariDataSource {
             setPersistenceUnitName(PERSISTENCE_UNIT_NAME);
             setPackagesToScan(MODEL_PACKAGE);
             HashMap<String, String> MAP_PROPERTIES = new HashMap<>();
-            MAP_PROPERTIES.put(HIBERNATE_SHOW_SQL, environment.getProperty(COMMON_PROPERTIES_SHOW_SQL));
-            MAP_PROPERTIES.put(HIBERNATE_JTA_PLATFORM, environment.getProperty(CONFIGURATION_PROPERTIES +  ".jta-platform"));
+            MAP_PROPERTIES.put(CommonDataSourceConfigurationConstant.HIBERNATE_SHOW_SQL, environment.getProperty(CommonDataSourceConfigurationConstant.COMMON_PROPERTIES_SHOW_SQL));
+            MAP_PROPERTIES.put(CommonDataSourceConfigurationConstant.HIBERNATE_JTA_PLATFORM, environment.getProperty(CONFIGURATION_PROPERTIES +  ".jta-platform"));
             setJpaPropertyMap(MAP_PROPERTIES);
         }};
     }

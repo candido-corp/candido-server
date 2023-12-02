@@ -1,4 +1,4 @@
-package com.candido.server.persistence._common;
+package com.candido.server.persistence.v1._common;
 
 public class CommonDataSourceConfigurationConstant {
     public final static String HIBERNATE_SHOW_SQL = "hibernate.show_sql";
