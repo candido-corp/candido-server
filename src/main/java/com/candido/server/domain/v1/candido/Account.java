@@ -33,15 +33,6 @@ public class Account {
     public Account() {
     }
 
-    public Account(int id, AccountStatus status, String email, String password, LocalDateTime createdAt, LocalDateTime deletedAt) {
-        this.id = id;
-        this.status = status;
-        this.email = email;
-        this.password = password;
-        this.createdAt = createdAt;
-        this.deletedAt = deletedAt;
-    }
-
     public int getId() {
         return id;
     }
@@ -88,19 +79,6 @@ public class Account {
 
     public void setDeletedAt(LocalDateTime deletedAt) {
         this.deletedAt = deletedAt;
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        Account account = (Account) o;
-        return id == account.id && Objects.equals(status, account.status) && Objects.equals(email, account.email) && Objects.equals(password, account.password) && Objects.equals(createdAt, account.createdAt) && Objects.equals(deletedAt, account.deletedAt);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, status, email, password, createdAt, deletedAt);
     }
 
     @Override

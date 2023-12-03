@@ -5,20 +5,18 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 
-import java.util.Objects;
-
 @Entity
-@Table(name = "account_status")
-public class AccountStatus {
+@Table(name = "application_feedback_category")
+public class ApplicationFeedbackCategory {
 
     @Id
-    @Column(name = "account_status_id")
+    @Column(name = "application_feedback_category_id")
     private int id;
 
     @Column(name = "description")
     private String description;
 
-    public AccountStatus() {
+    public ApplicationFeedbackCategory() {
     }
 
     public int getId() {
@@ -39,7 +37,7 @@ public class AccountStatus {
 
     @Override
     public String toString() {
-        return "AccountStatus{" +
+        return "ApplicationFeedbackCategory{" +
                 "id=" + id +
                 ", description='" + description + '\'' +
                 '}';
