@@ -10,7 +10,8 @@ public class ApplicationFeedback {
     @Column(name = "application_feedback_id")
     private int id;
 
-    @Column(name = "fk_application_id")
+    @OneToOne
+    @JoinColumn(name = "fk_application_id", insertable = false, updatable = false)
     private Application application;
 
     @ManyToOne
