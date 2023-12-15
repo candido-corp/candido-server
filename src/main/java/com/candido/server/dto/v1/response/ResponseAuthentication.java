@@ -1,4 +1,4 @@
-package com.candido.server.security.domain.v1.response;
+package com.candido.server.dto.v1.response;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
