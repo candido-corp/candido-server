@@ -1,23 +1,26 @@
 package com.candido.server.domain.v1.provider;
 
-import lombok.Getter;
-import lombok.RequiredArgsConstructor;
 
-import java.util.Arrays;
-import java.util.Optional;
+import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
-@Getter
-@RequiredArgsConstructor
-public enum AuthProvider {
-    LOCAL(1),
-    GOOGLE(2);
+@Data
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
+@Entity
+@Table(name = "auth_provider")
+public class AuthProvider {
 
-    private final int providerId;
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "auth_provider_id")
+    private int id;
 
-    public static Optional<AuthProvider> findByProviderName(String providerName) {
-        return Arrays.stream(AuthProvider.values())
-                .filter(authProvider -> authProvider.name().equalsIgnoreCase(providerName))
-                .findFirst();
-    }
+    @Column(name = "description")
+    private String description;
 
 }

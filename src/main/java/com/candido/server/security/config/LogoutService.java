@@ -1,6 +1,6 @@
 package com.candido.server.security.config;
 
-import com.biotekna.doctor.security.domain.token.TokenRepository;
+import com.candido.server.domain.v1.token.TokenRepository;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;

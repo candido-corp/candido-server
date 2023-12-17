@@ -1,5 +1,6 @@
 package com.candido.server.security.config;
 
+import com.candido.server.domain.v1.account.AccountRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

@@ -16,11 +16,11 @@ public class AccountStatus {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id")
+    @Column(name = "account_status_id")
     private int id;
 
-    @Column(name = "name")
-    private String name;
+    @Column(name = "description")
+    private String description;
 
     public AccountStatus(int id) {
         this.id = id;

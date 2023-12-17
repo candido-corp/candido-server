@@ -15,14 +15,11 @@ import lombok.NoArgsConstructor;
 public class XrefRolePermission {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id")
-    private int id;
-
-    @Column(name = "fk_role_id")
+    @Column(name = "fk_account_role_id")
     private int roleId;
 
-    @Column(name = "fk_permission_id")
+    @Id
+    @Column(name = "fk_account_permission_id")
     private int permissionId;
 
 }

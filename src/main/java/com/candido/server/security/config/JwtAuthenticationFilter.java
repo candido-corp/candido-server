@@ -1,5 +1,7 @@
 package com.candido.server.security.config;
 
+import com.candido.server.domain.v1.token.Token;
+import com.candido.server.service.auth.token.TokenService;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;

@@ -13,26 +13,26 @@ import java.util.Set;
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
-@Table(name = "role")
-public class Role {
+@Table(name = "account_role")
+public class AccountRole {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id")
+    @Column(name = "account_role_id")
     private int id;
 
-    @Column(name = "name")
-    private String name;
+    @Column(name = "description")
+    private String description;
 
     @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(
             name = "xref_role_permission",
-            joinColumns = @JoinColumn(name = "fk_role_id"),
-            inverseJoinColumns = @JoinColumn(name = "fk_permission_id")
+            joinColumns = @JoinColumn(name = "fk_account_role_id"),
+            inverseJoinColumns = @JoinColumn(name = "fk_account_permission_id")
     )
-    private Set<Permission> permissions;
+    private Set<AccountPermission> accountPermissions;
 
-    public Role(int id) {
+    public AccountRole(int id) {
         this.id = id;
     }
 

@@ -1,4 +1,4 @@
-package com.candido.server.dto.v1.request;
+package com.candido.server.dto.v1.request.auth;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 

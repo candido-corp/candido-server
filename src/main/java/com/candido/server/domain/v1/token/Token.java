@@ -1,6 +1,6 @@
 package com.candido.server.domain.v1.token;
 
-import com.biotekna.doctor.security.domain.account.Account;
+import com.candido.server.domain.v1.account.Account;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -21,7 +21,7 @@ public class Token {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id")
+    @Column(name = "token_id")
     private Long id;
 
     @ManyToOne
@@ -41,24 +41,24 @@ public class Token {
     private String accessToken;
 
     @Column(name = "access_token_expiration")
-    private Date accessTokenExpiration;
+    private LocalDateTime accessTokenExpiration;
 
     @Lob
     @Column(name = "refresh_token")
     private String refreshToken;
 
     @Column(name = "refresh_token_expiration")
-    private Date refreshTokenExpiration;
+    private LocalDateTime refreshTokenExpiration;
 
     @Column(name = "ip_address")
     private String ipAddress;
 
     public boolean isAccessTokenExpired() {
-        return getAccessTokenExpiration().toInstant().isBefore(LocalDateTime.now().toInstant(ZoneOffset.UTC));
+        return getAccessTokenExpiration().isBefore(LocalDateTime.now());
     }
 
     public boolean isRefreshTokenExpired() {
-        return getRefreshTokenExpiration().toInstant().isBefore(LocalDateTime.now().toInstant(ZoneOffset.UTC));
+        return getRefreshTokenExpiration().isBefore(LocalDateTime.now());
     }
 
 }

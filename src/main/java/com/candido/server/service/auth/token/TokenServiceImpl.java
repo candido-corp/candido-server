@@ -1,11 +1,14 @@
 package com.candido.server.service.auth.token;
 
-import com.biotekna.doctor.security.config.JwtService;
-import com.biotekna.doctor.security.domain.account.Account;
-import com.biotekna.doctor.security.domain.token.*;
+import com.candido.server.domain.v1.account.Account;
+import com.candido.server.domain.v1.token.*;
+import com.candido.server.security.config.JwtService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.time.Instant;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
@@ -46,7 +49,10 @@ public class TokenServiceImpl implements TokenService {
         revokeAllAccountTokens(account);
 
         // Estraggo la data di scadenza
-        Date accessTokenExpiration = jwtService.extractExpiration(accessToken);
+        Date accessTokenExpirationDate = jwtService.extractExpiration(accessToken);
+        LocalDateTime accessTokenExpiration = Instant.ofEpochMilli(accessTokenExpirationDate.getTime())
+                .atZone(ZoneId.systemDefault())
+                .toLocalDateTime();
 
         // Creo il token per l'utente
         var token = Token
@@ -61,7 +67,10 @@ public class TokenServiceImpl implements TokenService {
 
         // Imposto il refresh token se non nullo
         if(refreshToken != null) {
-            Date refreshTokenExpiration = jwtService.extractExpiration(refreshToken);
+            Date refreshTokenExpirationDate = jwtService.extractExpiration(refreshToken);
+            LocalDateTime refreshTokenExpiration = Instant.ofEpochMilli(refreshTokenExpirationDate.getTime())
+                    .atZone(ZoneId.systemDefault())
+                    .toLocalDateTime();
             token.setRefreshToken(refreshToken);
             token.setRefreshTokenExpiration(refreshTokenExpiration);
         }

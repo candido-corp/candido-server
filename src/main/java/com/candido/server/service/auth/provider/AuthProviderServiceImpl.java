@@ -1,12 +1,12 @@
 package com.candido.server.service.auth.provider;
 
-import com.biotekna.doctor.security.domain.provider.XrefAccountProvider;
-import com.biotekna.doctor.security.domain.provider.XrefAccountProviderRepository;
+import com.candido.server.domain.v1.provider.XrefAccountProvider;
+import com.candido.server.domain.v1.provider.XrefAccountProviderRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 @Service
-public class ProviderServiceImpl implements ProviderService {
+public class AuthProviderServiceImpl implements AuthProviderService {
 
     @Autowired
     private XrefAccountProviderRepository xrefAccountProviderRepository;

@@ -1,7 +1,7 @@
 package com.candido.server.security.config;
 
-import com.candido.server.domain.v1.account.PermissionEnum;
-import com.candido.server.domain.v1.account.RoleEnum;
+import com.candido.server.domain.v1.account.AccountPermissionEnum;
+import com.candido.server.domain.v1.account.AccountRoleEnum;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -71,9 +71,9 @@ public class SecurityConfiguration {
                         .permitAll()
 
                         // Imposto la sicurezza per i path
-                        .requestMatchers("/api/v1/admin/**").hasAnyRole(RoleEnum.ADMIN.name())
-                        .requestMatchers(HttpMethod.GET, "/api/v1/admin/**").hasAuthority(PermissionEnum.ADMIN_READ.name())
-                        .requestMatchers(HttpMethod.POST, "/api/v1/admin/**").hasAuthority(PermissionEnum.ADMIN_CREATE.name())
+                        .requestMatchers("/api/v1/admin/**").hasAnyRole(AccountRoleEnum.ADMIN.name())
+                        .requestMatchers(HttpMethod.GET, "/api/v1/admin/**").hasAuthority(AccountPermissionEnum.ADMIN_READ.name())
+                        .requestMatchers(HttpMethod.POST, "/api/v1/admin/**").hasAuthority(AccountPermissionEnum.ADMIN_CREATE.name())
 
                         // Per tutti gli altri url bisogna essere autenticati
                         .anyRequest()

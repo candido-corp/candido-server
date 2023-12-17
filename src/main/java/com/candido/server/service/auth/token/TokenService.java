@@ -1,9 +1,9 @@
 package com.candido.server.service.auth.token;
 
-import com.biotekna.doctor.security.domain.account.Account;
-import com.biotekna.doctor.security.domain.token.Token;
-import com.biotekna.doctor.security.domain.token.TokenScopeCategoryEnum;
-import com.biotekna.doctor.security.domain.token.TokenTypeEnum;
+import com.candido.server.domain.v1.account.Account;
+import com.candido.server.domain.v1.token.Token;
+import com.candido.server.domain.v1.token.TokenScopeCategoryEnum;
+import com.candido.server.domain.v1.token.TokenTypeEnum;
 
 import java.util.List;
 import java.util.Optional;

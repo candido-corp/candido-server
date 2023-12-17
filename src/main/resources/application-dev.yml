@@ -1,0 +1,53 @@
+application:
+  name: candido
+  client:
+    domain: http://localhost:3000
+  security:
+    jwt:
+      secret-key: 6150645367566B58703273357638792F423F4528482B4D6251655468576D5A71
+      expiration: 86400000 # 1 day in ms
+      refresh-token:
+        expiration: 604800000 # 7 days in ms
+      registration-token:
+        expiration: 864000000 # 10 days in ms
+      reset-token:
+        expiration: 864000000 # 10 days in ms
+  email:
+    host: smtp.sendgrid.net
+    port: 587
+    username: apikey
+    password: ${SMTP_PASSWORD}
+    protocol: smtp
+    smtp:
+      auth: true
+      starttls:
+        enable: true
+    debug: false
+    no-reply: ${SMTP_SENDER}
+  support:
+    phone: 1234567890
+    email: support@candido.com
+
+spring:
+  main:
+    allow-bean-definition-overriding: true
+  mvc:
+    view:
+      prefix: /templates
+      suffix: .html
+    pathpattern:
+      matching-strategy: ANT_PATH_MATCHER
+  datasource:
+    url: jdbc:mariadb://localhost:3306/candido
+    username: root
+    password: root
+    driver-class-name: org.mariadb.jdbc.Driver
+  jpa:
+    hibernate:
+      ddl-auto: none
+    show-sql: false
+    properties:
+      hibernate:
+        format_sql: true
+    database: mysql
+    database-platform: org.hibernate.dialect.MariaDBDialect

@@ -1,31 +1,35 @@
 package com.candido.server.service.auth;
 
-import com.biotekna.doctor.event.auth.OnRegistrationCompletedEvent;
-import com.biotekna.doctor.event.auth.OnRegistrationEvent;
-import com.biotekna.doctor.event.auth.OnResetAccountCompletedEvent;
-import com.biotekna.doctor.event.auth.OnResetAccountEvent;
-import com.biotekna.doctor.exception._common.BTExceptionName;
-import com.biotekna.doctor.exception.account.*;
-import com.biotekna.doctor.exception.security.auth.AuthException;
-import com.biotekna.doctor.exception.security.auth.TokenException;
-import com.biotekna.doctor.exception.security.auth.VerifyRegistrationTokenException;
-import com.biotekna.doctor.exception.security.auth.VerifyResetTokenException;
-import com.biotekna.doctor.exception.security.jwt.InvalidJWTTokenException;
-import com.biotekna.doctor.security.config.JwtService;
-import com.biotekna.doctor.security.domain.account.*;
-import com.biotekna.doctor.security.domain.provider.AuthProvider;
-import com.biotekna.doctor.security.domain.token.Token;
-import com.biotekna.doctor.security.domain.token.TokenScopeCategoryEnum;
-import com.biotekna.doctor.security.domain.token.TokenTypeEnum;
-import com.biotekna.doctor.security.dto.AuthenticationRequest;
-import com.biotekna.doctor.security.dto.AuthenticationResponse;
-import com.biotekna.doctor.security.dto.PasswordResetRequest;
-import com.biotekna.doctor.security.dto.RegisterRequest;
-import com.biotekna.doctor.service.account.AccountService;
-import com.biotekna.doctor.service.auth.provider.ProviderService;
-import com.biotekna.doctor.service.auth.token.TokenService;
-import com.biotekna.doctor.validation.email.EmailConstraintValidator;
-import com.biotekna.doctor.validation.password.PasswordConstraintValidator;
+import com.candido.server.config.AppPropertiesConfig;
+import com.candido.server.domain.v1.account.*;
+import com.candido.server.domain.v1.provider.AuthProviderEnum;
+import com.candido.server.domain.v1.token.Token;
+import com.candido.server.domain.v1.token.TokenScopeCategoryEnum;
+import com.candido.server.domain.v1.token.TokenTypeEnum;
+import com.candido.server.dto.v1.request.auth.RequestAuthentication;
+import com.candido.server.dto.v1.request.auth.RequestPasswordReset;
+import com.candido.server.dto.v1.request.auth.RequestRegister;
+import com.candido.server.dto.v1.response.auth.ResponseAuthentication;
+import com.candido.server.event.auth.OnRegistrationCompletedEvent;
+import com.candido.server.event.auth.OnRegistrationEvent;
+import com.candido.server.event.auth.OnResetAccountCompletedEvent;
+import com.candido.server.event.auth.OnResetAccountEvent;
+import com.candido.server.exception._common.BTExceptionName;
+import com.candido.server.exception.account.AccountNotFoundException;
+import com.candido.server.exception.account.DuplicateAccountException;
+import com.candido.server.exception.account.InvalidEmailAccountException;
+import com.candido.server.exception.account.PasswordsDoNotMatchException;
+import com.candido.server.exception.security.auth.AuthException;
+import com.candido.server.exception.security.auth.TokenException;
+import com.candido.server.exception.security.auth.VerifyRegistrationTokenException;
+import com.candido.server.exception.security.auth.VerifyResetTokenException;
+import com.candido.server.exception.security.jwt.InvalidJWTTokenException;
+import com.candido.server.security.config.JwtService;
+import com.candido.server.service.account.AccountService;
+import com.candido.server.service.auth.provider.AuthProviderService;
+import com.candido.server.service.auth.token.TokenService;
+import com.candido.server.validation.email.EmailConstraintValidator;
+import com.candido.server.validation.password.PasswordConstraintValidator;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.transaction.Transactional;
@@ -52,15 +56,17 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 
     private final TokenService tokenService;
 
-    private final ProviderService providerService;
+    private final AuthProviderService authProviderService;
 
     private final AccountService accountService;
 
     private final ApplicationEventPublisher eventPublisher;
 
+    private final AppPropertiesConfig appPropertiesConfig;
+
     @Transactional
     @Override
-    public void register(RegisterRequest request, String ipAddress, String appUrl) {
+    public void register(RequestRegister request, String ipAddress, String appUrl) {
         // Controllo che l'account non esista già
         var duplicateAccount = accountService.findByEmail(request.email());
         if (duplicateAccount.isPresent())
@@ -75,22 +81,12 @@ public class AuthenticationServiceImpl implements AuthenticationService {
         if (!request.password().equals(request.confirmPassword()))
             throw new PasswordsDoNotMatchException(BTExceptionName.AUTH_PASSWORDS_DO_NOT_MATCH.name());
 
-        // Controllo che il nome non sia vuoto
-        if(request.firstname() == null || request.firstname().isEmpty())
-            throw new FirstNameEmptyException(BTExceptionName.FIRST_NAME_CAN_NOT_BE_EMPTY.name());
-
-        // Controllo che il cognome non sia vuoto
-        if(request.lastname() == null || request.lastname().isEmpty())
-            throw new LastNameEmptyException(BTExceptionName.LAST_NAME_CAN_NOT_BE_EMPTY.name());
-
         // Creo l'utente con ruolo di USER impostando tutti i campi necessari
         var account = Account
                 .builder()
-                .firstname(request.firstname())
-                .lastname(request.lastname())
                 .email(request.email())
                 .password(passwordEncoder.encode(request.password()))
-                .role(new Role(RoleEnum.USER.getRoleId()))
+                .accountRole(new AccountRole(AccountRoleEnum.USER.getRoleId()))
                 .createdAt(LocalDateTime.now())
                 .status(new AccountStatus(AccountStatusEnum.Pending.getStatusId()))
                 .build();
@@ -99,7 +95,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
         var savedAccount = accountService.save(account);
 
         // Salvo il provider collegato all'account
-        providerService.addProviderToAccount(AuthProvider.LOCAL.getProviderId(), savedAccount.getId());
+        authProviderService.addProviderToAccount(AuthProviderEnum.LOCAL.getProviderId(), savedAccount.getId());
 
         // Creo un token per la verifica della registrazione
         var accessToken = jwtService.generateRegistrationToken(account);
@@ -145,7 +141,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
             throw new VerifyRegistrationTokenException();
 
         // Abilito l'account
-        account.setStatus(new AccountStatus(AccountStatusEnum.Enabled.getStatusId()));
+        account.setStatus(new AccountStatus(AccountStatusEnum.Verified.getStatusId()));
         accountService.save(account);
 
         // Elimino il token di registrazione
@@ -157,7 +153,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     }
 
     @Override
-    public AuthenticationResponse authenticate(AuthenticationRequest request, String ipAddress) {
+    public ResponseAuthentication authenticate(RequestAuthentication request, String ipAddress) {
         // Controllo che l'email e la password non siano vuoti
         if (request.email() == null) throw new AuthException(BTExceptionName.EMAIL_CAN_NOT_BE_EMPTY.name());
         if (request.password() == null) throw new AuthException(BTExceptionName.PASSWORD_CAN_NOT_BE_EMPTY.name());
@@ -194,17 +190,17 @@ public class AuthenticationServiceImpl implements AuthenticationService {
         );
 
         // Ritorno il token appena generato
-        return AuthenticationResponse
+        return ResponseAuthentication
                 .builder()
                 .accessToken(accessToken)
-                .accessTokenExpirationDate(token.getAccessTokenExpiration())
+                .expiresIn(appPropertiesConfig.getSecurity().getJwt().getExpiration())
                 .refreshToken(refreshToken)
-                .refreshTokenExpirationDate(token.getAccessTokenExpiration())
+                .refreshExpiresIn(appPropertiesConfig.getSecurity().getJwt().getRefreshToken().getExpiration())
                 .build();
     }
 
     @Override
-    public AuthenticationResponse refreshToken(HttpServletRequest request, HttpServletResponse response) {
+    public ResponseAuthentication refreshToken(HttpServletRequest request, HttpServletResponse response) {
         // Recupero header di autorizzazione
         final String authHeader = request.getHeader(HttpHeaders.AUTHORIZATION);
 
@@ -268,12 +264,12 @@ public class AuthenticationServiceImpl implements AuthenticationService {
         );
 
         // Creo la risposta da inviare
-        return AuthenticationResponse
+        return ResponseAuthentication
                 .builder()
                 .accessToken(token.getAccessToken())
-                .accessTokenExpirationDate(token.getAccessTokenExpiration())
+                .expiresIn(appPropertiesConfig.getSecurity().getJwt().getExpiration())
                 .refreshToken(token.getRefreshToken())
-                .refreshTokenExpirationDate(token.getAccessTokenExpiration())
+                .refreshExpiresIn(appPropertiesConfig.getSecurity().getJwt().getRefreshToken().getExpiration())
                 .build();
 
     }
@@ -309,7 +305,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     }
 
     @Override
-    public AuthenticationResponse resetPassword(String resetToken, PasswordResetRequest request, String ipAddress) {
+    public ResponseAuthentication resetPassword(String resetToken, RequestPasswordReset request, String ipAddress) {
         // Estraggo lo username dal token
         String username = jwtService.extractUsername(resetToken);
 
@@ -342,7 +338,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 
         // Abilito l'account se non è abilitato
         if(account.getStatus().getId() == AccountStatusEnum.Pending.getStatusId()) {
-            account.setStatus(new AccountStatus(AccountStatusEnum.Enabled.getStatusId()));
+            account.setStatus(new AccountStatus(AccountStatusEnum.Verified.getStatusId()));
         }
 
         // Salvo l'account
@@ -374,12 +370,12 @@ public class AuthenticationServiceImpl implements AuthenticationService {
         );
 
         // Creo la risposta da inviare
-        return AuthenticationResponse
+        return ResponseAuthentication
                 .builder()
                 .accessToken(token.getAccessToken())
-                .accessTokenExpirationDate(token.getAccessTokenExpiration())
+                .expiresIn(appPropertiesConfig.getSecurity().getJwt().getExpiration())
                 .refreshToken(token.getRefreshToken())
-                .refreshTokenExpirationDate(token.getAccessTokenExpiration())
+                .refreshExpiresIn(appPropertiesConfig.getSecurity().getJwt().getRefreshToken().getExpiration())
                 .build();
     }
 

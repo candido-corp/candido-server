@@ -1,6 +1,6 @@
 package com.candido.server.domain.v1.account;
 
-import com.candido.server.domain.v1.provider.Provider;
+import com.candido.server.domain.v1.provider.AuthProvider;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -26,24 +26,16 @@ public class Account implements UserDetails {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id")
+    @Column(name = "account_id")
     private Integer id;
 
     @ManyToOne
-    @JoinColumn(name = "fk_role_id")
-    private Role role;
+    @JoinColumn(name = "fk_account_role_id")
+    private AccountRole accountRole;
 
     @ManyToOne
     @JoinColumn(name = "fk_account_status_id")
     private AccountStatus status;
-
-    @JsonProperty("first_name")
-    @Column(name = "first_name")
-    private String firstname;
-
-    @JsonProperty("last_name")
-    @Column(name = "last_name")
-    private String lastname;
 
     @Column(name = "email")
     private String email;
@@ -65,18 +57,18 @@ public class Account implements UserDetails {
             joinColumns = @JoinColumn(name = "fk_account_id"),
             inverseJoinColumns = @JoinColumn(name = "fk_provider_id")
     )
-    Set<Provider> providers;
+    Set<AuthProvider> authProviders;
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         // Mappo tutti i permessi del ruolo richiesto in SimpleGrantedAuthority
-        var authorities = role.getPermissions()
+        var authorities = accountRole.getAccountPermissions()
                 .stream()
-                .map(permission -> new SimpleGrantedAuthority(permission.getName()))
+                .map(permission -> new SimpleGrantedAuthority(permission.getDescription()))
                 .collect(Collectors.toList());
 
         // Aggiungo il ruolo richiamato
-        authorities.add(new SimpleGrantedAuthority("ROLE_" + role.getName()));
+        authorities.add(new SimpleGrantedAuthority("ROLE_" + accountRole.getDescription()));
 
         return authorities;
     }
@@ -108,7 +100,7 @@ public class Account implements UserDetails {
 
     @Override
     public boolean isEnabled() {
-        return status.getName().equals(AccountStatusEnum.Enabled.name());
+        return status.getDescription().equals(AccountStatusEnum.Verified.name());
     }
 
 }

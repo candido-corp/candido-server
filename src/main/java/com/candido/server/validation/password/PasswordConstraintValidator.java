@@ -1,5 +1,7 @@
 package com.candido.server.validation.password;
 
+import com.candido.server.exception.account.InvalidPasswordAccountException;
+import com.candido.server.exception.account.InvalidPasswordAccountListException;
 import org.passay.*;
 
 import java.util.ArrayList;

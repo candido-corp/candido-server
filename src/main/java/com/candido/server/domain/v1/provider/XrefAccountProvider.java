@@ -12,16 +12,14 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @Entity
 @Table(name = "xref_account_provider")
+@IdClass(XrefAccountProviderIdentity.class)
 public class XrefAccountProvider {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id")
-    private int id;
-
     @Column(name = "fk_account_id")
     private int accountId;
 
+    @Id
     @Column(name = "fk_provider_id")
     private int providerId;
 

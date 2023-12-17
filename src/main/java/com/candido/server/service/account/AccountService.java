@@ -1,6 +1,6 @@
 package com.candido.server.service.account;
 
-import com.biotekna.doctor.security.domain.account.Account;
+import com.candido.server.domain.v1.account.Account;
 
 import java.util.Optional;
 
@@ -10,5 +10,4 @@ public interface AccountService {
     Account save(Account account);
     void enableAccount(int accountId);
     void editPassword(String email, String currentPassword, String password, String confirmPassword);
-    void editAccountName(String email, String firstName, String lastName);
 }

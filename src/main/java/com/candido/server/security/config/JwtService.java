@@ -1,9 +1,9 @@
 package com.candido.server.security.config;
 
-import com.biotekna.doctor.config.AppPropertiesConfig;
-import com.biotekna.doctor.exception._common.BTExceptionResolver;
-import com.biotekna.doctor.exception.security.jwt.SecurityJWTException;
-import com.biotekna.doctor.security.domain.token.JWTStateEnum;
+import com.candido.server.config.AppPropertiesConfig;
+import com.candido.server.domain.v1.token.JWTStateEnum;
+import com.candido.server.exception._common.BTExceptionResolver;
+import com.candido.server.exception.security.jwt.SecurityJWTException;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
@@ -138,7 +138,7 @@ public class JwtService {
                 .setSubject(userDetails.getUsername())
                 .setIssuedAt(new Date(System.currentTimeMillis()))
                 .setExpiration(new Date(System.currentTimeMillis() + expirationTimeMillis))
-                .setIssuer("Biotekna")
+                .setIssuer("Candido")
                 .signWith(getSignInKey(), SignatureAlgorithm.HS256)
                 .compact();
     }

@@ -1,16 +1,14 @@
 package com.candido.server.service.account;
 
-import com.biotekna.doctor.exception._common.BTExceptionName;
-import com.biotekna.doctor.exception.account.AccountNotFoundException;
-import com.biotekna.doctor.exception.account.FirstNameEmptyException;
-import com.biotekna.doctor.exception.account.LastNameEmptyException;
-import com.biotekna.doctor.exception.account.PasswordsDoNotMatchException;
-import com.biotekna.doctor.security.domain.account.Account;
-import com.biotekna.doctor.security.domain.account.AccountRepository;
-import com.biotekna.doctor.security.domain.account.AccountStatus;
-import com.biotekna.doctor.security.domain.account.AccountStatusEnum;
-import com.biotekna.doctor.service.auth.token.TokenService;
-import com.biotekna.doctor.validation.password.PasswordConstraintValidator;
+import com.candido.server.domain.v1.account.Account;
+import com.candido.server.domain.v1.account.AccountRepository;
+import com.candido.server.domain.v1.account.AccountStatus;
+import com.candido.server.domain.v1.account.AccountStatusEnum;
+import com.candido.server.exception._common.BTExceptionName;
+import com.candido.server.exception.account.AccountNotFoundException;
+import com.candido.server.exception.account.PasswordsDoNotMatchException;
+import com.candido.server.service.auth.token.TokenService;
+import com.candido.server.validation.password.PasswordConstraintValidator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -47,7 +45,7 @@ public class AccountServiceImpl implements AccountService {
     @Override
     public void enableAccount(int accountId) {
         findById(accountId).ifPresent(account -> {
-            account.setStatus(new AccountStatus(AccountStatusEnum.Enabled.getStatusId()));
+            account.setStatus(new AccountStatus(AccountStatusEnum.Verified.getStatusId()));
             save(account);
             tokenService.revokeAllAccountTokens(account);
         });
@@ -71,20 +69,4 @@ public class AccountServiceImpl implements AccountService {
         save(account);
     }
 
-    @Override
-    public void editAccountName(String email, String firstName, String lastName) {
-        // Controllo che il nome non sia vuoto
-        if(firstName == null || firstName.isEmpty())
-            throw new FirstNameEmptyException(BTExceptionName.FIRST_NAME_CAN_NOT_BE_EMPTY.name());
-
-        // Controllo che il cognome non sia vuoto
-        if(lastName == null || lastName.isEmpty())
-            throw new LastNameEmptyException(BTExceptionName.LAST_NAME_CAN_NOT_BE_EMPTY.name());
-
-        findByEmail(email).ifPresent(account -> {
-            account.setFirstname(firstName);
-            account.setLastname(lastName);
-            save(account);
-        });
-    }
 }
