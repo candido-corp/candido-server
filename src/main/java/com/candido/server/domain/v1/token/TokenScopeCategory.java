@@ -14,11 +14,11 @@ public class TokenScopeCategory {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id")
+    @Column(name = "token_scope_category_id")
     private int id;
 
-    @Column(name = "name")
-    private String name;
+    @Column(name = "description")
+    private String description;
 
     public TokenScopeCategory(int id) {
         this.id = id;
