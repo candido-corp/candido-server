@@ -26,11 +26,6 @@ public class AuthenticationController {
     public ResponseEntity<Void> register(
             @RequestBody RequestRegister request, HttpServletRequest httpRequest
     ) {
-        try {
-            Thread.sleep(2000);
-        } catch (InterruptedException e) {
-            throw new RuntimeException(e);
-        }
         authenticationServiceImpl.register(request, utilService.getClientIP(httpRequest), utilService.getAppUrl(httpRequest));
         return ResponseEntity.noContent().build();
     }
@@ -39,12 +34,6 @@ public class AuthenticationController {
     public ResponseEntity<Void> verifyRegistrationToken(
             @PathVariable("token") String token
     ) {
-        // TODO: Togli il ritardo
-        try {
-            Thread.sleep(2000);
-        } catch (InterruptedException e) {
-            throw new RuntimeException(e);
-        }
         authenticationServiceImpl.verifyRegistrationToken(token);
         return ResponseEntity.noContent().build();
     }
@@ -53,12 +42,6 @@ public class AuthenticationController {
     public ResponseEntity<ResponseAuthentication> authenticate(
             @RequestBody RequestAuthentication request, HttpServletRequest httpRequest
     ) {
-        // TODO: Togli il ritardo
-        try {
-            Thread.sleep(2000);
-        } catch (InterruptedException e) {
-            throw new RuntimeException(e);
-        }
         return ResponseEntity.ok(authenticationServiceImpl.authenticate(request, utilService.getClientIP(httpRequest)));
     }
 

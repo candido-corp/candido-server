@@ -29,12 +29,6 @@ public class AuthenticationAccountController {
 
     @PostMapping("/reset-password-verify/{token}")
     public ResponseEntity<Void> verifyResetToken(@PathVariable("token") String token) {
-        // TODO: Togli il ritardo
-        try {
-            Thread.sleep(2000);
-        } catch (InterruptedException e) {
-            throw new RuntimeException(e);
-        }
         authenticationServiceImpl.getAccountAndVerifyToken(token, TokenScopeCategoryEnum.BTD_RESET.getTokenScopeCategoryId());
         return ResponseEntity.noContent().build();
     }
@@ -45,12 +39,6 @@ public class AuthenticationAccountController {
             @PathVariable("token") String token,
             HttpServletRequest httpRequest
     ) {
-        // TODO: Togli il ritardo
-        try {
-            Thread.sleep(2000);
-        } catch (InterruptedException e) {
-            throw new RuntimeException(e);
-        }
         return ResponseEntity.ok(authenticationServiceImpl.resetPassword(token, request, utilService.getClientIP(httpRequest)));
     }
 
