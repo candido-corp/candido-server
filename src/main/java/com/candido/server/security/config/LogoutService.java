@@ -36,9 +36,7 @@ public class LogoutService implements LogoutHandler {
         // Se il token non è null lo disabilito e pulisco il contesto di spring
         if(storedToken != null) {
             // TODO: Elimina il token
-//            storedToken.setExpired(true);
-//            storedToken.setRevoked(true);
-            tokenRepository.save(storedToken);
+            tokenRepository.delete(storedToken);
             SecurityContextHolder.clearContext();
         }
     }
