@@ -65,7 +65,9 @@ public class SecurityConfiguration {
                 )
                 .authorizeHttpRequests(auth -> auth
                         // Abilita una whitelist di url
-                        .requestMatchers("/api/v1/auth/**", "/oauth2/**", "/",
+                        .requestMatchers(
+                                "/api/v1/auth/**", "/oauth2/**", "/",
+                                "/docker/test",
                                 "/error",
                                 "/favicon.ico")
                         .permitAll()
