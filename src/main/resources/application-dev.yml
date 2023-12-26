@@ -13,17 +13,18 @@ application:
       reset-token:
         expiration: 864000000 # 10 days in ms
   email:
-    host: smtp.sendgrid.net
+    host: ${SMTPHOST}
     port: 587
     username: apikey
-    password: ${SMTP_PASSWORD}
+    password: ${SMTPPASSWORD}
     protocol: smtp
     smtp:
       auth: true
       starttls:
         enable: true
     debug: false
-    no-reply: ${SMTP_SENDER}
+    no-reply: ${SMTPNOREPLY}
+    can-send: ${SMTPCANSEND}
   support:
     phone: 1234567890
     email: support@candido.com
@@ -38,9 +39,9 @@ spring:
     pathpattern:
       matching-strategy: ANT_PATH_MATCHER
   datasource:
-    url: jdbc:mariadb://localhost:3306/candido
-    username: root
-    password: root
+    url: jdbc:mariadb://${DBHOST}:${DBPORT}/${DBNAME}
+    username: ${DBUSER}
+    password: ${DBPASSWORD}
     driver-class-name: org.mariadb.jdbc.Driver
   jpa:
     hibernate:
@@ -50,4 +51,4 @@ spring:
       hibernate:
         format_sql: true
     database: mysql
-    database-platform: org.hibernate.dialect.MariaDBDialect
+    #database-platform: org.hibernate.dialect.MariaDBDialect

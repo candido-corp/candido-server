@@ -16,7 +16,7 @@ import java.time.LocalDateTime;
 
 @Slf4j
 @Component
-public class AuthListenerListenerImpl implements AuthListenerService {
+public class AuthListenerImpl implements AuthListenerService {
 
     @Autowired
     private EmailService emailService;
