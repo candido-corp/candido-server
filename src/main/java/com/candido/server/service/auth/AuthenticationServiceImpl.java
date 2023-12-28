@@ -153,6 +153,19 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     }
 
     @Override
+    public void verifyRegistrationByEmail(String email) {
+        // TODO: Delete this service
+        // Recupero l'utente dal database
+        var account = accountService
+                .findByEmail(email)
+                .orElseThrow(() -> new AccountNotFoundException(BTExceptionName.ACCOUNT_NOT_FOUND.name()));
+
+        // Abilito l'account
+        account.setStatus(new AccountStatus(AccountStatusEnum.Verified.getStatusId()));
+        accountService.save(account);
+    }
+
+    @Override
     public ResponseAuthentication authenticate(RequestAuthentication request, String ipAddress) {
         // Controllo che l'email e la password non siano vuoti
         if (request.email() == null) throw new AuthException(BTExceptionName.EMAIL_CAN_NOT_BE_EMPTY.name());

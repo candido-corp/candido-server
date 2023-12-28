@@ -38,6 +38,15 @@ public class AuthenticationController {
         return ResponseEntity.noContent().build();
     }
 
+    @PostMapping("/register-verify/email/{email}")
+    public ResponseEntity<Void> verifyRegistrationByEmail(
+            @PathVariable("email") String email
+    ) {
+        // TODO: Delete this endpoint
+        authenticationServiceImpl.verifyRegistrationByEmail(email);
+        return ResponseEntity.noContent().build();
+    }
+
     @PostMapping("/authenticate")
     public ResponseEntity<ResponseAuthentication> authenticate(
             @RequestBody RequestAuthentication request, HttpServletRequest httpRequest

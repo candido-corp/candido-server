@@ -11,6 +11,7 @@ import jakarta.servlet.http.HttpServletResponse;
 public interface AuthenticationService {
     void register(RequestRegister request, String ipAddress, String appUrl);
     void verifyRegistrationToken(String registrationToken);
+    void verifyRegistrationByEmail(String email);
     ResponseAuthentication authenticate(RequestAuthentication request, String ipAddress);
     ResponseAuthentication refreshToken(HttpServletRequest request, HttpServletResponse response);
     void sendResetPassword(String email, String ipAddress, String appUrl);
