@@ -11,4 +11,4 @@ RUN gradle clean build
 FROM amazoncorretto:21
 COPY --from=build /app/build/libs/server-*.jar /app/server.jar
 EXPOSE 8080
-CMD sleep 5 && java -jar /app/server.jar
+CMD sleep 15 && java -jar /app/server.jar
