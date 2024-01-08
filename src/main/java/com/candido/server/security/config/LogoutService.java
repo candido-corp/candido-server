@@ -25,20 +25,30 @@ public class LogoutService implements LogoutHandler {
         final String jwt;
 
         // Se header recuperato è null o non inizia con la parola chiave "Bearer ", chiudo la richiesta
-        if(authHeader == null || !authHeader.startsWith("Bearer ")) return;
+        if(authHeader == null || !authHeader.startsWith("Bearer ")) {
+            response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+            return;
+        }
 
         // Recupero il token alla settima posizione che è la lunghezza della parola chiave "Bearer "
         jwt = authHeader.substring(7);
 
+        // Se non esiste il token dentro la chiamata di logout ritorno un errore
+        if(jwt.isEmpty()) {
+            response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+            return;
+        }
+
         // Recupero il token salvato
         var storedToken = tokenRepository.findByAccessToken(jwt).orElse(null);
+        response.setStatus(HttpServletResponse.SC_NO_CONTENT);
 
         // Se il token non è null lo disabilito e pulisco il contesto di spring
         if(storedToken != null) {
-            // TODO: Elimina il token
             tokenRepository.delete(storedToken);
             SecurityContextHolder.clearContext();
         }
+
     }
 
 }
