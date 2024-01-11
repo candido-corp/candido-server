@@ -1,5 +1,6 @@
 package com.candido.server.controller.auth;
 
+import com.candido.server.domain.v1.token.Token;
 import com.candido.server.dto.v1.request.auth.RequestAuthentication;
 import com.candido.server.dto.v1.request.auth.RequestRegister;
 import com.candido.server.dto.v1.response.auth.ResponseAuthentication;
@@ -11,6 +12,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/v1/auth")
@@ -38,15 +41,6 @@ public class AuthenticationController {
         return ResponseEntity.noContent().build();
     }
 
-    @PostMapping("/register-verify/email/{email}")
-    public ResponseEntity<Void> verifyRegistrationByEmail(
-            @PathVariable("email") String email
-    ) {
-        // TODO: Delete this endpoint
-        authenticationServiceImpl.verifyRegistrationByEmail(email);
-        return ResponseEntity.noContent().build();
-    }
-
     @PostMapping("/authenticate")
     public ResponseEntity<ResponseAuthentication> authenticate(
             @RequestBody RequestAuthentication request, HttpServletRequest httpRequest
@@ -57,6 +51,25 @@ public class AuthenticationController {
     @PostMapping("/refresh-token")
     public ResponseEntity<ResponseAuthentication> refreshToken(HttpServletRequest request, HttpServletResponse response) {
         return ResponseEntity.ok(authenticationServiceImpl.refreshToken(request, response));
+    }
+
+    @PostMapping("/register-verify/email/{email}")
+    public ResponseEntity<Void> verifyRegistrationByEmail(
+            @PathVariable("email") String email
+    ) {
+        // TODO: Delete this endpoint
+        authenticationServiceImpl.verifyRegistrationByEmail(email);
+        return ResponseEntity.noContent().build();
+    }
+
+    @PostMapping("/token/{email}")
+    public ResponseEntity<List<Token>> getTokenList(
+            @PathVariable("email") String email
+    ) {
+        // TODO: Delete this endpoint
+        return ResponseEntity.ok(
+                authenticationServiceImpl.getListOfTokenByEmail(email)
+        );
     }
 
 }

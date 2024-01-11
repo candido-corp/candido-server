@@ -42,6 +42,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -150,19 +151,6 @@ public class AuthenticationServiceImpl implements AuthenticationService {
         // Invio un evento quando viene confermata la registrazione
         eventPublisher.publishEvent(new OnRegistrationCompletedEvent(this, account));
 
-    }
-
-    @Override
-    public void verifyRegistrationByEmail(String email) {
-        // TODO: Delete this service
-        // Recupero l'utente dal database
-        var account = accountService
-                .findByEmail(email)
-                .orElseThrow(() -> new AccountNotFoundException(BTExceptionName.ACCOUNT_NOT_FOUND.name()));
-
-        // Abilito l'account
-        account.setStatus(new AccountStatus(AccountStatusEnum.Verified.getStatusId()));
-        accountService.save(account);
     }
 
     @Override
@@ -418,6 +406,30 @@ public class AuthenticationServiceImpl implements AuthenticationService {
             throw new TokenException();
 
         return account;
+    }
+
+    @Override
+    public void verifyRegistrationByEmail(String email) {
+        // TODO: Delete this service
+        // Recupero l'utente dal database
+        var account = accountService
+                .findByEmail(email)
+                .orElseThrow(() -> new AccountNotFoundException(BTExceptionName.ACCOUNT_NOT_FOUND.name()));
+
+        // Abilito l'account
+        account.setStatus(new AccountStatus(AccountStatusEnum.Verified.getStatusId()));
+        accountService.save(account);
+    }
+
+    @Override
+    public List<Token> getListOfTokenByEmail(String email) {
+        // TODO: Delete this service
+        // Recupero l'utente dal database
+        var account = accountService
+                .findByEmail(email)
+                .orElseThrow(() -> new AccountNotFoundException(BTExceptionName.ACCOUNT_NOT_FOUND.name()));
+
+        return tokenService.findAllValidTokenByUser(account.getId());
     }
 
 }
