@@ -36,7 +36,7 @@ public class AccountErrorAdvice {
     @ExceptionHandler({AccountNotFoundException.class})
     public ResponseEntity<BTExceptionResponse> handleAccountNotFoundException(AccountNotFoundException ex, Locale locale) {
         log.info("[EXCEPTION] ({}) -> {}", AccountNotFoundException.class.getName(), LocalDateTime.now());
-        return btExceptionResolver.resolveBusinessBTException(ex, locale, HttpStatus.BAD_REQUEST);
+        return btExceptionResolver.resolveBusinessBTException(ex, locale, HttpStatus.NOT_FOUND);
     }
 
     @ExceptionHandler({InvalidEmailAccountException.class})
