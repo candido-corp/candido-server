@@ -36,6 +36,9 @@ dependencies {
 	annotationProcessor 'org.mapstruct:mapstruct-processor:1.5.5.Final'
 	implementation 'org.passay:passay:1.6.4'
 
+	// https://mvnrepository.com/artifact/org.hibernate.orm/hibernate-jpamodelgen
+	annotationProcessor 'org.hibernate.orm:hibernate-jpamodelgen:6.4.1.Final'
+
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
 }
 
