@@ -37,7 +37,7 @@ public class AuthListenerImpl implements AuthListenerService {
     @Override
     @EventListener
     public void handleOnRegistrationEvent(OnRegistrationEvent event) {
-        log.info("[BTDoctor::Registration] Account -> {}", event.getAccount());
+        log.info("[Candido::Registration] Account -> {}", event.getAccount());
 
         String text = "";
         try {
@@ -45,7 +45,7 @@ public class AuthListenerImpl implements AuthListenerService {
             byte[] fileContent = StreamUtils.copyToByteArray(resource.getInputStream());
             text = new String(fileContent, StandardCharsets.UTF_8);
         } catch (Exception e) {
-            log.error("[BTDoctor::Error::handleOnRegistrationEvent] at {} -> {}", LocalDateTime.now(), e.getMessage());
+            log.error("[Candido::Error::handleOnRegistrationEvent] at {} -> {}", LocalDateTime.now(), e.getMessage());
         }
 
         String linkToVerify = clientDomain + "/auth/register/verify/" + event.getRegistrationToken();
@@ -66,7 +66,7 @@ public class AuthListenerImpl implements AuthListenerService {
     @Override
     @EventListener
     public void handleOnRegistrationCompletedEvent(OnRegistrationCompletedEvent event) {
-        log.info("[BTDoctor::RegistrationCompleted] Account -> {}", event.getAccount());
+        log.info("[Candido::RegistrationCompleted] Account -> {}", event.getAccount());
 
         String text = "";
         try {
@@ -74,7 +74,7 @@ public class AuthListenerImpl implements AuthListenerService {
             byte[] fileContent = StreamUtils.copyToByteArray(resource.getInputStream());
             text = new String(fileContent, StandardCharsets.UTF_8);
         } catch (Exception e) {
-            log.error("[BTDoctor::Error::handleOnRegistrationCompletedEvent] at {} -> {}", LocalDateTime.now(), e.getMessage());
+            log.error("[Candido::Error::handleOnRegistrationCompletedEvent] at {} -> {}", LocalDateTime.now(), e.getMessage());
         }
 
         text = text
@@ -93,7 +93,7 @@ public class AuthListenerImpl implements AuthListenerService {
     @Override
     @EventListener
     public void handleOnResetAccountEvent(OnResetAccountEvent event) {
-        log.info("[BTDoctor::ResetAccount] Account -> {}", event.getAccount());
+        log.info("[Candido::ResetAccount] Account -> {}", event.getAccount());
 
         String text = "";
         try {
@@ -101,7 +101,7 @@ public class AuthListenerImpl implements AuthListenerService {
             byte[] fileContent = StreamUtils.copyToByteArray(resource.getInputStream());
             text = new String(fileContent, StandardCharsets.UTF_8);
         } catch (Exception e) {
-            log.error("[BTDoctor::Error::handleOnResetAccountEvent] at {} -> {}", LocalDateTime.now(), e.getMessage());
+            log.error("[Candido::Error::handleOnResetAccountEvent] at {} -> {}", LocalDateTime.now(), e.getMessage());
         }
 
         String linkToVerify = clientDomain + "/auth/reset/" + event.getResetToken();
@@ -122,7 +122,7 @@ public class AuthListenerImpl implements AuthListenerService {
     @Override
     @EventListener
     public void handleOnResetAccountCompletedEvent(OnResetAccountCompletedEvent event) {
-        log.info("[BTDoctor::ResetAccountCompleted] Account -> {}", event.getAccount());
+        log.info("[Candido::ResetAccountCompleted] Account -> {}", event.getAccount());
 
         String text = "";
         try {
@@ -130,7 +130,7 @@ public class AuthListenerImpl implements AuthListenerService {
             byte[] fileContent = StreamUtils.copyToByteArray(resource.getInputStream());
             text = new String(fileContent, StandardCharsets.UTF_8);
         } catch (Exception e) {
-            log.error("[BTDoctor::Error::handleOnResetAccountCompletedEvent] at {} -> {}", LocalDateTime.now(), e.getMessage());
+            log.error("[Candido::Error::handleOnResetAccountCompletedEvent] at {} -> {}", LocalDateTime.now(), e.getMessage());
         }
 
         text = text

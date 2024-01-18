@@ -8,6 +8,7 @@ import com.candido.server.exception.account.AccountNotFoundException;
 import com.candido.server.service.account.AccountService;
 import com.candido.server.service.mapstruct.AccountMapper;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
