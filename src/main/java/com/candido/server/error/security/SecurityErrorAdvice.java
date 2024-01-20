@@ -8,6 +8,7 @@ import com.candido.server.exception.security.auth.TokenException;
 import com.candido.server.exception.security.auth.VerifyRegistrationTokenException;
 import com.candido.server.exception.security.auth.VerifyResetTokenException;
 import com.candido.server.exception.security.jwt.InvalidJWTTokenException;
+import io.swagger.v3.oas.annotations.Hidden;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,11 +16,13 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.bind.annotation.ResponseStatus;
 
 import javax.naming.AuthenticationException;
 import java.time.LocalDateTime;
 import java.util.Locale;
 
+@Hidden
 @Slf4j
 @RequiredArgsConstructor
 @ControllerAdvice
@@ -34,12 +37,14 @@ public class SecurityErrorAdvice {
             VerifyResetTokenException.class,
             TokenException.class
     })
+    @ResponseStatus(HttpStatus.UNAUTHORIZED)
     public ResponseEntity<Void> handleTokenException(BTException ex, Locale locale) {
         log.info("[EXCEPTION] ({}) -> {}", BTException.class.getName(), LocalDateTime.now());
         return new ResponseEntity<>(null, HttpStatus.UNAUTHORIZED);
     }
 
     @ExceptionHandler({AuthException.class})
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
     public ResponseEntity<BTExceptionResponse> handleAuthenticationException(AuthException ex, Locale locale) {
         log.info("[EXCEPTION] ({}) -> {}", AuthenticationException.class.getName(), LocalDateTime.now());
         return btExceptionResolver.resolveAuthenticationBTException(ex, locale, HttpStatus.BAD_REQUEST);
