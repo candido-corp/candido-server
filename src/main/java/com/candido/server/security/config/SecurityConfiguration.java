@@ -68,9 +68,13 @@ public class SecurityConfiguration {
                         // TODO: Elimina i path che non c'entrano
                         .requestMatchers(
                                 "/api/v1/auth/**", "/oauth2/**", "/",
-                                "/docker/test/**",
                                 "/error",
-                                "/favicon.ico")
+                                "/favicon.ico",
+                                "/docker/test/**",
+                                "/swagger-ui.html",
+                                "/swagger-ui/**",
+                                "/v3/api-docs/**"
+                        )
                         .permitAll()
 
                         // Imposto la sicurezza per i path
