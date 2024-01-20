@@ -28,6 +28,16 @@ application:
   support:
     phone: 1234567890
     email: support@candido.com
+  api:
+    version: 0.0.1
+    description: API for managing the entire online application project.
+    server:
+      development:
+        url: http://localhost:8080/
+      production:
+        url: http://candido.com:8080/
+  tos:
+    uri: http://localhost:8080/terms-of-service
 
 spring:
   main:
