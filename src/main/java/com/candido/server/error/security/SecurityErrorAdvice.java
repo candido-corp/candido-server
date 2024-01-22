@@ -22,7 +22,6 @@ import javax.naming.AuthenticationException;
 import java.time.LocalDateTime;
 import java.util.Locale;
 
-@Hidden
 @Slf4j
 @RequiredArgsConstructor
 @ControllerAdvice
