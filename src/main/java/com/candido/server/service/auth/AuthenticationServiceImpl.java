@@ -75,7 +75,6 @@ public class AuthenticationServiceImpl implements AuthenticationService {
             throw new InvalidEmailAccountException(BTExceptionName.INVALID_EMAIL.name());
 
         // Controllo che l'email sia uguale a quella di conferma
-        PasswordConstraintValidator.isValid(request.password());
         if (!request.email().equals(request.confirmEmail()))
             throw new EmailsDoNotMatchException(BTExceptionName.AUTH_EMAILS_DO_NOT_MATCH.name());
 
