@@ -32,8 +32,15 @@ public class AccountErrorAdvice {
 
     @ExceptionHandler({PasswordsDoNotMatchException.class})
     @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public ResponseEntity<BTExceptionResponse> handlePasswordDoNotMatchException(PasswordsDoNotMatchException ex, Locale locale) {
+    public ResponseEntity<BTExceptionResponse> handlePasswordsDoNotMatchException(PasswordsDoNotMatchException ex, Locale locale) {
         log.info("[EXCEPTION] ({}) -> {}", PasswordsDoNotMatchException.class.getName(), LocalDateTime.now());
+        return btExceptionResolver.resolveValidationBTException(ex, locale, HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler({EmailsDoNotMatchException.class})
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public ResponseEntity<BTExceptionResponse> handleEmailsDoNotMatchException(EmailsDoNotMatchException ex, Locale locale) {
+        log.info("[EXCEPTION] ({}) -> {}", EmailsDoNotMatchException.class.getName(), LocalDateTime.now());
         return btExceptionResolver.resolveValidationBTException(ex, locale, HttpStatus.BAD_REQUEST);
     }
 

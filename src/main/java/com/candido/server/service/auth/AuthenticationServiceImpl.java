@@ -15,10 +15,7 @@ import com.candido.server.event.auth.OnRegistrationEvent;
 import com.candido.server.event.auth.OnResetAccountCompletedEvent;
 import com.candido.server.event.auth.OnResetAccountEvent;
 import com.candido.server.exception._common.BTExceptionName;
-import com.candido.server.exception.account.AccountNotFoundException;
-import com.candido.server.exception.account.DuplicateAccountException;
-import com.candido.server.exception.account.InvalidEmailAccountException;
-import com.candido.server.exception.account.PasswordsDoNotMatchException;
+import com.candido.server.exception.account.*;
 import com.candido.server.exception.security.auth.AuthException;
 import com.candido.server.exception.security.auth.TokenException;
 import com.candido.server.exception.security.auth.VerifyRegistrationTokenException;
@@ -76,6 +73,11 @@ public class AuthenticationServiceImpl implements AuthenticationService {
         // Controllo che l'email abbia un formato valido
         if (!EmailConstraintValidator.isValid(request.email()))
             throw new InvalidEmailAccountException(BTExceptionName.INVALID_EMAIL.name());
+
+        // Controllo che l'email sia uguale a quella di conferma
+        PasswordConstraintValidator.isValid(request.password());
+        if (!request.email().equals(request.confirmEmail()))
+            throw new EmailsDoNotMatchException(BTExceptionName.AUTH_EMAILS_DO_NOT_MATCH.name());
 
         // Controllo che la password soddisfi i requisiti minimi
         PasswordConstraintValidator.isValid(request.password());
