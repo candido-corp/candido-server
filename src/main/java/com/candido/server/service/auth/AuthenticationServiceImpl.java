@@ -6,6 +6,7 @@ import com.candido.server.domain.v1.provider.AuthProviderEnum;
 import com.candido.server.domain.v1.token.Token;
 import com.candido.server.domain.v1.token.TokenScopeCategoryEnum;
 import com.candido.server.domain.v1.token.TokenTypeEnum;
+import com.candido.server.domain.v1.user.User;
 import com.candido.server.dto.v1.request.auth.RequestAuthentication;
 import com.candido.server.dto.v1.request.auth.RequestPasswordReset;
 import com.candido.server.dto.v1.request.auth.RequestRegister;
@@ -25,6 +26,7 @@ import com.candido.server.security.config.JwtService;
 import com.candido.server.service.account.AccountService;
 import com.candido.server.service.auth.provider.AuthProviderService;
 import com.candido.server.service.auth.token.TokenService;
+import com.candido.server.service.user.UserService;
 import com.candido.server.validation.email.EmailConstraintValidator;
 import com.candido.server.validation.password.PasswordConstraintValidator;
 import jakarta.servlet.http.HttpServletRequest;
@@ -62,6 +64,8 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 
     private final AppPropertiesConfig appPropertiesConfig;
 
+    private final UserService userService;
+
     @Transactional
     @Override
     public void register(RequestRegister request, String ipAddress, String appUrl) {
@@ -73,10 +77,6 @@ public class AuthenticationServiceImpl implements AuthenticationService {
         // Controllo che l'email abbia un formato valido
         if (!EmailConstraintValidator.isValid(request.email()))
             throw new InvalidEmailAccountException(BTExceptionName.INVALID_EMAIL.name());
-
-        // Controllo che l'email sia uguale a quella di conferma
-        if (!request.email().equals(request.confirmEmail()))
-            throw new EmailsDoNotMatchException(BTExceptionName.AUTH_EMAILS_DO_NOT_MATCH.name());
 
         // Controllo che la password soddisfi i requisiti minimi
         PasswordConstraintValidator.isValid(request.password());
@@ -96,6 +96,18 @@ public class AuthenticationServiceImpl implements AuthenticationService {
         // Salvo l'utente appena creato
         var savedAccount = accountService.save(account);
 
+        // Creo il profilo dell'utente
+        var user = User
+                .builder()
+                .accountId(savedAccount.getId())
+                .firstName(request.firstName())
+                .lastName(request.lastName())
+                .createdAt(LocalDateTime.now())
+                .build();
+
+        // Salvo il profilo dell'utente appena creato
+        userService.save(user);
+
         // Salvo il provider collegato all'account
         authProviderService.addProviderToAccount(AuthProviderEnum.LOCAL.getProviderId(), savedAccount.getId());
 
@@ -114,7 +126,6 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 
         // Invio un evento quando viene completata la registrazione
         eventPublisher.publishEvent(new OnRegistrationEvent(this, savedAccount, accessToken, appUrl));
-
     }
 
     @Override

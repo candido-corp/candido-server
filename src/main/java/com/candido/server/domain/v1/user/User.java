@@ -1,6 +1,7 @@
 package com.candido.server.domain.v1.user;
 
 import jakarta.persistence.*;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
@@ -11,6 +12,7 @@ import java.time.LocalDateTime;
 @Getter
 @Setter
 @ToString
+@Builder
 @Entity
 @Table(name = "user")
 public class User {

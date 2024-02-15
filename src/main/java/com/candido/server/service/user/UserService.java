@@ -6,4 +6,5 @@ import java.util.Optional;
 
 public interface UserService {
     Optional<User> findByAccountId(int accountId);
+    User save(User user);
 }

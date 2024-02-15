@@ -2,7 +2,6 @@ package com.candido.server.controller.account;
 
 import com.candido.server.domain.v1.account.Account;
 import com.candido.server.domain.v1.user.User;
-import com.candido.server.dto.v1.request.account.RequestEditAccountName;
 import com.candido.server.dto.v1.util.AccountDto;
 import com.candido.server.dto.v1.util.UserDto;
 import com.candido.server.exception._common.BTExceptionName;
@@ -13,13 +12,10 @@ import com.candido.server.service.mapstruct.AccountMapper;
 import com.candido.server.service.mapstruct.UserMapper;
 import com.candido.server.service.user.UserService;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/v1/me")
@@ -53,6 +49,11 @@ public class AccountController {
                 .orElseThrow(() -> new UserNotFoundException(BTExceptionName.USER_NOT_FOUND.name()));
 
         return ResponseEntity.ok(userMapper.userToUserDto(user));
+    }
+
+    @PostMapping("/details")
+    public ResponseEntity<UserDto> postUserInfo(Authentication authentication) {
+        return null;
     }
 
 }
