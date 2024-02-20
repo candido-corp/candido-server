@@ -1,15 +1,18 @@
 package com.candido.server.domain.v1.token;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
+
+import java.time.LocalDateTime;
 
 @Data
 @Builder
 @Entity
+@NoArgsConstructor
+@AllArgsConstructor
 @Table(name = "temporary_code")
 public class TemporaryCode {
 
@@ -17,7 +20,17 @@ public class TemporaryCode {
     @Column(name = "temporary_code_id")
     private int id;
 
+    @OneToOne
+    @JoinColumn(name = "fk_token_id", insertable = false, updatable = false)
+    private Token token;
+
+    @Column(name = "fk_token_id")
+    private Integer tokenId;
+
     @Column(name = "temporary_code")
     private String code;
+
+    @Column(name = "expiration_date")
+    private LocalDateTime expirationDate;
 
 }
