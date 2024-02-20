@@ -9,7 +9,7 @@ import org.springframework.stereotype.Component;
 import java.util.Properties;
 
 @Component
-public class SpringMailConfiguration {
+public class SpringMailConfig {
 
     @Value("${application.email.host}")
     private String host;
