@@ -25,4 +25,10 @@ public class UtilServiceImpl implements UtilService {
         return xfHeader.split(",")[0];
     }
 
+    @Override
+    public int countDigits(long number) {
+        number = Math.abs(number);
+        return (int) (Math.log10(number) + 1);
+    }
+
 }
