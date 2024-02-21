@@ -3,6 +3,7 @@ package com.candido.server.service.auth;
 import com.candido.server.config.AppPropertiesConfig;
 import com.candido.server.domain.v1.account.*;
 import com.candido.server.domain.v1.provider.AuthProviderEnum;
+import com.candido.server.domain.v1.token.TemporaryCode;
 import com.candido.server.domain.v1.token.Token;
 import com.candido.server.domain.v1.token.TokenScopeCategoryEnum;
 import com.candido.server.domain.v1.token.TokenTypeEnum;
@@ -11,6 +12,7 @@ import com.candido.server.dto.v1.request.auth.RequestAuthentication;
 import com.candido.server.dto.v1.request.auth.RequestPasswordReset;
 import com.candido.server.dto.v1.request.auth.RequestRegister;
 import com.candido.server.dto.v1.response.auth.ResponseAuthentication;
+import com.candido.server.dto.v1.response.auth.ResponseRegistration;
 import com.candido.server.event.auth.OnRegistrationCompletedEvent;
 import com.candido.server.event.auth.OnRegistrationEvent;
 import com.candido.server.event.auth.OnResetAccountCompletedEvent;
@@ -25,6 +27,7 @@ import com.candido.server.exception.security.jwt.InvalidJWTTokenException;
 import com.candido.server.security.config.JwtService;
 import com.candido.server.service.account.AccountService;
 import com.candido.server.service.auth.provider.AuthProviderService;
+import com.candido.server.service.auth.token.TemporaryCodeService;
 import com.candido.server.service.auth.token.TokenService;
 import com.candido.server.service.user.UserService;
 import com.candido.server.validation.email.EmailConstraintValidator;
@@ -66,9 +69,11 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 
     private final UserService userService;
 
+    private final TemporaryCodeService temporaryCodeService;
+
     @Transactional
     @Override
-    public void register(RequestRegister request, String ipAddress, String appUrl) {
+    public ResponseRegistration register(RequestRegister request, String ipAddress, String appUrl, boolean isEmailVerification) {
         // Controllo che l'account non esista già
         var duplicateAccount = accountService.findByEmail(request.email());
         if (duplicateAccount.isPresent())
@@ -90,7 +95,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
                 .password(passwordEncoder.encode(request.password()))
                 .accountRole(new AccountRole(AccountRoleEnum.USER.getRoleId()))
                 .createdAt(LocalDateTime.now())
-                .status(new AccountStatus(AccountStatusEnum.Pending.getStatusId()))
+                .status(new AccountStatus(AccountStatusEnum.PENDING.getStatusId()))
                 .build();
 
         // Salvo l'utente appena creato
@@ -115,7 +120,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
         var accessToken = jwtService.generateRegistrationToken(account);
 
         // Salva il token dell'utente
-        tokenService.saveUserToken(
+        var token = tokenService.saveUserToken(
                 savedAccount,
                 accessToken,
                 null,
@@ -124,12 +129,23 @@ public class AuthenticationServiceImpl implements AuthenticationService {
                 TokenScopeCategoryEnum.BTD_REGISTRATION
         );
 
-        // Invio un evento quando viene completata la registrazione
-        eventPublisher.publishEvent(new OnRegistrationEvent(this, savedAccount, accessToken, appUrl));
+        if(!isEmailVerification) {
+            var temporaryCode = temporaryCodeService.generateCode(token.getId());
+
+            // TODO: Invia email diversa
+            // Invio un evento quando viene completata la registrazione
+//            eventPublisher.publishEvent(new OnRegistrationEvent(this, savedAccount, accessToken, appUrl));
+
+        } else {
+            // Invio un evento quando viene completata la registrazione
+            eventPublisher.publishEvent(new OnRegistrationEvent(this, savedAccount, accessToken, appUrl));
+        }
+
+        return ResponseRegistration.builder().sessionId(token.getUuidAccessToken()).build();
     }
 
     @Override
-    public void verifyRegistrationToken(String registrationToken) {
+    public void verifyRegistrationByToken(String registrationToken) {
         // Estraggo lo username dal token
         String username = jwtService.extractUsername(registrationToken);
 
@@ -154,7 +170,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
             throw new VerifyRegistrationTokenException();
 
         // Abilito l'account
-        account.setStatus(new AccountStatus(AccountStatusEnum.Verified.getStatusId()));
+        account.setStatus(new AccountStatus(AccountStatusEnum.VERIFIED.getStatusId()));
         accountService.save(account);
 
         // Elimino il token di registrazione
@@ -163,6 +179,52 @@ public class AuthenticationServiceImpl implements AuthenticationService {
         // Invio un evento quando viene confermata la registrazione
         eventPublisher.publishEvent(new OnRegistrationCompletedEvent(this, account));
 
+    }
+
+    @Override
+    public void verifyRegistrationBySessionIdAndTemporaryCode(String sessionId, String temporaryCode) {
+        // Recupero il token in base alla sessione e allo scopo di registrazione
+        Optional<Token> token = tokenService.findByUUIDAndTokenScopeCategoryId(
+                sessionId, TokenScopeCategoryEnum.BTD_REGISTRATION.getTokenScopeCategoryId()
+        );
+
+        // Se il token è presente e la sessione è uguale
+        if (token.isEmpty() || !token.get().getUuidAccessToken().equals(sessionId))
+            throw new VerifyRegistrationTokenException();
+
+        // Recupero il token di accesso
+        String registrationToken = token.get().getAccessToken();
+
+        // Estraggo lo username dal token
+        String username = jwtService.extractUsername(registrationToken);
+
+        // Se lo username è nullo sollevo un'eccezione
+        if (username == null) throw new VerifyRegistrationTokenException();
+
+        // Recupero l'utente dal database
+        var account = accountService
+                .findByEmail(username)
+                .orElseThrow(() -> new AccountNotFoundException(BTExceptionName.ACCOUNT_NOT_FOUND.name()));
+
+        // Controllo che il token sia valido altrimenti sollevo un'eccezione
+        if (!jwtService.isValidToken(registrationToken, account)) throw new VerifyRegistrationTokenException();
+
+        // Recupero il codice temporaneo
+        var code = temporaryCodeService.findByCode(temporaryCode);
+
+        // Controllo che il codice temporaneo non sia scaduto
+        if(code.isEmpty() || code.get().isExpired())
+            throw new VerifyRegistrationTokenException();
+
+        // Abilito l'account
+        account.setStatus(new AccountStatus(AccountStatusEnum.VERIFIED.getStatusId()));
+        accountService.save(account);
+
+        // Elimino il token di registrazione
+        tokenService.delete(token.get());
+
+        // Invio un evento quando viene confermata la registrazione
+        eventPublisher.publishEvent(new OnRegistrationCompletedEvent(this, account));
     }
 
     @Override
@@ -350,8 +412,8 @@ public class AuthenticationServiceImpl implements AuthenticationService {
         account.setPassword(passwordEncoder.encode(request.password()));
 
         // Abilito l'account se non è abilitato
-        if(account.getStatus().getId() == AccountStatusEnum.Pending.getStatusId()) {
-            account.setStatus(new AccountStatus(AccountStatusEnum.Verified.getStatusId()));
+        if(account.getStatus().getId() == AccountStatusEnum.PENDING.getStatusId()) {
+            account.setStatus(new AccountStatus(AccountStatusEnum.VERIFIED.getStatusId()));
         }
 
         // Salvo l'account
@@ -429,7 +491,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
                 .orElseThrow(() -> new AccountNotFoundException(BTExceptionName.ACCOUNT_NOT_FOUND.name()));
 
         // Abilito l'account
-        account.setStatus(new AccountStatus(AccountStatusEnum.Verified.getStatusId()));
+        account.setStatus(new AccountStatus(AccountStatusEnum.VERIFIED.getStatusId()));
         accountService.save(account);
     }
 

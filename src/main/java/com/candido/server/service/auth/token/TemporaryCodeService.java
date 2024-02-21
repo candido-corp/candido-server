@@ -10,8 +10,8 @@ public interface TemporaryCodeService {
     long countCodeList(Specification<TemporaryCode> specification);
     Optional<TemporaryCode> getFirstCodeNotAssigned();
     Optional<TemporaryCode> findByCode(String code);
-    TemporaryCode generateCode(Integer tokenId, LocalDateTime expirationDate);
+    TemporaryCode generateCode(Long tokenId);
     void checkTemporaryCodePoolSize();
     void delete(String code);
-    TemporaryCode assignCode(int tokenId);
+    TemporaryCode assignCode(long tokenId);
 }

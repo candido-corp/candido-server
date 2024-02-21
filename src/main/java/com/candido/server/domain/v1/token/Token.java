@@ -53,6 +53,9 @@ public class Token {
     @Column(name = "ip_address")
     private String ipAddress;
 
+    @Column(name = "uuid_access_token")
+    private String uuidAccessToken;
+
     public boolean isAccessTokenExpired() {
         return getAccessTokenExpiration().isBefore(LocalDateTime.now());
     }

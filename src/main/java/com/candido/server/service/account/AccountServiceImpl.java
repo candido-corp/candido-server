@@ -45,7 +45,7 @@ public class AccountServiceImpl implements AccountService {
     @Override
     public void enableAccount(int accountId) {
         findById(accountId).ifPresent(account -> {
-            account.setStatus(new AccountStatus(AccountStatusEnum.Verified.getStatusId()));
+            account.setStatus(new AccountStatus(AccountStatusEnum.VERIFIED.getStatusId()));
             save(account);
             tokenService.revokeAllAccountTokens(account);
         });

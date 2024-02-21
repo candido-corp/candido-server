@@ -12,6 +12,7 @@ import java.time.ZoneId;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 @Service
 public class TokenServiceImpl implements TokenService {
@@ -30,6 +31,11 @@ public class TokenServiceImpl implements TokenService {
     @Override
     public Optional<Token> findByRefreshToken(String refreshToken) {
         return tokenRepository.findByRefreshToken(refreshToken);
+    }
+
+    @Override
+    public Optional<Token> findByUUIDAndTokenScopeCategoryId(String uuid, int tokenScopeCategoryId) {
+        return tokenRepository.findByUuidAccessTokenAndTokenScopeCategoryId(uuid, tokenScopeCategoryId);
     }
 
     @Override
@@ -64,6 +70,10 @@ public class TokenServiceImpl implements TokenService {
                 .tokenScopeCategory(new TokenScopeCategory(tokenScopeCategoryEnum.getTokenScopeCategoryId()))
                 .ipAddress(ipAddress)
                 .build();
+
+        // Imposto un UUID nel caso della registrazione
+        if(tokenScopeCategoryEnum.getTokenScopeCategoryId() == TokenScopeCategoryEnum.BTD_REGISTRATION.getTokenScopeCategoryId())
+            token.setUuidAccessToken(UUID.randomUUID().toString().replaceAll("-", ""));
 
         // Imposto il refresh token se non nullo
         if(refreshToken != null) {

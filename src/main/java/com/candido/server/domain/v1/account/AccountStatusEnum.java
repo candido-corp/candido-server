@@ -6,9 +6,9 @@ import lombok.RequiredArgsConstructor;
 @Getter
 @RequiredArgsConstructor
 public enum AccountStatusEnum {
-    Pending(1),
-    Verified(2),
-    Disabled(3);
+    PENDING(1),
+    VERIFIED(2),
+    DISABLED(3);
 
     private final int statusId;
 }

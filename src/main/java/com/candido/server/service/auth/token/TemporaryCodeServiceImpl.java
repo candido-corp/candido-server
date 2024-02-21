@@ -12,7 +12,6 @@ import org.springframework.stereotype.Service;
 import java.security.SecureRandom;
 import java.time.LocalDateTime;
 import java.util.Optional;
-import java.util.Random;
 
 @Service
 public class TemporaryCodeServiceImpl implements TemporaryCodeService {
@@ -25,9 +24,9 @@ public class TemporaryCodeServiceImpl implements TemporaryCodeService {
     /**
      * This represents the max size of a single temporary code.
      * This is intended to be MAX - 1 because the random algorithm exclude the last value.
-     * Basically the code would be of 6 digit.
+     * Basically if the number is 1_000_000 the code would be of 6 digit.
      */
-    private static final int MAX_TEMPORARY_CODE_SIZE = 1000000;
+    private static final int MAX_TEMPORARY_CODE_SIZE = 1_000_000;
 
     /**
      * This represents the max number of seconds (S) that the code can be active.
@@ -60,7 +59,7 @@ public class TemporaryCodeServiceImpl implements TemporaryCodeService {
     }
 
     @Override
-    public TemporaryCode generateCode(Integer tokenId, LocalDateTime expirationDate) {
+    public TemporaryCode generateCode(Long tokenId) {
         SecureRandom random = new SecureRandom();
         int randomNumber = 0;
         String formattedNumber = "";
@@ -74,7 +73,7 @@ public class TemporaryCodeServiceImpl implements TemporaryCodeService {
         var temporaryCode = TemporaryCode.builder()
                 .code(formattedNumber)
                 .tokenId(tokenId)
-                .expirationDate(expirationDate)
+                .expirationDate(LocalDateTime.now().plusSeconds(MAX_TEMPORARY_CODE_DURATION))
                 .build();
 
         return temporaryCodeRepository.save(temporaryCode);
@@ -86,7 +85,7 @@ public class TemporaryCodeServiceImpl implements TemporaryCodeService {
         long currentPoolSize =  countCodeList(((root, query, criteriaBuilder) -> root.get(TemporaryCode_.TOKEN_ID).isNull()));
         if(currentPoolSize < MIN_TEMPORARY_CODE_POOL_SIZE) {
             for(int i = 0; i < MIN_TEMPORARY_CODE_POOL_SIZE - currentPoolSize; i++) {
-                generateCode(null, null);
+                generateCode(null);
             }
         }
     }
@@ -97,8 +96,8 @@ public class TemporaryCodeServiceImpl implements TemporaryCodeService {
     }
 
     @Override
-    public TemporaryCode assignCode(int tokenId) {
-        TemporaryCode temporaryCode = getFirstCodeNotAssigned().orElseGet(() -> generateCode(tokenId, LocalDateTime.now().plusSeconds(MAX_TEMPORARY_CODE_DURATION)));
+    public TemporaryCode assignCode(long tokenId) {
+        TemporaryCode temporaryCode = getFirstCodeNotAssigned().orElseGet(() -> generateCode(tokenId));
         if(!temporaryCode.getTokenId().equals(tokenId)) {
             temporaryCode.setTokenId(tokenId);
             temporaryCodeRepository.save(temporaryCode);

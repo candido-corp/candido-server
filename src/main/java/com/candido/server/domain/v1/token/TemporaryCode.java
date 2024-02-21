@@ -25,12 +25,16 @@ public class TemporaryCode {
     private Token token;
 
     @Column(name = "fk_token_id")
-    private Integer tokenId;
+    private Long tokenId;
 
     @Column(name = "temporary_code")
     private String code;
 
     @Column(name = "expiration_date")
     private LocalDateTime expirationDate;
+
+    public boolean isExpired() {
+        return getExpirationDate().isBefore(LocalDateTime.now());
+    }
 
 }

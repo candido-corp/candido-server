@@ -6,14 +6,16 @@ import com.candido.server.dto.v1.request.auth.RequestAuthentication;
 import com.candido.server.dto.v1.request.auth.RequestPasswordReset;
 import com.candido.server.dto.v1.request.auth.RequestRegister;
 import com.candido.server.dto.v1.response.auth.ResponseAuthentication;
+import com.candido.server.dto.v1.response.auth.ResponseRegistration;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
 import java.util.List;
 
 public interface AuthenticationService {
-    void register(RequestRegister request, String ipAddress, String appUrl);
-    void verifyRegistrationToken(String registrationToken);
+    ResponseRegistration register(RequestRegister request, String ipAddress, String appUrl, boolean isEmailVerification);
+    void verifyRegistrationByToken(String registrationToken);
+    void verifyRegistrationBySessionIdAndTemporaryCode(String sessionId, String temporaryCode);
     ResponseAuthentication authenticate(RequestAuthentication request, String ipAddress);
     ResponseAuthentication refreshToken(HttpServletRequest request, HttpServletResponse response);
     void sendResetPassword(String email, String ipAddress, String appUrl);
