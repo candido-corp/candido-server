@@ -17,6 +17,7 @@ import java.time.LocalDateTime;
 public class TemporaryCode {
 
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "temporary_code_id")
     private int id;
 

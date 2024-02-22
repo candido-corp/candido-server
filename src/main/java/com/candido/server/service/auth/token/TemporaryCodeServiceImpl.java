@@ -59,6 +59,13 @@ public class TemporaryCodeServiceImpl implements TemporaryCodeService {
     }
 
     @Override
+    public Optional<TemporaryCode> findByTokenId(long tokenId) {
+        Specification<TemporaryCode> byTokenId = ((root, query, criteriaBuilder) ->
+                criteriaBuilder.equal(root.get(TemporaryCode_.TOKEN_ID), tokenId));
+        return temporaryCodeRepository.findOne(byTokenId);
+    }
+
+    @Override
     public TemporaryCode generateCode(Long tokenId) {
         SecureRandom random = new SecureRandom();
         int randomNumber = 0;
@@ -73,10 +80,31 @@ public class TemporaryCodeServiceImpl implements TemporaryCodeService {
         var temporaryCode = TemporaryCode.builder()
                 .code(formattedNumber)
                 .tokenId(tokenId)
-                .expirationDate(LocalDateTime.now().plusSeconds(MAX_TEMPORARY_CODE_DURATION))
                 .build();
 
         return temporaryCodeRepository.save(temporaryCode);
+    }
+
+    @Override
+    public void delete(String code) {
+        findByCode(code).ifPresent(temporaryCode -> temporaryCodeRepository.delete(temporaryCode));
+    }
+
+    @Override
+    public void delete(TemporaryCode temporaryCode) {
+        temporaryCodeRepository.delete(temporaryCode);
+    }
+
+    @Override
+    public TemporaryCode assignCode(long tokenId) {
+        TemporaryCode temporaryCode = getFirstCodeNotAssigned().orElseGet(() -> generateCode(tokenId));
+        temporaryCode.setExpirationDate(LocalDateTime.now().plusSeconds(MAX_TEMPORARY_CODE_DURATION));
+        if(temporaryCode.getTokenId() == null) {
+            temporaryCode.setTokenId(tokenId);
+            temporaryCodeRepository.save(temporaryCode);
+        }
+        checkTemporaryCodePoolSize();
+        return temporaryCode;
     }
 
     @Async
@@ -88,22 +116,6 @@ public class TemporaryCodeServiceImpl implements TemporaryCodeService {
                 generateCode(null);
             }
         }
-    }
-
-    @Override
-    public void delete(String code) {
-        findByCode(code).ifPresent(temporaryCode -> temporaryCodeRepository.delete(temporaryCode));
-    }
-
-    @Override
-    public TemporaryCode assignCode(long tokenId) {
-        TemporaryCode temporaryCode = getFirstCodeNotAssigned().orElseGet(() -> generateCode(tokenId));
-        if(!temporaryCode.getTokenId().equals(tokenId)) {
-            temporaryCode.setTokenId(tokenId);
-            temporaryCodeRepository.save(temporaryCode);
-        }
-        checkTemporaryCodePoolSize();
-        return temporaryCode;
     }
 
 }

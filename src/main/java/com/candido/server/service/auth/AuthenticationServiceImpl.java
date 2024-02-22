@@ -45,6 +45,7 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 
 @Service
@@ -130,7 +131,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
         );
 
         if(!isEmailVerification) {
-            var temporaryCode = temporaryCodeService.generateCode(token.getId());
+            var temporaryCode = temporaryCodeService.assignCode(token.getId());
 
             // TODO: Invia email diversa
             // Invio un evento quando viene completata la registrazione
@@ -207,13 +208,18 @@ public class AuthenticationServiceImpl implements AuthenticationService {
                 .orElseThrow(() -> new AccountNotFoundException(BTExceptionName.ACCOUNT_NOT_FOUND.name()));
 
         // Controllo che il token sia valido altrimenti sollevo un'eccezione
-        if (!jwtService.isValidToken(registrationToken, account)) throw new VerifyRegistrationTokenException();
+        if (!jwtService.isValidToken(registrationToken, account))
+            throw new VerifyRegistrationTokenException();
 
         // Recupero il codice temporaneo
         var code = temporaryCodeService.findByCode(temporaryCode);
 
         // Controllo che il codice temporaneo non sia scaduto
         if(code.isEmpty() || code.get().isExpired())
+            throw new VerifyRegistrationTokenException();
+
+        // Se l'ID del token è diverso dell'ID del token della sessione
+        if(!Objects.equals(code.get().getTokenId(), token.get().getId()))
             throw new VerifyRegistrationTokenException();
 
         // Abilito l'account
@@ -480,6 +486,11 @@ public class AuthenticationServiceImpl implements AuthenticationService {
             throw new TokenException();
 
         return account;
+    }
+
+    @Override
+    public void resendCodeRegistrationBySessionId(int sessionId) {
+
     }
 
     @Override

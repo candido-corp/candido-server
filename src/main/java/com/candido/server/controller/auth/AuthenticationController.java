@@ -53,6 +53,15 @@ public class AuthenticationController {
         return executeRegistration(request, httpRequest, false);
     }
 
+    @PostMapping("/register/code-verification/session/{sessionId}/resend-code")
+    public ResponseEntity<ResponseRegistration> resendCodeForCodeVerification(
+            @PathVariable("sessionId") int sessionId,
+            HttpServletRequest httpRequest
+    ) {
+        // TODO: Implementa
+        return null;
+    }
+
     @PostMapping("/register-verify/{token}")
     public ResponseEntity<Void> verifyRegistrationByToken(
             @PathVariable("token") String token
@@ -61,10 +70,10 @@ public class AuthenticationController {
         return ResponseEntity.noContent().build();
     }
 
-    @PostMapping("/register-verify/session_id/{sessionId}")
+    @PostMapping("/register-verify/session/{sessionId}")
     public ResponseEntity<Void> verifyRegistrationBySessionIdAndTemporaryCode(
             @PathVariable("sessionId") String sessionId,
-            @RequestBody RequestRegisterVerifyTemporaryCode request
+            @Valid @RequestBody RequestRegisterVerifyTemporaryCode request
     ) {
         authenticationService.verifyRegistrationBySessionIdAndTemporaryCode(sessionId, request.temporaryCode());
         return ResponseEntity.noContent().build();

@@ -23,6 +23,9 @@ public class TokenServiceImpl implements TokenService {
     @Autowired
     TokenRepository tokenRepository;
 
+    @Autowired
+    TemporaryCodeService temporaryCodeService;
+
     @Override
     public Optional<Token> findByAccessToken(String accessToken) {
         return tokenRepository.findByAccessToken(accessToken);
@@ -91,6 +94,9 @@ public class TokenServiceImpl implements TokenService {
 
     @Override
     public void delete(Token token) {
+        // Elimino le dipendenze del token prima di eliminarlo
+        temporaryCodeService.findByTokenId(token.getId()).ifPresent(temporaryCode -> temporaryCodeService.delete(temporaryCode));
+
         tokenRepository.delete(token);
     }
 

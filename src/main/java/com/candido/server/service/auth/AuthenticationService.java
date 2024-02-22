@@ -14,15 +14,19 @@ import java.util.List;
 
 public interface AuthenticationService {
     ResponseRegistration register(RequestRegister request, String ipAddress, String appUrl, boolean isEmailVerification);
+
     void verifyRegistrationByToken(String registrationToken);
     void verifyRegistrationBySessionIdAndTemporaryCode(String sessionId, String temporaryCode);
+    Account getAccountAndVerifyToken(String token, int tokenScopeCategoryId);
+    void resendCodeRegistrationBySessionId(int sessionId);
+
     ResponseAuthentication authenticate(RequestAuthentication request, String ipAddress);
     ResponseAuthentication refreshToken(HttpServletRequest request, HttpServletResponse response);
     void sendResetPassword(String email, String ipAddress, String appUrl);
     ResponseAuthentication resetPassword(String resetToken, RequestPasswordReset request, String ipAddress);
-    Account getAccountAndVerifyToken(String token, int tokenScopeCategoryId);
 
 
+    // TODO: Elimina i servizi qui sotto
     void verifyRegistrationByEmail(String email);
     List<Token> getListOfTokenByEmail(String email);
 }
