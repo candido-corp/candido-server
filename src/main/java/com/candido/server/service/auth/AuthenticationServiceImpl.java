@@ -19,10 +19,7 @@ import com.candido.server.event.auth.OnResetAccountCompletedEvent;
 import com.candido.server.event.auth.OnResetAccountEvent;
 import com.candido.server.exception._common.BTExceptionName;
 import com.candido.server.exception.account.*;
-import com.candido.server.exception.security.auth.AuthException;
-import com.candido.server.exception.security.auth.TokenException;
-import com.candido.server.exception.security.auth.VerifyRegistrationTokenException;
-import com.candido.server.exception.security.auth.VerifyResetTokenException;
+import com.candido.server.exception.security.auth.*;
 import com.candido.server.exception.security.jwt.InvalidJWTTokenException;
 import com.candido.server.security.config.JwtService;
 import com.candido.server.service.account.AccountService;
@@ -489,8 +486,22 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     }
 
     @Override
-    public void resendCodeRegistrationBySessionId(int sessionId) {
+    public void resendCodeRegistrationBySessionId(String sessionId) {
+        var token = tokenService
+                .findByUUIDAndTokenScopeCategoryId(sessionId, TokenScopeCategoryEnum.BTD_REGISTRATION.getTokenScopeCategoryId());
 
+        if(token.isEmpty()) throw new TokenException();
+
+        var temporaryCode = temporaryCodeService
+                .findByTokenId(token.get().getId());
+
+        if(temporaryCode.isEmpty()) throw new TemporaryCodeException();
+
+        String code = temporaryCode.get().getCode();
+
+        // TODO: Invia email diversa
+        // Invio un evento quando viene completata la registrazione
+//            eventPublisher.publishEvent(new OnRegistrationEvent(this, savedAccount, accessToken, appUrl));
     }
 
     @Override

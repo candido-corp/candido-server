@@ -54,12 +54,11 @@ public class AuthenticationController {
     }
 
     @PostMapping("/register/code-verification/session/{sessionId}/resend-code")
-    public ResponseEntity<ResponseRegistration> resendCodeForCodeVerification(
-            @PathVariable("sessionId") int sessionId,
-            HttpServletRequest httpRequest
+    public ResponseEntity<Void> resendCodeForCodeVerification(
+            @PathVariable("sessionId") String sessionId
     ) {
-        // TODO: Implementa
-        return null;
+        authenticationService.resendCodeRegistrationBySessionId(sessionId);
+        return ResponseEntity.noContent().build();
     }
 
     @PostMapping("/register-verify/{token}")

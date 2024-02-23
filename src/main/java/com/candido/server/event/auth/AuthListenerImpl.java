@@ -39,17 +39,12 @@ public class AuthListenerImpl implements AuthListenerService {
     public void handleOnRegistrationEvent(OnRegistrationEvent event) {
         log.info("[Candido::Registration] Account -> {}", event.getAccount());
 
-        String text = "";
-        try {
-            ClassPathResource resource = new ClassPathResource("/static/email/registration.html");
-            byte[] fileContent = StreamUtils.copyToByteArray(resource.getInputStream());
-            text = new String(fileContent, StandardCharsets.UTF_8);
-        } catch (Exception e) {
-            log.error("[Candido::Error::handleOnRegistrationEvent] at {} -> {}", LocalDateTime.now(), e.getMessage());
-        }
-
         String linkToVerify = clientDomain + "/auth/register/verify/" + event.getRegistrationToken();
-        text = text
+
+        String content = utilService.getTemplateContentFromLocalResources(
+                "/static/email/registration.html",
+                "Candido::Error::handleOnRegistrationEvent"
+        )
                 .replace("{{registration.username}}", event.getAccount().getUsername())
                 .replace("{{registration.url}}", linkToVerify);
 
@@ -58,7 +53,7 @@ public class AuthListenerImpl implements AuthListenerService {
                 applicationName,
                 event.getAccount().getEmail(),
                 "Confirm your registration",
-                text
+                content
         );
     }
 

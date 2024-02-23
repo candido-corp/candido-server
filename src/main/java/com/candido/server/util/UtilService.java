@@ -6,4 +6,5 @@ public interface UtilService {
     String getAppUrl(HttpServletRequest request);
     String getClientIP(HttpServletRequest request);
     int countDigits(long number);
+    String getTemplateContentFromLocalResources(String pathResource, String functionError);
 }

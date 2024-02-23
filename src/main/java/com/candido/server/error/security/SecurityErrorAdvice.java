@@ -3,10 +3,7 @@ package com.candido.server.error.security;
 import com.candido.server.exception._common.BTException;
 import com.candido.server.exception._common.BTExceptionResolver;
 import com.candido.server.exception._common.BTExceptionResponse;
-import com.candido.server.exception.security.auth.AuthException;
-import com.candido.server.exception.security.auth.TokenException;
-import com.candido.server.exception.security.auth.VerifyRegistrationTokenException;
-import com.candido.server.exception.security.auth.VerifyResetTokenException;
+import com.candido.server.exception.security.auth.*;
 import com.candido.server.exception.security.jwt.InvalidJWTTokenException;
 import io.swagger.v3.oas.annotations.Hidden;
 import lombok.RequiredArgsConstructor;
@@ -34,7 +31,8 @@ public class SecurityErrorAdvice {
             VerifyRegistrationTokenException.class,
             InvalidJWTTokenException.class,
             VerifyResetTokenException.class,
-            TokenException.class
+            TokenException.class,
+            TemporaryCodeException.class
     })
     @ResponseStatus(HttpStatus.UNAUTHORIZED)
     public ResponseEntity<Void> handleTokenException(BTException ex, Locale locale) {

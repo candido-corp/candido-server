@@ -1,8 +1,15 @@
 package com.candido.server.util;
 
 import jakarta.servlet.http.HttpServletRequest;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.core.io.ClassPathResource;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StreamUtils;
 
+import java.nio.charset.StandardCharsets;
+import java.time.LocalDateTime;
+
+@Slf4j
 @Service
 public class UtilServiceImpl implements UtilService {
 
@@ -29,6 +36,19 @@ public class UtilServiceImpl implements UtilService {
     public int countDigits(long number) {
         number = Math.abs(number);
         return (int) (Math.log10(number) + 1);
+    }
+
+    @Override
+    public String getTemplateContentFromLocalResources(String pathResource, String functionError) {
+        String text = "";
+        try {
+            ClassPathResource resource = new ClassPathResource(pathResource);
+            byte[] fileContent = StreamUtils.copyToByteArray(resource.getInputStream());
+            text = new String(fileContent, StandardCharsets.UTF_8);
+        } catch (Exception e) {
+            log.error("[{}] at {} -> {}", functionError, LocalDateTime.now(), e.getMessage(), e);
+        }
+        return text;
     }
 
 }
