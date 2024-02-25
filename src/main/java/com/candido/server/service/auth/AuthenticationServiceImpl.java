@@ -17,7 +17,7 @@ import com.candido.server.event.auth.OnRegistrationCompletedEvent;
 import com.candido.server.event.auth.OnRegistrationEvent;
 import com.candido.server.event.auth.OnResetAccountCompletedEvent;
 import com.candido.server.event.auth.OnResetAccountEvent;
-import com.candido.server.exception._common.BTExceptionName;
+import com.candido.server.exception._common.ExceptionNameEnum;
 import com.candido.server.exception.account.*;
 import com.candido.server.exception.security.auth.*;
 import com.candido.server.exception.security.jwt.InvalidJWTTokenException;
@@ -75,16 +75,16 @@ public class AuthenticationServiceImpl implements AuthenticationService {
         // Controllo che l'account non esista già
         var duplicateAccount = accountService.findByEmail(request.email());
         if (duplicateAccount.isPresent())
-            throw new DuplicateAccountException(BTExceptionName.AUTH_REGISTRATION_DUPLICATE_USERNAME_ACCOUNT.name());
+            throw new DuplicateAccountException(ExceptionNameEnum.AUTH_REGISTRATION_DUPLICATE_USERNAME_ACCOUNT.name());
 
         // Controllo che l'email abbia un formato valido
         if (!EmailConstraintValidator.isValid(request.email()))
-            throw new InvalidEmailAccountException(BTExceptionName.INVALID_EMAIL.name());
+            throw new InvalidEmailAccountException(ExceptionNameEnum.INVALID_EMAIL.name());
 
         // Controllo che la password soddisfi i requisiti minimi
         PasswordConstraintValidator.isValid(request.password());
         if (!request.password().equals(request.confirmPassword()))
-            throw new PasswordsDoNotMatchException(BTExceptionName.AUTH_PASSWORDS_DO_NOT_MATCH.name());
+            throw new PasswordsDoNotMatchException(ExceptionNameEnum.AUTH_PASSWORDS_DO_NOT_MATCH.name());
 
         // Creo l'utente con ruolo di USER impostando tutti i campi necessari
         var account = Account
@@ -153,7 +153,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
         // Recupero l'utente dal database
         var account = accountService
                 .findByEmail(username)
-                .orElseThrow(() -> new AccountNotFoundException(BTExceptionName.ACCOUNT_NOT_FOUND.name()));
+                .orElseThrow(() -> new AccountNotFoundException(ExceptionNameEnum.ACCOUNT_NOT_FOUND.name()));
 
         // Controllo che il token sia valido altrimenti sollevo un'eccezione
         if (!jwtService.isValidToken(registrationToken, account)) throw new VerifyRegistrationTokenException();
@@ -202,7 +202,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
         // Recupero l'utente dal database
         var account = accountService
                 .findByEmail(username)
-                .orElseThrow(() -> new AccountNotFoundException(BTExceptionName.ACCOUNT_NOT_FOUND.name()));
+                .orElseThrow(() -> new AccountNotFoundException(ExceptionNameEnum.ACCOUNT_NOT_FOUND.name()));
 
         // Controllo che il token sia valido altrimenti sollevo un'eccezione
         if (!jwtService.isValidToken(registrationToken, account))
@@ -233,8 +233,8 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     @Override
     public ResponseAuthentication authenticate(RequestAuthentication request, String ipAddress) {
         // Controllo che l'email e la password non siano vuoti
-        if (request.email() == null) throw new AuthException(BTExceptionName.EMAIL_CAN_NOT_BE_EMPTY.name());
-        if (request.password() == null) throw new AuthException(BTExceptionName.PASSWORD_CAN_NOT_BE_EMPTY.name());
+        if (request.email() == null) throw new AuthException(ExceptionNameEnum.EMAIL_CAN_NOT_BE_EMPTY.name());
+        if (request.password() == null) throw new AuthException(ExceptionNameEnum.PASSWORD_CAN_NOT_BE_EMPTY.name());
 
         // Se non corretto AuthenticationManager si occupa già di sollevare eccezioni
         authenticationManager.authenticate(
@@ -300,7 +300,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
         userEmail = jwtService.extractUsername(refreshToken);
 
         // Se lo username non è nullo
-        if (userEmail == null) throw new AccountNotFoundException(BTExceptionName.ACCOUNT_NOT_FOUND.name());
+        if (userEmail == null) throw new AccountNotFoundException(ExceptionNameEnum.ACCOUNT_NOT_FOUND.name());
 
         // Recupero l'utente dal database
         var user = accountService.findByEmail(userEmail).orElseThrow();
@@ -393,7 +393,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
         // Recupero l'utente dal database
         var account = accountService
                 .findByEmail(username)
-                .orElseThrow(() -> new AccountNotFoundException(BTExceptionName.ACCOUNT_NOT_FOUND.name()));
+                .orElseThrow(() -> new AccountNotFoundException(ExceptionNameEnum.ACCOUNT_NOT_FOUND.name()));
 
         // Controllo che il token sia valido altrimenti sollevo un'eccezione
         if (!jwtService.isValidToken(resetToken, account)) throw new VerifyResetTokenException();
@@ -410,7 +410,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
         // Modifico la password
         PasswordConstraintValidator.isValid(request.password());
         if (!request.password().equals(request.confirmPassword()))
-            throw new PasswordsDoNotMatchException(BTExceptionName.AUTH_PASSWORDS_DO_NOT_MATCH.name());
+            throw new PasswordsDoNotMatchException(ExceptionNameEnum.AUTH_PASSWORDS_DO_NOT_MATCH.name());
 
         account.setPassword(passwordEncoder.encode(request.password()));
 
@@ -468,7 +468,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
         // Recupero l'utente dal database
         var account = accountService
                 .findByEmail(username)
-                .orElseThrow(() -> new AccountNotFoundException(BTExceptionName.ACCOUNT_NOT_FOUND.name()));
+                .orElseThrow(() -> new AccountNotFoundException(ExceptionNameEnum.ACCOUNT_NOT_FOUND.name()));
 
         // Controllo che il token sia valido altrimenti sollevo un'eccezione
         if (!jwtService.isValidToken(token, account)) throw new TokenException();
@@ -510,7 +510,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
         // Recupero l'utente dal database
         var account = accountService
                 .findByEmail(email)
-                .orElseThrow(() -> new AccountNotFoundException(BTExceptionName.ACCOUNT_NOT_FOUND.name()));
+                .orElseThrow(() -> new AccountNotFoundException(ExceptionNameEnum.ACCOUNT_NOT_FOUND.name()));
 
         // Abilito l'account
         account.setStatus(new AccountStatus(AccountStatusEnum.VERIFIED.getStatusId()));
@@ -523,7 +523,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
         // Recupero l'utente dal database
         var account = accountService
                 .findByEmail(email)
-                .orElseThrow(() -> new AccountNotFoundException(BTExceptionName.ACCOUNT_NOT_FOUND.name()));
+                .orElseThrow(() -> new AccountNotFoundException(ExceptionNameEnum.ACCOUNT_NOT_FOUND.name()));
 
         return tokenService.findAllValidTokenByUser(account.getId());
     }
