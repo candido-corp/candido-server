@@ -11,7 +11,7 @@ public class OnRegistrationEvent extends ApplicationEvent {
 
     private final String registrationToken;
 
-    private final Integer temporaryCode;
+    private final String temporaryCode;
 
     private final String appUrl;
 
@@ -23,12 +23,16 @@ public class OnRegistrationEvent extends ApplicationEvent {
         this.appUrl = appUrl;
     }
 
-    public OnRegistrationEvent(Object source, final Account account, final int temporaryCode, final String appUrl) {
+    public OnRegistrationEvent(Object source, final Account account, final String registrationToken, final String temporaryCode, final String appUrl) {
         super(source);
         this.account = account;
-        this.registrationToken = null;
+        this.registrationToken = registrationToken;
         this.temporaryCode = temporaryCode;
         this.appUrl = appUrl;
+    }
+
+    public boolean isRegistrationByCodeVerification() {
+        return temporaryCode != null;
     }
 
 }

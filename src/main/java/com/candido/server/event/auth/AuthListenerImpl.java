@@ -41,10 +41,24 @@ public class AuthListenerImpl implements AuthListenerService {
 
         String linkToVerify = clientDomain + "/auth/register/verify/" + event.getRegistrationToken();
 
-        String content = utilService.getTemplateContentFromLocalResources(
-                "/static/email/registration.html",
-                "Candido::Error::handleOnRegistrationEvent"
-        )
+        String content;
+        String subject = "Confirm your identity";
+
+        if (event.isRegistrationByCodeVerification()) {
+            subject = "Here's your verification code " + event.getTemporaryCode();
+            content = utilService.getTemplateContentFromLocalResources(
+                            "/static/email/registration_by_code.html",
+                            "Candido::Error::handleOnRegistrationEvent"
+                    )
+                    .replace("{{registration.code}}", String.valueOf(event.getTemporaryCode()));
+        } else {
+            content = utilService.getTemplateContentFromLocalResources(
+                    "/static/email/registration.html",
+                    "Candido::Error::handleOnRegistrationEvent"
+            );
+        }
+
+        content = content
                 .replace("{{registration.username}}", event.getAccount().getUsername())
                 .replace("{{registration.url}}", linkToVerify);
 
@@ -52,7 +66,7 @@ public class AuthListenerImpl implements AuthListenerService {
                 noReply,
                 applicationName,
                 event.getAccount().getEmail(),
-                "Confirm your registration",
+                subject,
                 content
         );
     }
@@ -63,24 +77,20 @@ public class AuthListenerImpl implements AuthListenerService {
     public void handleOnRegistrationCompletedEvent(OnRegistrationCompletedEvent event) {
         log.info("[Candido::RegistrationCompleted] Account -> {}", event.getAccount());
 
-        String text = "";
-        try {
-            ClassPathResource resource = new ClassPathResource("/static/email/registration_completed.html");
-            byte[] fileContent = StreamUtils.copyToByteArray(resource.getInputStream());
-            text = new String(fileContent, StandardCharsets.UTF_8);
-        } catch (Exception e) {
-            log.error("[Candido::Error::handleOnRegistrationCompletedEvent] at {} -> {}", LocalDateTime.now(), e.getMessage());
-        }
-
-        text = text
-                .replace("{{registration.username}}", event.getAccount().getUsername());
+        String content = utilService.getTemplateContentFromLocalResources(
+                        "/static/email/registration_completed.html",
+                        "Candido::Error::handleOnRegistrationCompletedEvent"
+                )
+                .replace("{{registration.username}}", event.getAccount().getUsername())
+                .replace("{{registration.first_name}}", event.getUser().getFirstName())
+                .replace("{{registration.last_name}}", event.getUser().getLastName());
 
         emailService.sendSimpleMessage(
                 noReply,
                 applicationName,
                 event.getAccount().getEmail(),
                 "Registration confirmed",
-                text
+                content
         );
     }
 
@@ -90,17 +100,12 @@ public class AuthListenerImpl implements AuthListenerService {
     public void handleOnResetAccountEvent(OnResetAccountEvent event) {
         log.info("[Candido::ResetAccount] Account -> {}", event.getAccount());
 
-        String text = "";
-        try {
-            ClassPathResource resource = new ClassPathResource("/static/email/reset_password.html");
-            byte[] fileContent = StreamUtils.copyToByteArray(resource.getInputStream());
-            text = new String(fileContent, StandardCharsets.UTF_8);
-        } catch (Exception e) {
-            log.error("[Candido::Error::handleOnResetAccountEvent] at {} -> {}", LocalDateTime.now(), e.getMessage());
-        }
-
         String linkToVerify = clientDomain + "/auth/reset/" + event.getResetToken();
-        text = text
+
+        String content = utilService.getTemplateContentFromLocalResources(
+                        "/static/email/reset_password.html",
+                        "Candido::Error::handleOnResetAccountEvent"
+                )
                 .replace("{{reset.name}}", event.getAccount().getUsername())
                 .replace("{{reset.url}}", linkToVerify);
 
@@ -109,7 +114,7 @@ public class AuthListenerImpl implements AuthListenerService {
                 applicationName,
                 event.getAccount().getEmail(),
                 "Password reset",
-                text
+                content
         );
     }
 
@@ -119,16 +124,10 @@ public class AuthListenerImpl implements AuthListenerService {
     public void handleOnResetAccountCompletedEvent(OnResetAccountCompletedEvent event) {
         log.info("[Candido::ResetAccountCompleted] Account -> {}", event.getAccount());
 
-        String text = "";
-        try {
-            ClassPathResource resource = new ClassPathResource("/static/email/reset_password_completed.html");
-            byte[] fileContent = StreamUtils.copyToByteArray(resource.getInputStream());
-            text = new String(fileContent, StandardCharsets.UTF_8);
-        } catch (Exception e) {
-            log.error("[Candido::Error::handleOnResetAccountCompletedEvent] at {} -> {}", LocalDateTime.now(), e.getMessage());
-        }
-
-        text = text
+        String content = utilService.getTemplateContentFromLocalResources(
+                        "/static/email/reset_password_completed.html",
+                        "Candido::Error::handleOnResetAccountCompletedEvent"
+                )
                 .replace("{{reset.username}}", event.getAccount().getUsername());
 
         emailService.sendSimpleMessage(
@@ -136,7 +135,7 @@ public class AuthListenerImpl implements AuthListenerService {
                 applicationName,
                 event.getAccount().getEmail(),
                 "Password reset completed",
-                text
+                content
         );
     }
 

@@ -18,7 +18,7 @@ public interface AuthenticationService {
     void verifyRegistrationByToken(String registrationToken);
     void verifyRegistrationBySessionIdAndTemporaryCode(String sessionId, String temporaryCode);
     Account getAccountAndVerifyToken(String token, int tokenScopeCategoryId);
-    void resendCodeRegistrationBySessionId(String sessionId);
+    void resendCodeRegistrationBySessionId(String sessionId, String appUrl);
 
     ResponseAuthentication authenticate(RequestAuthentication request, String ipAddress);
     ResponseAuthentication refreshToken(HttpServletRequest request, HttpServletResponse response);

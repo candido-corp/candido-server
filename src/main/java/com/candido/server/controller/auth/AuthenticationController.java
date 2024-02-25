@@ -55,9 +55,11 @@ public class AuthenticationController {
 
     @PostMapping("/register/code-verification/session/{sessionId}/resend-code")
     public ResponseEntity<Void> resendCodeForCodeVerification(
-            @PathVariable("sessionId") String sessionId
+            @PathVariable("sessionId") String sessionId,
+            HttpServletRequest httpRequest
     ) {
-        authenticationService.resendCodeRegistrationBySessionId(sessionId);
+        String appURL = utilService.getAppUrl(httpRequest);
+        authenticationService.resendCodeRegistrationBySessionId(sessionId, appURL);
         return ResponseEntity.noContent().build();
     }
 

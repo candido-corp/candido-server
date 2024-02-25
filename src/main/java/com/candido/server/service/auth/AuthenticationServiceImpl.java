@@ -3,7 +3,6 @@ package com.candido.server.service.auth;
 import com.candido.server.config.AppPropertiesConfig;
 import com.candido.server.domain.v1.account.*;
 import com.candido.server.domain.v1.provider.AuthProviderEnum;
-import com.candido.server.domain.v1.token.TemporaryCode;
 import com.candido.server.domain.v1.token.Token;
 import com.candido.server.domain.v1.token.TokenScopeCategoryEnum;
 import com.candido.server.domain.v1.token.TokenTypeEnum;
@@ -130,10 +129,8 @@ public class AuthenticationServiceImpl implements AuthenticationService {
         if(!isEmailVerification) {
             var temporaryCode = temporaryCodeService.assignCode(token.getId());
 
-            // TODO: Invia email diversa
             // Invio un evento quando viene completata la registrazione
-//            eventPublisher.publishEvent(new OnRegistrationEvent(this, savedAccount, accessToken, appUrl));
-
+            eventPublisher.publishEvent(new OnRegistrationEvent(this, savedAccount, accessToken, temporaryCode.getCode(), appUrl));
         } else {
             // Invio un evento quando viene completata la registrazione
             eventPublisher.publishEvent(new OnRegistrationEvent(this, savedAccount, accessToken, appUrl));
@@ -174,8 +171,11 @@ public class AuthenticationServiceImpl implements AuthenticationService {
         // Elimino il token di registrazione
         tokenService.delete(token.get());
 
+        // Recupero l'utente
+        var user = userService.findByAccountId(account.getId()).orElse(new User());
+
         // Invio un evento quando viene confermata la registrazione
-        eventPublisher.publishEvent(new OnRegistrationCompletedEvent(this, account));
+        eventPublisher.publishEvent(new OnRegistrationCompletedEvent(this, account, user));
 
     }
 
@@ -226,8 +226,11 @@ public class AuthenticationServiceImpl implements AuthenticationService {
         // Elimino il token di registrazione
         tokenService.delete(token.get());
 
+        // Recupero l'utente
+        var user = userService.findByAccountId(account.getId()).orElse(new User());
+
         // Invio un evento quando viene confermata la registrazione
-        eventPublisher.publishEvent(new OnRegistrationCompletedEvent(this, account));
+        eventPublisher.publishEvent(new OnRegistrationCompletedEvent(this, account, user));
     }
 
     @Override
@@ -486,22 +489,22 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     }
 
     @Override
-    public void resendCodeRegistrationBySessionId(String sessionId) {
+    public void resendCodeRegistrationBySessionId(String sessionId, String appUrl) {
         var token = tokenService
                 .findByUUIDAndTokenScopeCategoryId(sessionId, TokenScopeCategoryEnum.BTD_REGISTRATION.getTokenScopeCategoryId());
 
         if(token.isEmpty()) throw new TokenException();
 
-        var temporaryCode = temporaryCodeService
-                .findByTokenId(token.get().getId());
+        var account = accountService.findById(token.get().getAccount().getId());
 
-        if(temporaryCode.isEmpty()) throw new TemporaryCodeException();
+        if(account.isEmpty()) throw new AccountNotFoundException(ExceptionNameEnum.ACCOUNT_NOT_FOUND.name());
 
-        String code = temporaryCode.get().getCode();
+        temporaryCodeService.findByTokenId(token.get().getId()).ifPresent(temporaryCodeService::delete);
 
-        // TODO: Invia email diversa
+        var temporaryCode = temporaryCodeService.assignCode(token.get().getId());
+
         // Invio un evento quando viene completata la registrazione
-//            eventPublisher.publishEvent(new OnRegistrationEvent(this, savedAccount, accessToken, appUrl));
+        eventPublisher.publishEvent(new OnRegistrationEvent(this, account.get(), token.get().getAccessToken(), temporaryCode.getCode(), appUrl));
     }
 
     @Override

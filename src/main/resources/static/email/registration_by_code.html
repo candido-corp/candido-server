@@ -12,17 +12,22 @@
                 <tr>
                     <td>
                         <p style="font-weight:600; font-size:24px; line-height:1.25; margin:16px 0; margin-bottom: 20px; color:#000000 !important; text-align:center;">We're almost settled!</p>
-                        <p style="font-size:16px; line-height:1.25; margin:16px 0; color:#000000 !important;">You’re just one click away from sending your first application with Candido! All you need to do is verify your email address to activate your account.</p>
+                        <p style="font-size:16px; line-height:1.25; margin:16px 0; color:#000000 !important;">You’re almost there from sending your first application with Candido! All you need to do is copy this one-time code to activate your account.</p>
+                        <p style="font-size:16px; line-height:1.25; margin:16px 0; color:#000000 !important;">
+                            Please enter the below code:
+                        </p>
                         <table align="center" border="0" cellspacing="0" cellpadding="0" style="margin:20px auto; padding:20px; border-radius:8px; text-align:center; width:550px;">
                             <tr>
                                 <td>
-                                    <a href="{{registration.url}}" target="_blank" style="font-size:18px; background-color:#0091ea !important; color:#ffffff !important; line-height:100%; border-radius:0.5em; cursor:pointer; text-decoration:none; display:inline-block; width: 300px; padding:12px 48px;">Confirm my Email</a>
+                                    <a href="{{registration.url}}" target="_blank" style="font-size: 18px; border: 3px solid #0091ea !important; color: #0091ea !important; line-height: 100%; border-radius: 0.5em; cursor: pointer; text-decoration: none; display: inline-block; min-width: 250px; padding: 12px 0px; letter-spacing: 12px; background-color: white; font-weight: bold; text-align: center;">
+                                        <pre>&nbsp;{{registration.code}}</pre>
+                                    </a>
                                     <p style="max-width:300px; font-size:12px; line-height:14px; margin:10px 0px; text-align:center; margin:0 auto; padding-top:16px;">If the button above does not work, you can alternatively copy and paste the following link into your web browser to confirm your registration:</p>
                                     <a href="{{registration.url}}" target="_blank" style="font-size:12px; color:#0366d6 !important; text-decoration:none; cursor:pointer; word-break:break-all;">{{registration.url}}</a>
                                 </td>
                             </tr>
                         </table>
-                        <p style="font-size:16px; line-height:1.25; margin:16px 0; color:#000000 !important;">Once you click the button, your registration will be officially completed, and you will be able to send how many applications you want. There are plenty of opportunities waiting for you!</p>
+                        <p style="font-size:16px; line-height:1.25; margin:16px 0; color:#000000 !important;">Once you copy this code, your registration will be officially completed, and you will be able to send how many applications you want. There are plenty of opportunities waiting for you!</p>
                         <p style="font-size:16px; line-height:1.25; margin:16px 0; color:#000000 !important;">Thank you for registering with us and for placing your trust in our services. We are excited to have you on board!</p>
                     </td>
                 </tr>
@@ -34,5 +39,3 @@
         </td>
     </tr>
 </table>
-</body>
-</html>
