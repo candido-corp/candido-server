@@ -100,7 +100,7 @@ public class Account implements UserDetails {
 
     @Override
     public boolean isEnabled() {
-        return status.getDescription().equals(AccountStatusEnum.VERIFIED.name());
+        return status.getId() == AccountStatusEnum.VERIFIED.getStatusId();
     }
 
 }
