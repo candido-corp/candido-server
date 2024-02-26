@@ -54,6 +54,7 @@ spring:
     password: ${DBPASSWORD}
     driver-class-name: org.mariadb.jdbc.Driver
   jpa:
+    open-in-view: false
     hibernate:
       ddl-auto: none
     show-sql: false
