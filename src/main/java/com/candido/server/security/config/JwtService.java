@@ -117,20 +117,6 @@ public class JwtService {
      * @return la stringa contenente il token.
      */
     public String buildToken(Map<String, Object> extraClaims, UserDetails userDetails, long expirationTimeMillis) {
-//        return Jwts
-//                .builder()
-//                .header()
-//                .add("typ", "JWT")
-//                .and()
-//                .claims()
-//                .add(extraClaims)
-//                .and()
-//                .subject(userDetails.getUsername())
-//                .issuedAt(new Date(System.currentTimeMillis()))
-//                .expiration(new Date(System.currentTimeMillis() + expirationTimeMillis))
-//                .issuer("Biotekna")
-//                .signWith(getSignInKey())
-//                .compact();
         return Jwts
                 .builder()
                 .setHeaderParam("typ", "JWT")
@@ -186,12 +172,6 @@ public class JwtService {
      */
     private Claims extractAllClaims(String token) {
         try {
-//            return Jwts
-//                    .parser()
-//                    .verifyWith(getSignInKey())
-//                    .build()
-//                    .parseSignedClaims(token)
-//                    .getPayload();
             return Jwts
                     .parserBuilder()
                     .setSigningKey(getSignInKey())
