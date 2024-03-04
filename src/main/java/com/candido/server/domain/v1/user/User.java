@@ -46,6 +46,9 @@ public class User {
     @Column(name = "phone_number")
     private String phoneNumber;
 
+    @Column(name = "last_modified_name")
+    private LocalDateTime lastModifiedName;
+
     @Column(name = "created_at")
     private LocalDateTime createdAt;
 

@@ -2,6 +2,7 @@ package com.candido.server.controller.account;
 
 import com.candido.server.domain.v1.account.Account;
 import com.candido.server.domain.v1.user.User;
+import com.candido.server.dto.v1.request.account.RequestUpdateUserDto;
 import com.candido.server.dto.v1.util.AccountDto;
 import com.candido.server.dto.v1.util.UserDto;
 import com.candido.server.exception._common.ExceptionNameEnum;
@@ -48,11 +49,20 @@ public class AccountController {
         User user = userService.findByAccountId(account.getId())
                 .orElseThrow(() -> new UserNotFoundException(ExceptionNameEnum.USER_NOT_FOUND.name()));
 
-        return ResponseEntity.ok(userMapper.userToUserDto(user));
+        UserDto userDto = userMapper.userToUserDto(user);
+        userDto.setCanChangeName(user.getLastModifiedName());
+
+        return ResponseEntity.ok(userDto);
     }
 
     @PostMapping("/details")
-    public ResponseEntity<UserDto> postUserInfo(Authentication authentication) {
+    public ResponseEntity<UserDto> postUserInfo(
+            Authentication authentication,
+            @RequestBody RequestUpdateUserDto requestUpdateUserDto
+    ) {
+        // TODO: Modifica nome e cognome ogni X giorni. La prima volta è possibile cambiarlo subito.
+        // TODO: Se c'è una candidatura aperta non può modificare il nome e cognome.
+
         return null;
     }
 
