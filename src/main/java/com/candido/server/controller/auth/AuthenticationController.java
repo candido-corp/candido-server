@@ -6,7 +6,9 @@ import com.candido.server.dto.v1.request.auth.RequestRegister;
 import com.candido.server.dto.v1.request.auth.RequestRegisterVerifyTemporaryCode;
 import com.candido.server.dto.v1.response.auth.ResponseAuthentication;
 import com.candido.server.dto.v1.response.auth.ResponseRegistration;
+import com.candido.server.dto.v1.response.auth.ResponseToken;
 import com.candido.server.service.auth.AuthenticationService;
+import com.candido.server.service.mapstruct.TokenMapper;
 import com.candido.server.util.UtilService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -17,6 +19,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/v1/auth")
@@ -27,6 +30,9 @@ public class AuthenticationController {
 
     @Autowired
     UtilService utilService;
+
+    @Autowired
+    TokenMapper tokenMapper;
 
     private ResponseEntity<ResponseRegistration> executeRegistration(
             RequestRegister request, HttpServletRequest httpRequest, boolean isEmailVerification
@@ -102,14 +108,16 @@ public class AuthenticationController {
         return ResponseEntity.noContent().build();
     }
 
-    @PostMapping("/token/{email}")
-    public ResponseEntity<List<Token>> getTokenList(
+    @GetMapping("/token/{email}")
+    public ResponseEntity<List<ResponseToken>> getTokenList(
             @PathVariable("email") String email
     ) {
         // TODO: Delete this endpoint
-        return ResponseEntity.ok(
-                authenticationService.getListOfTokenByEmail(email)
-        );
+        List<Token> tokenList = authenticationService.getListOfTokenByEmail(email);
+        List<ResponseToken> responseTokenList = tokenList
+                .stream().map(token -> tokenMapper.tokenToTokenDto(token)).collect(Collectors.toList());
+
+        return ResponseEntity.ok(responseTokenList);
     }
 
 }
