@@ -9,8 +9,8 @@ import com.candido.server.exception._common.ExceptionNameEnum;
 import com.candido.server.exception.account.AccountNotFoundException;
 import com.candido.server.exception.user.UserNotFoundException;
 import com.candido.server.service.account.AccountService;
+import com.candido.server.service.mapper.UserMapperService;
 import com.candido.server.service.mapstruct.AccountMapper;
-import com.candido.server.service.mapstruct.UserMapper;
 import com.candido.server.service.user.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,7 +29,7 @@ public class AccountController {
     AccountMapper accountMapper;
 
     @Autowired
-    UserMapper userMapper;
+    UserMapperService userMapper;
 
     @Autowired
     UserService userService;
@@ -50,7 +50,6 @@ public class AccountController {
                 .orElseThrow(() -> new UserNotFoundException(ExceptionNameEnum.USER_NOT_FOUND.name()));
 
         UserDto userDto = userMapper.userToUserDto(user);
-        userDto.setCanChangeName(user.getLastModifiedName());
 
         return ResponseEntity.ok(userDto);
     }
@@ -63,7 +62,15 @@ public class AccountController {
         // TODO: Modifica nome e cognome ogni X giorni. La prima volta è possibile cambiarlo subito.
         // TODO: Se c'è una candidatura aperta non può modificare il nome e cognome.
 
-        return null;
+        Account account = accountService.findByEmail(authentication.getName())
+                .orElseThrow(() -> new AccountNotFoundException(ExceptionNameEnum.ACCOUNT_NOT_FOUND.name()));
+
+        User user = userService.findByAccountId(account.getId())
+                .orElseThrow(() -> new UserNotFoundException(ExceptionNameEnum.USER_NOT_FOUND.name()));
+
+        UserDto userDto = userMapper.userToUserDto(userService.save(user, requestUpdateUserDto));
+
+        return ResponseEntity.ok(userDto);
     }
 
 }

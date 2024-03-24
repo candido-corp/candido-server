@@ -1,14 +1,16 @@
 package com.candido.server.service.user;
 
+import com.candido.server.domain.v1.user.Gender;
 import com.candido.server.domain.v1.user.User;
 import com.candido.server.domain.v1.user.UserRepository;
 import com.candido.server.domain.v1.user.User_;
-import com.candido.server.service.mapstruct.UserMapper;
+import com.candido.server.dto.v1.request.account.RequestUpdateUserDto;
+import com.candido.server.dto.v1.util.GenderDto;
+import com.candido.server.service.mapper.UserMapperService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDateTime;
 import java.util.Optional;
 
 @Service
@@ -16,9 +18,6 @@ public class UserServiceImpl implements UserService {
 
     @Autowired
     UserRepository userRepository;
-
-    @Autowired
-    UserMapper userMapper;
 
     @Override
     public Optional<User> findByAccountId(int accountId) {
@@ -31,4 +30,13 @@ public class UserServiceImpl implements UserService {
     public User save(User user) {
         return userRepository.save(user);
     }
+
+    @Override
+    public User save(User user, RequestUpdateUserDto requestUpdateUserDto) {
+        user.setFirstName(requestUpdateUserDto.firstName());
+        user.setLastName(requestUpdateUserDto.lastName());
+//        user.setGender((Gender) new GenderDto(requestUpdateUserDto.genderId(), null));
+        return null;
+    }
+
 }

@@ -5,6 +5,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 @Data
@@ -27,7 +28,7 @@ public class UserDto {
     AddressDto address;
 
     @JsonProperty("birthdate")
-    String birthdate;
+    LocalDate birthdate;
 
     @JsonProperty("mobile_number")
     String mobileNumber;
@@ -36,10 +37,10 @@ public class UserDto {
     String phoneNumber;
 
     @JsonProperty("created_at")
-    String createdAt;
+    LocalDateTime createdAt;
 
     @JsonProperty("deleted_at")
-    String deletedAt;
+    LocalDateTime deletedAt;
 
     @JsonProperty("can_change_name")
     boolean canChangeName;
