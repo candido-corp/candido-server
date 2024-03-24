@@ -140,6 +140,11 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     }
 
     @Override
+    public boolean checkEmailAvailability(String email) {
+        return accountService.findByEmail(email).isEmpty();
+    }
+
+    @Override
     public void verifyRegistrationByToken(String registrationToken) {
         // Estraggo lo username dal token
         String username = jwtService.extractUsername(registrationToken);

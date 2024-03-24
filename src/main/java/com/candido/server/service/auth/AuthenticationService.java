@@ -15,6 +15,7 @@ import java.util.List;
 public interface AuthenticationService {
     ResponseRegistration register(RequestRegister request, String ipAddress, String appUrl, boolean isEmailVerification);
 
+    boolean checkEmailAvailability(String email);
     void verifyRegistrationByToken(String registrationToken);
     void verifyRegistrationBySessionIdAndTemporaryCode(String sessionId, String temporaryCode);
     Account getAccountAndVerifyToken(String token, int tokenScopeCategoryId);

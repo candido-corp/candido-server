@@ -5,6 +5,7 @@ import com.candido.server.dto.v1.request.auth.RequestAuthentication;
 import com.candido.server.dto.v1.request.auth.RequestRegister;
 import com.candido.server.dto.v1.request.auth.RequestRegisterVerifyTemporaryCode;
 import com.candido.server.dto.v1.response.auth.ResponseAuthentication;
+import com.candido.server.dto.v1.response.auth.ResponseCheckEmail;
 import com.candido.server.dto.v1.response.auth.ResponseRegistration;
 import com.candido.server.dto.v1.response.auth.ResponseToken;
 import com.candido.server.service.auth.AuthenticationService;
@@ -33,6 +34,11 @@ public class AuthenticationController {
 
     @Autowired
     TokenMapper tokenMapper;
+
+    @PostMapping("/check-email/{email}")
+    public ResponseEntity<ResponseCheckEmail> checkEmailAvailability(@PathVariable("email") String email) {
+        return ResponseEntity.ok(new ResponseCheckEmail(authenticationService.checkEmailAvailability(email)));
+    }
 
     private ResponseEntity<ResponseRegistration> executeRegistration(
             RequestRegister request, HttpServletRequest httpRequest, boolean isEmailVerification
