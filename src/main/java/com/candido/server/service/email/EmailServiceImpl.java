@@ -1,5 +1,6 @@
 package com.candido.server.service.email;
 
+import com.candido.server.domain.v1.account.Account;
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.InternetAddress;
 import jakarta.mail.internet.MimeMessage;
@@ -8,8 +9,12 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Service;
+import org.thymeleaf.context.Context;
+import org.thymeleaf.spring6.SpringTemplateEngine;
 
 import java.io.UnsupportedEncodingException;
+import java.util.HashMap;
+import java.util.Map;
 
 @Service
 public class EmailServiceImpl implements EmailService {
@@ -19,6 +24,9 @@ public class EmailServiceImpl implements EmailService {
 
     @Value("${application.email.can-send}")
     private boolean smtpCanSend;
+
+    @Autowired
+    private SpringTemplateEngine templateEngine;
 
     @Override
     public void sendSimpleMessage(String from, String fromPersonal, String to, String subject, String text) {
@@ -36,6 +44,29 @@ public class EmailServiceImpl implements EmailService {
                 throw new RuntimeException(e);
             }
         }
+    }
+
+    public String buildEmailContent(String templateName, Map<String, Object> variables) {
+        Context context = new Context();
+        context.setVariables(variables);
+        return templateEngine.process("email/" + templateName, context);
+    }
+
+    @Override
+    public String buildRegistrationEmailContent(Account account, String linkToVerify) {
+        Map<String, Object> variables = new HashMap<>();
+        variables.put("username", account.getUsername());
+        variables.put("registrationUrl", linkToVerify);
+        return buildEmailContent("registration", variables);
+    }
+
+    @Override
+    public String buildCodeVerificationEmailContent(Account account, String temporaryCode, String linkToVerify) {
+        Map<String, Object> variables = new HashMap<>();
+        variables.put("username", account.getUsername());
+        variables.put("registrationCode", temporaryCode);
+        variables.put("registrationUrl", linkToVerify);
+        return buildEmailContent("registration_by_code", variables);
     }
 
 }

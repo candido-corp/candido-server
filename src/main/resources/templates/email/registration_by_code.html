@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Activate Your Candido Account</title>
+    <style>
+        /* Stili globali */
+        body {
+            background-color: #ffffff;
+            color: #000000;
+            font-family: 'Montserrat', sans-serif;
+            margin: 0;
+            padding: 0;
+            -webkit-text-size-adjust: 100%;
+            -ms-text-size-adjust: 100%;
+        }
+        table {
+            border-spacing: 0;
+            mso-table-lspace: 0pt;
+            mso-table-rspace: 0pt;
+        }
+        img {
+            -ms-interpolation-mode: bicubic;
+        }
+    </style>
+</head>
+<body style="margin: 0; padding: 0; background-color: #ffffff;">
+<center>
+    <table width="100%" border="0" cellpadding="0" cellspacing="0" bgcolor="#ffffff" style="max-width: 600px; margin: auto;">
+        <!-- Logo -->
+        <tr>
+            <td>
+                <img src="https://lh3.googleusercontent.com/u/0/drive-viewer/AKGpihY-2eP_vxjIGAW98tSj-vq5vzwtZxcfo2zb-yJiIsKqC49nv_ZMgfyJ2xbNO8OpgHNFaFCTsRnlF-WCupMK-6Irhe7qQQ=w2673-h1324-v0"
+                     alt="Logo Candido"
+                     style="outline:none; border:none; text-decoration:none; height: 50px">
+            </td>
+        </tr>
+
+        <!-- Main Content -->
+        <tr>
+            <td style="padding: 24px; background-color: #D3EFFF; border-radius: 8px; text-align: center;">
+                <h1 style="font-weight: 600; font-size: 24px; margin: 16px 0; color: #000000;">We're almost settled!</h1>
+                <p style="font-size: 16px; margin: 16px 0; color: #000000;">You’re almost there from sending your first application with Candido! All you need to do is copy this one-time code to activate your account.</p>
+                <p style="font-size: 16px; margin: 16px 0; color: #000000;">
+                    Please enter the below code:
+                </p>
+
+                <!-- Activation Code -->
+                <div style="background-color: #ffffff; border: 3px solid #0091ea; border-radius: 0.5em; padding: 16px; font-size: 18px; font-weight: bold; letter-spacing: 12px; color: #0091ea; margin: 20px auto; display: inline-block;">
+                    <span th:text="${registrationCode}">123456</span>
+                </div>
+
+                <!-- Additional Instructions -->
+                <p style="font-size: 12px; margin: 20px auto; color: #000000; padding-top: 16px;">If the button above does not work, you can alternatively copy and paste the following link into your web browser to confirm your registration:</p>
+                <a th:href="${registrationUrl}" th:text="${registrationUrl}" style="font-size: 12px; color: #0366d6; text-decoration: none; word-break: break-all;">Click here to activate</a>
+            </td>
+        </tr>
+
+        <!-- Footer Content -->
+        <tr>
+            <td style="font-size: 10px; color: #6a737d; text-align: center; padding: 16px;">
+                This email was sent to <strong th:text="${username}">[username]</strong>, which is associated with a Candido account whose authentication is pending.
+                <br/>
+                <br/>
+                © 2023 Candido - All Rights Reserved<br/>
+                <a href="https://example.com" style="color: #0366d6; text-decoration: none;">Camponogara, Venice - Italy</a>
+            </td>
+        </tr>
+    </table>
+</center>
+</body>
+</html>
