@@ -30,4 +30,7 @@ public interface TokenService {
     List<Token> findAllValidTokenByUser(Integer accountId);
     void revokeAllAccountTokens(Account account);
 
+
+    Token createRegistrationToken(Account account, String ipAddress);
+
 }

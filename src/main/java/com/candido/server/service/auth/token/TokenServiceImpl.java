@@ -117,4 +117,20 @@ public class TokenServiceImpl implements TokenService {
         validAccountTokens.forEach(this::delete);
     }
 
+    @Override
+    public Token createRegistrationToken(Account account, String ipAddress) {
+        // Creo un token per la verifica della registrazione
+        var accessToken = jwtService.generateRegistrationToken(account);
+
+        // Salva il token dell'utente
+        return saveUserToken(
+                account,
+                accessToken,
+                null,
+                ipAddress,
+                TokenTypeEnum.BEARER,
+                TokenScopeCategoryEnum.BTD_REGISTRATION
+        );
+    }
+
 }
