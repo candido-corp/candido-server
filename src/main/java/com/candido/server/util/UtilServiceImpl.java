@@ -2,9 +2,11 @@ package com.candido.server.util;
 
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StreamUtils;
+import org.springframework.web.util.UriComponentsBuilder;
 
 import java.nio.charset.StandardCharsets;
 import java.time.LocalDateTime;
@@ -12,6 +14,9 @@ import java.time.LocalDateTime;
 @Slf4j
 @Service
 public class UtilServiceImpl implements UtilService {
+
+    @Value("${application.client.domain}")
+    private String clientDomain;
 
     @Override
     public String getAppUrl(HttpServletRequest request) {
@@ -49,6 +54,24 @@ public class UtilServiceImpl implements UtilService {
             log.error("[{}] at {} -> {}", functionError, LocalDateTime.now(), e.getMessage(), e);
         }
         return text;
+    }
+
+    @Override
+    public String buildVerificationLink(String token) {
+        return UriComponentsBuilder
+                .fromHttpUrl(clientDomain)
+                .path("/auth/register/verify/")
+                .queryParam("token", token)
+                .toUriString();
+    }
+
+    @Override
+    public String buildCodeVerificationLink(String token) {
+        return UriComponentsBuilder
+                .fromHttpUrl(clientDomain)
+                .path("/auth/register/verify/code")
+                .queryParam("token", token)
+                .toUriString();
     }
 
 }

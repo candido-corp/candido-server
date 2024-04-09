@@ -7,4 +7,7 @@ public interface UtilService {
     String getClientIP(HttpServletRequest request);
     int countDigits(long number);
     String getTemplateContentFromLocalResources(String pathResource, String functionError);
+
+    String buildVerificationLink(String token);
+    String buildCodeVerificationLink(String token);
 }
