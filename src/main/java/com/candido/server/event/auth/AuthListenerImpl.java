@@ -1,18 +1,14 @@
 package com.candido.server.event.auth;
 
+import com.candido.server.domain.v1.email.ConstEmailSubject;
 import com.candido.server.service.email.EmailService;
 import com.candido.server.util.UtilService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.event.EventListener;
-import org.springframework.core.io.ClassPathResource;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
-import org.springframework.util.StreamUtils;
-
-import java.nio.charset.StandardCharsets;
-import java.time.LocalDateTime;
 
 @Slf4j
 @Component
@@ -36,37 +32,72 @@ public class AuthListenerImpl implements AuthListenerService {
     @Async
     @Override
     @EventListener
-    public void handleOnRegistrationEvent(OnRegistrationEvent event) {
-        log.info("[Candido::Registration] Account -> {}", event.getAccount());
+    public void handleOnEmailRegistrationEvent(OnEmailRegistrationEvent event) {
+        log.info("[Candido::EmailRegistration] Account -> {}", event.getAccount());
 
-        String linkToVerify = clientDomain + "/auth/register/verify/" + event.getRegistrationToken();
+//        String linkToVerify = clientDomain + "/auth/register/verify/" + event.getRegistrationToken();
+//
+//        String subject = "Confirm your identity";
+//
+//        String content = utilService.getTemplateContentFromLocalResources(
+//                "/static/email/registration.html",
+//                "Candido::Error::handleOnEmailRegistrationEvent"
+//                ).replace("{{registration.username}}", event.getAccount().getUsername())
+//                .replace("{{registration.url}}", linkToVerify);
+//
+//        emailService.sendSimpleMessage(
+//                noReply,
+//                applicationName,
+//                event.getAccount().getEmail(),
+//                subject,
+//                content
+//        );
 
-        String content;
-        String subject = "Confirm your identity";
-
-        if (event.isRegistrationByCodeVerification()) {
-            subject = "Here's your verification code " + event.getTemporaryCode();
-            content = utilService.getTemplateContentFromLocalResources(
-                            "/static/email/registration_by_code.html",
-                            "Candido::Error::handleOnRegistrationEvent"
-                    )
-                    .replace("{{registration.code}}", String.valueOf(event.getTemporaryCode()));
-        } else {
-            content = utilService.getTemplateContentFromLocalResources(
-                    "/static/email/registration.html",
-                    "Candido::Error::handleOnRegistrationEvent"
-            );
-        }
-
-        content = content
-                .replace("{{registration.username}}", event.getAccount().getUsername())
-                .replace("{{registration.url}}", linkToVerify);
+        String linkToVerify = utilService.buildVerificationLink(event.getRegistrationToken());
+        String content = emailService.buildRegistrationEmailContent(event.getAccount(), linkToVerify);
 
         emailService.sendSimpleMessage(
                 noReply,
                 applicationName,
                 event.getAccount().getEmail(),
-                subject,
+                ConstEmailSubject.EMAIL_VERIFICATION_SUBJECT,
+                content
+        );
+    }
+
+    @Async
+    @Override
+    @EventListener
+    public void handleOnCodeRegistrationEvent(OnCodeRegistrationEvent event) {
+        log.info("[Candido::CodeRegistration] Account -> {}", event.getAccount());
+
+//        String linkToVerify = clientDomain + "/auth/register/verify/" + event.getRegistrationToken();
+//
+//        String subject = "Here's your verification code " + event.getTemporaryCode();
+//        String content = utilService.getTemplateContentFromLocalResources(
+//                        "/static/email/registration_by_code.html",
+//                        "Candido::Error::handleOnEmailRegistrationEvent"
+//                )
+//                .replace("{{registration.code}}", String.valueOf(event.getTemporaryCode()))
+//                .replace("{{registration.username}}", event.getAccount().getUsername())
+//                .replace("{{registration.url}}", linkToVerify);
+//
+//        emailService.sendSimpleMessage(
+//                noReply,
+//                applicationName,
+//                event.getAccount().getEmail(),
+//                subject,
+//                content
+//        );
+
+        String linkToVerify = utilService.buildCodeVerificationLink(event.getRegistrationToken());
+        String content = emailService.buildCodeVerificationEmailContent(event.getAccount(), event.getTemporaryCode(), linkToVerify);
+
+        emailService.sendSimpleMessage(
+                noReply,
+                applicationName,
+                event.getAccount().getEmail(),
+                ConstEmailSubject.CODE_VERIFICATION_SUBJECT + " " + event.getTemporaryCode(),
                 content
         );
     }

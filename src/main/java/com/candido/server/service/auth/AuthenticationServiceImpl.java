@@ -12,10 +12,7 @@ import com.candido.server.dto.v1.request.auth.RequestPasswordReset;
 import com.candido.server.dto.v1.request.auth.RequestRegister;
 import com.candido.server.dto.v1.response.auth.ResponseAuthentication;
 import com.candido.server.dto.v1.response.auth.ResponseRegistration;
-import com.candido.server.event.auth.OnRegistrationCompletedEvent;
-import com.candido.server.event.auth.OnRegistrationEvent;
-import com.candido.server.event.auth.OnResetAccountCompletedEvent;
-import com.candido.server.event.auth.OnResetAccountEvent;
+import com.candido.server.event.auth.*;
 import com.candido.server.exception._common.ExceptionNameEnum;
 import com.candido.server.exception.account.*;
 import com.candido.server.exception.security.auth.*;
@@ -70,73 +67,39 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 
     @Transactional
     @Override
-    public ResponseRegistration register(RequestRegister request, String ipAddress, String appUrl, boolean isEmailVerification) {
-        // Controllo che l'account non esista già
-        var duplicateAccount = accountService.findByEmail(request.email());
-        if (duplicateAccount.isPresent())
-            throw new DuplicateAccountException(ExceptionNameEnum.AUTH_REGISTRATION_DUPLICATE_USERNAME_ACCOUNT.name());
+    public void registerByEmail(RequestRegister request, String ipAddress, String appUrl) {
+        var account = accountService.createAccount(request);
+        var token = tokenService.createRegistrationToken(account, ipAddress);
 
-        // Controllo che l'email abbia un formato valido
-        if (!EmailConstraintValidator.isValid(request.email()))
-            throw new InvalidEmailAccountException(ExceptionNameEnum.INVALID_EMAIL.name());
-
-        // Controllo che la password soddisfi i requisiti minimi
-        PasswordConstraintValidator.isValid(request.password());
-        if (!request.password().equals(request.confirmPassword()))
-            throw new PasswordsDoNotMatchException(ExceptionNameEnum.AUTH_PASSWORDS_DO_NOT_MATCH.name());
-
-        // Creo l'utente con ruolo di USER impostando tutti i campi necessari
-        var account = Account
-                .builder()
-                .email(request.email())
-                .password(passwordEncoder.encode(request.password()))
-                .accountRole(new AccountRole(AccountRoleEnum.USER.getRoleId()))
-                .createdAt(LocalDateTime.now())
-                .status(new AccountStatus(AccountStatusEnum.PENDING.getStatusId()))
-                .build();
-
-        // Salvo l'utente appena creato
-        var savedAccount = accountService.save(account);
-
-        // Creo il profilo dell'utente
-        var user = User
-                .builder()
-                .accountId(savedAccount.getId())
-                .firstName(request.firstName())
-                .lastName(request.lastName())
-                .createdAt(LocalDateTime.now())
-                .build();
-
-        // Salvo il profilo dell'utente appena creato
-        userService.save(user);
-
-        // Salvo il provider collegato all'account
-        authProviderService.addProviderToAccount(AuthProviderEnum.LOCAL.getProviderId(), savedAccount.getId());
-
-        // Creo un token per la verifica della registrazione
-        var accessToken = jwtService.generateRegistrationToken(account);
-
-        // Salva il token dell'utente
-        var token = tokenService.saveUserToken(
-                savedAccount,
-                accessToken,
-                null,
-                ipAddress,
-                TokenTypeEnum.BEARER,
-                TokenScopeCategoryEnum.BTD_REGISTRATION
+        var event = new OnEmailRegistrationEvent(
+                this,
+                account,
+                token.getAccessToken(),
+                appUrl
         );
+        eventPublisher.publishEvent(event);
+    }
 
-        if(!isEmailVerification) {
-            var temporaryCode = temporaryCodeService.assignCode(token.getId());
+    @Transactional
+    @Override
+    public ResponseRegistration registerByCode(RequestRegister request, String ipAddress, String appUrl) {
+        var account = accountService.createAccount(request);
+        var token = tokenService.createRegistrationToken(account, ipAddress);
+        var temporaryCode = temporaryCodeService.assignCode(token.getId());
 
-            // Invio un evento quando viene completata la registrazione
-            eventPublisher.publishEvent(new OnRegistrationEvent(this, savedAccount, accessToken, temporaryCode.getCode(), appUrl));
-        } else {
-            // Invio un evento quando viene completata la registrazione
-            eventPublisher.publishEvent(new OnRegistrationEvent(this, savedAccount, accessToken, appUrl));
-        }
+        var event = new OnCodeRegistrationEvent(
+                this,
+                account,
+                token.getAccessToken(),
+                temporaryCode.getCode(),
+                appUrl
+        );
+        eventPublisher.publishEvent(event);
 
-        return ResponseRegistration.builder().sessionId(token.getUuidAccessToken()).build();
+        return ResponseRegistration
+                .builder()
+                .sessionId(token.getUuidAccessToken())
+                .build();
     }
 
     @Override
@@ -509,7 +472,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
         var temporaryCode = temporaryCodeService.assignCode(token.get().getId());
 
         // Invio un evento quando viene completata la registrazione
-        eventPublisher.publishEvent(new OnRegistrationEvent(this, account.get(), token.get().getAccessToken(), temporaryCode.getCode(), appUrl));
+        eventPublisher.publishEvent(new OnCodeRegistrationEvent(this, account.get(), token.get().getAccessToken(), temporaryCode.getCode(), appUrl));
     }
 
     @Override

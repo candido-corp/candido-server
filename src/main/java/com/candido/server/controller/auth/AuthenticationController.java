@@ -40,57 +40,7 @@ public class AuthenticationController {
         return ResponseEntity.ok(new ResponseCheckEmail(authenticationService.checkEmailAvailability(email)));
     }
 
-    private ResponseEntity<ResponseRegistration> executeRegistration(
-            RequestRegister request, HttpServletRequest httpRequest, boolean isEmailVerification
-    ) {
-        String clientIP = utilService.getClientIP(httpRequest);
-        String appURL = utilService.getAppUrl(httpRequest);
-        ResponseRegistration response = authenticationService.register(request, clientIP, appURL, isEmailVerification);
-        return isEmailVerification ? ResponseEntity.noContent().build() : ResponseEntity.ok(response);
-    }
 
-    @PostMapping("/register/email-verification")
-    public ResponseEntity<ResponseRegistration> registerThroughEmailVerification(
-            @Valid @RequestBody RequestRegister request,
-            HttpServletRequest httpRequest
-    ) {
-        return executeRegistration(request, httpRequest, true);
-    }
-
-    @PostMapping("/register/code-verification")
-    public ResponseEntity<ResponseRegistration> registerThroughCodeVerification(
-            @Valid @RequestBody RequestRegister request,
-            HttpServletRequest httpRequest
-    ) {
-        return executeRegistration(request, httpRequest, false);
-    }
-
-    @PostMapping("/register/code-verification/session/{sessionId}/resend-code")
-    public ResponseEntity<Void> resendCodeForCodeVerification(
-            @PathVariable("sessionId") String sessionId,
-            HttpServletRequest httpRequest
-    ) {
-        String appURL = utilService.getAppUrl(httpRequest);
-        authenticationService.resendCodeRegistrationBySessionId(sessionId, appURL);
-        return ResponseEntity.noContent().build();
-    }
-
-    @PostMapping("/register-verify/{token}")
-    public ResponseEntity<Void> verifyRegistrationByToken(
-            @PathVariable("token") String token
-    ) {
-        authenticationService.verifyRegistrationByToken(token);
-        return ResponseEntity.noContent().build();
-    }
-
-    @PostMapping("/register-verify/session/{sessionId}")
-    public ResponseEntity<Void> verifyRegistrationBySessionIdAndTemporaryCode(
-            @PathVariable("sessionId") String sessionId,
-            @Valid @RequestBody RequestRegisterVerifyTemporaryCode request
-    ) {
-        authenticationService.verifyRegistrationBySessionIdAndTemporaryCode(sessionId, request.temporaryCode());
-        return ResponseEntity.noContent().build();
-    }
 
     @PostMapping("/authenticate")
     public ResponseEntity<ResponseAuthentication> authenticate(

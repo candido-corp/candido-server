@@ -13,7 +13,8 @@ import jakarta.servlet.http.HttpServletResponse;
 import java.util.List;
 
 public interface AuthenticationService {
-    ResponseRegistration register(RequestRegister request, String ipAddress, String appUrl, boolean isEmailVerification);
+    void registerByEmail(RequestRegister request, String ipAddress, String appUrl);
+    ResponseRegistration registerByCode(RequestRegister request, String ipAddress, String appUrl);
 
     boolean checkEmailAvailability(String email);
     void verifyRegistrationByToken(String registrationToken);
