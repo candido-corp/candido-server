@@ -23,9 +23,10 @@ public class GenderController {
     GenderMapper genderMapper;
 
     @GetMapping
-    public ResponseEntity<List<GenderDto>> getAllGenders() {
+    public ResponseEntity<List<GenderDto>> getGenders() {
         List<Gender> genderList = genderService.findAll();
-        return ResponseEntity.ok(genderMapper.genderToGenderDto(genderList));
+        List<GenderDto> genderDtoList = genderMapper.genderToGenderDto(genderList);
+        return ResponseEntity.ok(genderDtoList);
     }
 
 }
