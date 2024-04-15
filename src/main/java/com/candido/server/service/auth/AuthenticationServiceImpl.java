@@ -109,40 +109,17 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 
     @Override
     public void verifyRegistrationByToken(String registrationToken) {
-        // Estraggo lo username dal token
         String username = jwtService.extractUsername(registrationToken);
-
-        // Se lo username è nullo sollevo un'eccezione
         if (username == null) throw new VerifyRegistrationTokenException();
 
-        // Recupero l'utente dal database
         var account = accountService
                 .findByEmail(username)
                 .orElseThrow(() -> new AccountNotFoundException(ExceptionNameEnum.ACCOUNT_NOT_FOUND.name()));
 
-        // Controllo che il token sia valido altrimenti sollevo un'eccezione
-        if (!jwtService.isValidToken(registrationToken, account)) throw new VerifyRegistrationTokenException();
+        tokenService.validateToken(registrationToken, account);
+        accountService.activateAccount(account);
 
-        // Recupero il token in base all'account ID e allo scopo di registrazione
-        Optional<Token> token = tokenService.findByAccountIdAndTokenScopeCategoryId(
-                account.getId(), TokenScopeCategoryEnum.BTD_REGISTRATION.getTokenScopeCategoryId()
-        );
-
-        // Se il token è presente e uguale a quello che mi è arrivato
-        if (token.isEmpty() || !token.get().getAccessToken().equals(registrationToken))
-            throw new VerifyRegistrationTokenException();
-
-        // Abilito l'account
-        account.setStatus(new AccountStatus(AccountStatusEnum.VERIFIED.getStatusId()));
-        accountService.save(account);
-
-        // Elimino il token di registrazione
-        tokenService.delete(token.get());
-
-        // Recupero l'utente
         var user = userService.findByAccountId(account.getId()).orElse(new User());
-
-        // Invio un evento quando viene confermata la registrazione
         eventPublisher.publishEvent(new OnRegistrationCompletedEvent(this, account, user));
 
     }

@@ -82,6 +82,13 @@ public class AccountServiceImpl implements AccountService {
         save(account);
     }
 
+    @Override
+    public void activateAccount(Account account) {
+        // Abilito l'account
+        account.setStatus(new AccountStatus(AccountStatusEnum.VERIFIED.getStatusId()));
+        save(account);
+    }
+
     @Transactional
     @Override
     public Account createAccount(RequestRegister request) {

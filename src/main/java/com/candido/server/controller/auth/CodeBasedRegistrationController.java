@@ -4,37 +4,23 @@ import com.candido.server.dto.v1.request.auth.RequestRegister;
 import com.candido.server.dto.v1.request.auth.RequestRegisterVerifyTemporaryCode;
 import com.candido.server.dto.v1.response.auth.ResponseRegistration;
 import com.candido.server.service.auth.AuthenticationService;
-import com.candido.server.service.mapstruct.TokenMapper;
 import com.candido.server.util.UtilService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/api/v1/auth/register")
+@RequestMapping("/api/v1/auth/register/code")
 @RequiredArgsConstructor
-public class AuthenticationRegisterController {
+public class CodeBasedRegistrationController {
 
     private final AuthenticationService authenticationService;
 
-    @Autowired
-    UtilService utilService;
+    private final UtilService utilService;
 
-    @PostMapping("/email")
-    public ResponseEntity<Void> registerByEmail(
-            @Valid @RequestBody RequestRegister request,
-            HttpServletRequest httpRequest
-    ) {
-        String clientIP = utilService.getClientIP(httpRequest);
-        String appURL = utilService.getAppUrl(httpRequest);
-        authenticationService.registerByEmail(request, clientIP, appURL);
-        return ResponseEntity.noContent().build();
-    }
-
-    @PostMapping("/code")
+    @PostMapping
     public ResponseEntity<ResponseRegistration> registerByCode(
             @Valid @RequestBody RequestRegister request,
             HttpServletRequest httpRequest
@@ -45,7 +31,7 @@ public class AuthenticationRegisterController {
         return ResponseEntity.ok(response);
     }
 
-    @PostMapping("/code/resend")
+    @PostMapping("/resend")
     public ResponseEntity<Void> resendCodeForCodeVerification(
             @PathVariable("sessionId") String sessionId,
             HttpServletRequest httpRequest
@@ -55,15 +41,7 @@ public class AuthenticationRegisterController {
         return ResponseEntity.noContent().build();
     }
 
-    @PostMapping("/email/verify/{token}")
-    public ResponseEntity<Void> verifyEmailRegistrationByToken(
-            @PathVariable("token") String token
-    ) {
-        authenticationService.verifyRegistrationByToken(token);
-        return ResponseEntity.noContent().build();
-    }
-
-    @PostMapping("/code/verify/{sessionId}")
+    @PostMapping("/verify/{sessionId}")
     public ResponseEntity<Void> verifyCodeRegistrationBySessionIdAndTemporaryCode(
             @PathVariable("sessionId") String sessionId,
             @Valid @RequestBody RequestRegisterVerifyTemporaryCode request

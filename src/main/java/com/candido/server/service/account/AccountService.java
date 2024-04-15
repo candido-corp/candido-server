@@ -11,6 +11,7 @@ public interface AccountService {
     Account save(Account account);
     void enableAccount(int accountId);
     void editPassword(String email, String currentPassword, String password, String confirmPassword);
+    void activateAccount(Account account);
 
 
     Account createAccount(RequestRegister request);

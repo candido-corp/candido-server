@@ -28,9 +28,12 @@ public interface TokenService {
     void delete(Token token);
 
     List<Token> findAllValidTokenByUser(Integer accountId);
+
     void revokeAllAccountTokens(Account account);
 
 
     Token createRegistrationToken(Account account, String ipAddress);
+
+    void validateToken(String registrationToken, Account account);
 
 }

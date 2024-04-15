@@ -29,28 +29,25 @@ public class AuthenticationController {
 
     private final AuthenticationService authenticationService;
 
-    @Autowired
-    UtilService utilService;
+    private final UtilService utilService;
 
-    @Autowired
-    TokenMapper tokenMapper;
+    private final TokenMapper tokenMapper;
 
-    @PostMapping("/check-email/{email}")
+    @PostMapping("/login")
+    public ResponseEntity<ResponseAuthentication> login(
+            @RequestBody RequestAuthentication request, HttpServletRequest httpRequest
+    ) {
+        String clientIP = utilService.getClientIP(httpRequest);
+        ResponseAuthentication authentication = authenticationService.authenticate(request, clientIP);
+        return ResponseEntity.ok(authentication);
+    }
+
+    @PostMapping("/check/email/{email}")
     public ResponseEntity<ResponseCheckEmail> checkEmailAvailability(@PathVariable("email") String email) {
         return ResponseEntity.ok(new ResponseCheckEmail(authenticationService.checkEmailAvailability(email)));
     }
 
-
-
-    @PostMapping("/authenticate")
-    public ResponseEntity<ResponseAuthentication> authenticate(
-            @RequestBody RequestAuthentication request, HttpServletRequest httpRequest
-    ) {
-        String clientIP = utilService.getClientIP(httpRequest);
-        return ResponseEntity.ok(authenticationService.authenticate(request, clientIP));
-    }
-
-    @PostMapping("/refresh-token")
+    @PostMapping("/token/refresh")
     public ResponseEntity<ResponseAuthentication> refreshToken(HttpServletRequest request, HttpServletResponse response) {
         return ResponseEntity.ok(authenticationService.refreshToken(request, response));
     }
