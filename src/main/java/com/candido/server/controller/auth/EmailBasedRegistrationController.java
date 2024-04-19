@@ -29,11 +29,11 @@ public class EmailBasedRegistrationController {
         return ResponseEntity.noContent().build();
     }
 
-    @PostMapping("/verify/{token}")
-    public ResponseEntity<Void> verifyEmailRegistrationByToken(
-            @PathVariable("token") String token
+    @PostMapping("/verify-token/{uuidAccessToken}")
+    public ResponseEntity<Void> verifyEmailRegistrationByUUIDAccessToken(
+            @PathVariable("uuidAccessToken") String token
     ) {
-        authenticationService.verifyRegistrationByToken(token);
+        authenticationService.verifyRegistrationByUUIDAccessToken(token);
         return ResponseEntity.noContent().build();
     }
 

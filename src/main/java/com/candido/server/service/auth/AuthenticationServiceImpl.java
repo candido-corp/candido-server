@@ -2,7 +2,6 @@ package com.candido.server.service.auth;
 
 import com.candido.server.config.AppPropertiesConfig;
 import com.candido.server.domain.v1.account.*;
-import com.candido.server.domain.v1.provider.AuthProviderEnum;
 import com.candido.server.domain.v1.token.Token;
 import com.candido.server.domain.v1.token.TokenScopeCategoryEnum;
 import com.candido.server.domain.v1.token.TokenTypeEnum;
@@ -23,7 +22,6 @@ import com.candido.server.service.auth.provider.AuthProviderService;
 import com.candido.server.service.auth.token.TemporaryCodeService;
 import com.candido.server.service.auth.token.TokenService;
 import com.candido.server.service.user.UserService;
-import com.candido.server.validation.email.EmailConstraintValidator;
 import com.candido.server.validation.password.PasswordConstraintValidator;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -36,7 +34,6 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -74,7 +71,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
         var event = new OnEmailRegistrationEvent(
                 this,
                 account,
-                token.getAccessToken(),
+                token.getUuidAccessToken(),
                 appUrl
         );
         eventPublisher.publishEvent(event);
@@ -90,7 +87,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
         var event = new OnCodeRegistrationEvent(
                 this,
                 account,
-                token.getAccessToken(),
+                token.getUuidAccessToken(),
                 temporaryCode.getCode(),
                 appUrl
         );
@@ -103,24 +100,30 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     }
 
     @Override
-    public boolean checkEmailAvailability(String email) {
-        return accountService.findByEmail(email).isEmpty();
-    }
+    public void verifyRegistrationByUUIDAccessToken(String registrationToken) {
+        Token token = tokenService.findByUUIDAndTokenScopeCategoryId(
+                registrationToken,
+                TokenScopeCategoryEnum.BTD_REGISTRATION.getTokenScopeCategoryId()
+        ).orElseThrow(TokenException::new);
 
-    @Override
-    public void verifyRegistrationByToken(String registrationToken) {
-        String username = jwtService.extractUsername(registrationToken);
+        String username = jwtService.extractUsername(token.getAccessToken());
         if (username == null) throw new VerifyRegistrationTokenException();
 
         var account = accountService
                 .findByEmail(username)
                 .orElseThrow(() -> new AccountNotFoundException(ExceptionNameEnum.ACCOUNT_NOT_FOUND.name()));
 
-        tokenService.validateToken(registrationToken, account);
+        tokenService.validateToken(token.getAccessToken(), account);
         accountService.activateAccount(account);
 
         var user = userService.findByAccountId(account.getId()).orElse(new User());
-        eventPublisher.publishEvent(new OnRegistrationCompletedEvent(this, account, user));
+
+        var event = new OnRegistrationCompletedEvent(
+                this,
+                account,
+                user
+        );
+        eventPublisher.publishEvent(event);
 
     }
 
@@ -132,7 +135,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
         );
 
         // Se il token è presente e la sessione è uguale
-        if (token.isEmpty() || !token.get().getUuidAccessToken().equals(sessionId))
+        if (token.isEmpty())
             throw new VerifyRegistrationTokenException();
 
         // Recupero il token di accesso
@@ -142,7 +145,8 @@ public class AuthenticationServiceImpl implements AuthenticationService {
         String username = jwtService.extractUsername(registrationToken);
 
         // Se lo username è nullo sollevo un'eccezione
-        if (username == null) throw new VerifyRegistrationTokenException();
+        if (username == null)
+            throw new VerifyRegistrationTokenException();
 
         // Recupero l'utente dal database
         var account = accountService
@@ -449,7 +453,14 @@ public class AuthenticationServiceImpl implements AuthenticationService {
         var temporaryCode = temporaryCodeService.assignCode(token.get().getId());
 
         // Invio un evento quando viene completata la registrazione
-        eventPublisher.publishEvent(new OnCodeRegistrationEvent(this, account.get(), token.get().getAccessToken(), temporaryCode.getCode(), appUrl));
+        var event = new OnCodeRegistrationEvent(
+                this,
+                account.get(),
+                token.get().getUuidAccessToken(),
+                temporaryCode.getCode(),
+                appUrl
+        );
+        eventPublisher.publishEvent(event);
     }
 
     @Override

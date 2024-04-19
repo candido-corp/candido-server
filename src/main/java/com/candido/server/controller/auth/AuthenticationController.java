@@ -2,20 +2,14 @@ package com.candido.server.controller.auth;
 
 import com.candido.server.domain.v1.token.Token;
 import com.candido.server.dto.v1.request.auth.RequestAuthentication;
-import com.candido.server.dto.v1.request.auth.RequestRegister;
-import com.candido.server.dto.v1.request.auth.RequestRegisterVerifyTemporaryCode;
 import com.candido.server.dto.v1.response.auth.ResponseAuthentication;
-import com.candido.server.dto.v1.response.auth.ResponseCheckEmail;
-import com.candido.server.dto.v1.response.auth.ResponseRegistration;
 import com.candido.server.dto.v1.response.auth.ResponseToken;
 import com.candido.server.service.auth.AuthenticationService;
 import com.candido.server.service.mapstruct.TokenMapper;
 import com.candido.server.util.UtilService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -42,14 +36,10 @@ public class AuthenticationController {
         return ResponseEntity.ok(authentication);
     }
 
-    @PostMapping("/check/email/{email}")
-    public ResponseEntity<ResponseCheckEmail> checkEmailAvailability(@PathVariable("email") String email) {
-        return ResponseEntity.ok(new ResponseCheckEmail(authenticationService.checkEmailAvailability(email)));
-    }
-
     @PostMapping("/token/refresh")
     public ResponseEntity<ResponseAuthentication> refreshToken(HttpServletRequest request, HttpServletResponse response) {
-        return ResponseEntity.ok(authenticationService.refreshToken(request, response));
+        ResponseAuthentication authentication = authenticationService.refreshToken(request, response);
+        return ResponseEntity.ok(authentication);
     }
 
     @PostMapping("/register-verify/email/{email}")

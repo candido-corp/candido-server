@@ -35,24 +35,6 @@ public class AuthListenerImpl implements AuthListenerService {
     public void handleOnEmailRegistrationEvent(OnEmailRegistrationEvent event) {
         log.info("[Candido::EmailRegistration] Account -> {}", event.getAccount());
 
-//        String linkToVerify = clientDomain + "/auth/register/verify/" + event.getRegistrationToken();
-//
-//        String subject = "Confirm your identity";
-//
-//        String content = utilService.getTemplateContentFromLocalResources(
-//                "/static/email/registration.html",
-//                "Candido::Error::handleOnEmailRegistrationEvent"
-//                ).replace("{{registration.username}}", event.getAccount().getUsername())
-//                .replace("{{registration.url}}", linkToVerify);
-//
-//        emailService.sendSimpleMessage(
-//                noReply,
-//                applicationName,
-//                event.getAccount().getEmail(),
-//                subject,
-//                content
-//        );
-
         String linkToVerify = utilService.buildVerificationLink(event.getRegistrationToken());
         String content = emailService.buildRegistrationEmailContent(event.getAccount(), linkToVerify);
 
@@ -70,25 +52,6 @@ public class AuthListenerImpl implements AuthListenerService {
     @EventListener
     public void handleOnCodeRegistrationEvent(OnCodeRegistrationEvent event) {
         log.info("[Candido::CodeRegistration] Account -> {}", event.getAccount());
-
-//        String linkToVerify = clientDomain + "/auth/register/verify/" + event.getRegistrationToken();
-//
-//        String subject = "Here's your verification code " + event.getTemporaryCode();
-//        String content = utilService.getTemplateContentFromLocalResources(
-//                        "/static/email/registration_by_code.html",
-//                        "Candido::Error::handleOnEmailRegistrationEvent"
-//                )
-//                .replace("{{registration.code}}", String.valueOf(event.getTemporaryCode()))
-//                .replace("{{registration.username}}", event.getAccount().getUsername())
-//                .replace("{{registration.url}}", linkToVerify);
-//
-//        emailService.sendSimpleMessage(
-//                noReply,
-//                applicationName,
-//                event.getAccount().getEmail(),
-//                subject,
-//                content
-//        );
 
         String linkToVerify = utilService.buildCodeVerificationLink(event.getRegistrationToken());
         String content = emailService.buildCodeVerificationEmailContent(event.getAccount(), event.getTemporaryCode(), linkToVerify);
