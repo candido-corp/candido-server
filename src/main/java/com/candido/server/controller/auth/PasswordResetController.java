@@ -34,8 +34,10 @@ public class PasswordResetController {
         return ResponseEntity.noContent().build();
     }
 
-    @PostMapping("/verify-token/{token}")
-    public ResponseEntity<Void> verifyResetToken(@PathVariable("token") String token) {
+    @PostMapping("/verify/{uuidAccessToken}")
+    public ResponseEntity<Void> verifyResetPasswordByUUIDAccessToken(
+            @PathVariable("token") String token
+    ) {
         authenticationService.getAccountAndVerifyToken(
                 token,
                 TokenScopeCategoryEnum.BTD_RESET.getTokenScopeCategoryId()

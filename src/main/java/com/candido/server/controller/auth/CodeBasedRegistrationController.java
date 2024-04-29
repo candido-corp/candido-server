@@ -41,7 +41,7 @@ public class CodeBasedRegistrationController {
         return ResponseEntity.noContent().build();
     }
 
-    @PostMapping("/verify/{sessionId}")
+    @PostMapping("/verify/{uuiAccessToken}")
     public ResponseEntity<Void> verifyCodeRegistrationBySessionIdAndTemporaryCode(
             @PathVariable("sessionId") String sessionId,
             @Valid @RequestBody RequestRegisterVerifyTemporaryCode request

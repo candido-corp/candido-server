@@ -4,6 +4,6 @@ public interface AuthListenerService {
     void handleOnEmailRegistrationEvent(OnEmailRegistrationEvent event);
     void handleOnCodeRegistrationEvent(OnCodeRegistrationEvent event);
     void handleOnRegistrationCompletedEvent(OnRegistrationCompletedEvent event);
-    void handleOnResetAccountEvent(OnResetAccountEvent event);
-    void handleOnResetAccountCompletedEvent(OnResetAccountCompletedEvent event);
+    void handleOnResetPasswordEvent(OnResetAccountEvent event);
+    void handleOnResetPasswordCompletedEvent(OnResetAccountCompletedEvent event);
 }

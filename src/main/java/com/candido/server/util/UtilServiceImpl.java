@@ -57,11 +57,11 @@ public class UtilServiceImpl implements UtilService {
     }
 
     @Override
-    public String buildVerificationLink(String token) {
+    public String buildEmailVerificationLink(String token) {
         return UriComponentsBuilder
                 .fromHttpUrl(clientDomain)
-                .path("/auth/register/verify/")
-                .queryParam("token", token)
+                .path("/auth/register/email/verify")
+                .queryParam("t", token)
                 .toUriString();
     }
 
@@ -69,8 +69,17 @@ public class UtilServiceImpl implements UtilService {
     public String buildCodeVerificationLink(String token) {
         return UriComponentsBuilder
                 .fromHttpUrl(clientDomain)
-                .path("/auth/register/verify/code")
-                .queryParam("token", token)
+                .path("/auth/register/code/verify")
+                .queryParam("t", token)
+                .toUriString();
+    }
+
+    @Override
+    public String buildResetPasswordLink(String token) {
+        return UriComponentsBuilder
+                .fromHttpUrl(clientDomain)
+                .path("/auth/reset-password/verify")
+                .queryParam("t", token)
                 .toUriString();
     }
 
