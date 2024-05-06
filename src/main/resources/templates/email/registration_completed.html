@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Welcome to Candido!</title>
+    <style>
+        body {
+            background-color: #ffffff;
+            color: #000000;
+            font-family: 'Montserrat', sans-serif;
+            margin: 0;
+            padding: 0;
+        }
+        .container {
+            max-width: 600px;
+            margin: 20px auto;
+            padding: 0;
+        }
+        .header img {
+            height: 50px;
+            margin-top: 10px;
+        }
+        .main-content {
+            background-color: #D3EFFF;
+            border-radius: 8px;
+            margin: 20px 0;
+            padding: 24px;
+            text-align: center;
+        }
+        .info-box {
+            background-color: #ffffff;
+            padding: 15px 20px;
+            border-radius: 0.5em;
+            text-align: left;
+            margin: 20px auto;
+            width: 550px;
+            font-size: 16px;
+            line-height: 140%;
+            color: #8e8e8e;
+        }
+        .footer {
+            font-size: 10px;
+            text-align: center;
+            color: #6a737d;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <div class="header">
+        <img src="https://i.postimg.cc/sXVJZkKF/temp-Imageq-IMotl.jpg" alt="Logo Candido">
+    </div>
+    <div class="main-content">
+        <h1>Welcome to Candido!</h1>
+        <p>Congratulations, <strong th:text="${username}">{{registration.username}}</strong>! Your registration is now complete.</p>
+        <p>We're excited to have you on board and can't wait to see all that you'll accomplish with Candido by your side!</p>
+        <div class="info-box">
+            <p><span>First name:</span> <strong th:text="${first_name}">{{registration.first_name}}</strong></p>
+            <p><span>Last name:</span> <strong th:text="${last_name}">{{registration.last_name}}</strong></p>
+            <p><span>E-mail:</span> <strong th:text="${username}">{{registration.username}}</strong></p>
+        </div>
+        <p>To start enjoying the services of Candido, simply log in to your account using your credentials. Feel free to explore our platform.</p>
+        <p>Thank you for choosing Candido. Opportunities are just waiting for you!</p>
+    </div>
+    <div class="footer">
+        This email was sent to <strong th:text="${username}">{{registration.username}}</strong>, which is associated with a registered Candido account.
+        <br>
+        © 2023 Candido - All Rights Reserved
+        <br>
+        <a href="" target="_blank">Camponogara, Venice - Italy</a>
+    </div>
+</div>
+</body>
+</html>
