@@ -33,20 +33,20 @@ public class CodeBasedRegistrationController {
 
     @PostMapping("/resend")
     public ResponseEntity<Void> resendCodeForCodeVerification(
-            @PathVariable("sessionId") String sessionId,
+            @RequestParam("s") String sessionId,
             HttpServletRequest httpRequest
     ) {
         String appURL = utilService.getAppUrl(httpRequest);
-        authenticationService.resendCodeRegistrationBySessionId(sessionId, appURL);
+        authenticationService.resendCodeRegistrationByUUIDAccessToken(sessionId, appURL);
         return ResponseEntity.noContent().build();
     }
 
-    @PostMapping("/verify/{uuiAccessToken}")
+    @PostMapping("/verify")
     public ResponseEntity<Void> verifyCodeRegistrationBySessionIdAndTemporaryCode(
-            @PathVariable("sessionId") String sessionId,
+            @RequestParam("t") String uuiAccessToken,
             @Valid @RequestBody RequestRegisterVerifyTemporaryCode request
     ) {
-        authenticationService.verifyRegistrationBySessionIdAndTemporaryCode(sessionId, request.temporaryCode());
+        authenticationService.verifyRegistrationByUUIDAccessTokenAndTemporaryCode(uuiAccessToken, request.temporaryCode());
         return ResponseEntity.noContent().build();
     }
 

@@ -1,6 +1,6 @@
 package com.candido.server.controller.auth;
 
-import com.candido.server.domain.v1.token.TokenScopeCategoryEnum;
+import com.candido.server.domain.v1.account.Account;
 import com.candido.server.dto.v1.request.auth.RequestPasswordReset;
 import com.candido.server.dto.v1.request.auth.RequestPasswordResetEmail;
 import com.candido.server.dto.v1.response.auth.ResponseAuthentication;
@@ -34,26 +34,22 @@ public class PasswordResetController {
         return ResponseEntity.noContent().build();
     }
 
-    @PostMapping("/verify/{uuidAccessToken}")
+    @GetMapping("/check-validity")
     public ResponseEntity<Void> verifyResetPasswordByUUIDAccessToken(
-            @PathVariable("token") String token
+            @RequestParam("t") String uuidAccessToken
     ) {
-        authenticationService.getAccountAndVerifyToken(
-                token,
-                TokenScopeCategoryEnum.BTD_RESET.getTokenScopeCategoryId()
-        );
-
+        authenticationService.checkValidityOfUUIDAccessTokenForResetPassword(uuidAccessToken);
         return ResponseEntity.noContent().build();
     }
 
-    @PostMapping("/change-password/{token}")
+    @PostMapping("/change-password")
     public ResponseEntity<ResponseAuthentication> resetPassword(
-            @PathVariable("token") String token,
+            @RequestParam("t") String uuidAccessToken,
             @RequestBody RequestPasswordReset request,
             HttpServletRequest httpRequest
     ) {
         ResponseAuthentication authentication = authenticationService.resetPassword(
-                token,
+                uuidAccessToken,
                 request,
                 utilService.getClientIP(httpRequest)
         );

@@ -29,9 +29,9 @@ public class EmailBasedRegistrationController {
         return ResponseEntity.noContent().build();
     }
 
-    @PostMapping("/verify/{uuidAccessToken}")
+    @PostMapping("/verify")
     public ResponseEntity<Void> verifyEmailRegistrationByUUIDAccessToken(
-            @PathVariable("uuidAccessToken") String uuidAccessToken
+            @RequestParam("t") String uuidAccessToken
     ) {
         authenticationService.verifyRegistrationByUUIDAccessToken(uuidAccessToken);
         return ResponseEntity.noContent().build();

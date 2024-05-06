@@ -64,6 +64,9 @@ public class TokenServiceImpl implements TokenService {
                 .atZone(ZoneId.systemDefault())
                 .toLocalDateTime();
 
+        // UUID access token
+        String uuidAccessToken = UUID.randomUUID().toString().replaceAll("-", "");
+
         // Creo il token per l'utente
         var token = Token
                 .builder()
@@ -73,11 +76,8 @@ public class TokenServiceImpl implements TokenService {
                 .accessTokenExpiration(accessTokenExpiration)
                 .tokenScopeCategory(new TokenScopeCategory(tokenScopeCategoryEnum.getTokenScopeCategoryId()))
                 .ipAddress(ipAddress)
+                .uuidAccessToken(uuidAccessToken)
                 .build();
-
-        // Imposto un UUID nel caso della registrazione
-        if(tokenScopeCategoryEnum.getTokenScopeCategoryId() == TokenScopeCategoryEnum.BTD_REGISTRATION.getTokenScopeCategoryId())
-            token.setUuidAccessToken(UUID.randomUUID().toString().replaceAll("-", ""));
 
         // Imposto il refresh token se non nullo
         if(refreshToken != null) {

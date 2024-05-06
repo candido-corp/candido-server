@@ -100,14 +100,15 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     }
 
     @Override
-    public void verifyRegistrationByUUIDAccessToken(String registrationToken) {
+    public void verifyRegistrationByUUIDAccessToken(String uuidAccessToken) {
         Token token = tokenService.findByUUIDAndTokenScopeCategoryId(
-                registrationToken,
+                uuidAccessToken,
                 TokenScopeCategoryEnum.BTD_REGISTRATION.getTokenScopeCategoryId()
         ).orElseThrow(TokenException::new);
 
         String username = jwtService.extractUsername(token.getAccessToken());
-        if (username == null) throw new VerifyRegistrationTokenException();
+        if (username == null)
+            throw new VerifyRegistrationTokenException();
 
         var account = accountService
                 .findByEmail(username)
@@ -128,18 +129,17 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     }
 
     @Override
-    public void verifyRegistrationBySessionIdAndTemporaryCode(String sessionId, String temporaryCode) {
-        // Recupero il token in base alla sessione e allo scopo di registrazione
-        Optional<Token> token = tokenService.findByUUIDAndTokenScopeCategoryId(
-                sessionId, TokenScopeCategoryEnum.BTD_REGISTRATION.getTokenScopeCategoryId()
-        );
-
-        // Se il token è presente e la sessione è uguale
-        if (token.isEmpty())
-            throw new VerifyRegistrationTokenException();
+    public void verifyRegistrationByUUIDAccessTokenAndTemporaryCode(String uuidAccessToken, String temporaryCode) {
+        // Recupero il token in base al UUID e allo scopo di registrazione
+        Token token = tokenService
+                .findByUUIDAndTokenScopeCategoryId(
+                        uuidAccessToken,
+                        TokenScopeCategoryEnum.BTD_REGISTRATION.getTokenScopeCategoryId()
+                )
+                .orElseThrow(VerifyRegistrationTokenException::new);
 
         // Recupero il token di accesso
-        String registrationToken = token.get().getAccessToken();
+        String registrationToken = token.getAccessToken();
 
         // Estraggo lo username dal token
         String username = jwtService.extractUsername(registrationToken);
@@ -165,7 +165,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
             throw new VerifyRegistrationTokenException();
 
         // Se l'ID del token è diverso dell'ID del token della sessione
-        if(!Objects.equals(code.get().getTokenId(), token.get().getId()))
+        if(!Objects.equals(code.get().getTokenId(), token.getId()))
             throw new VerifyRegistrationTokenException();
 
         // Abilito l'account
@@ -173,7 +173,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
         accountService.save(account);
 
         // Elimino il token di registrazione
-        tokenService.delete(token.get());
+        tokenService.delete(token);
 
         // Recupero l'utente
         var user = userService.findByAccountId(account.getId()).orElse(new User());
@@ -318,7 +318,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
             var accessToken = jwtService.generateResetToken(account.get());
 
             // Salva il token dell'utente
-            tokenService.saveUserToken(
+            Token token = tokenService.saveUserToken(
                     account.get(),
                     accessToken,
                     null,
@@ -328,19 +328,28 @@ public class AuthenticationServiceImpl implements AuthenticationService {
             );
 
             // Invio un evento quando viene completato il reset
-            eventPublisher.publishEvent(new OnResetAccountEvent(this, account.get(), accessToken, appUrl));
+            eventPublisher.publishEvent(new OnResetAccountEvent(this, account.get(), token.getUuidAccessToken(), appUrl));
 
         }
 
     }
 
     @Override
-    public ResponseAuthentication resetPassword(String resetToken, RequestPasswordReset request, String ipAddress) {
+    public ResponseAuthentication resetPassword(String uuidAccessToken, RequestPasswordReset request, String ipAddress) {
+        // Recupero il token in base al UUID
+        Token token = tokenService
+                .findByUUIDAndTokenScopeCategoryId(
+                        uuidAccessToken,
+                        TokenScopeCategoryEnum.BTD_RESET.getTokenScopeCategoryId()
+                )
+                .orElseThrow(VerifyRegistrationTokenException::new);
+
         // Estraggo lo username dal token
-        String username = jwtService.extractUsername(resetToken);
+        String username = jwtService.extractUsername(token.getAccessToken());
 
         // Se lo username è nullo sollevo un'eccezione
-        if (username == null) throw new VerifyResetTokenException();
+        if (username == null)
+            throw new VerifyResetTokenException();
 
         // Recupero l'utente dal database
         var account = accountService
@@ -348,16 +357,8 @@ public class AuthenticationServiceImpl implements AuthenticationService {
                 .orElseThrow(() -> new AccountNotFoundException(ExceptionNameEnum.ACCOUNT_NOT_FOUND.name()));
 
         // Controllo che il token sia valido altrimenti sollevo un'eccezione
-        if (!jwtService.isValidToken(resetToken, account)) throw new VerifyResetTokenException();
-
-        // Recupero il token in base all'account ID e allo scopo di reset
-        Optional<Token> tokenReset = tokenService.findByAccountIdAndTokenScopeCategoryId(
-                account.getId(), TokenScopeCategoryEnum.BTD_RESET.getTokenScopeCategoryId()
-        );
-
-        // Se il token è presente e uguale a quello che mi è arrivato
-        if (tokenReset.isEmpty() || !tokenReset.get().getAccessToken().equals(resetToken))
-            throw new VerifyRegistrationTokenException();
+        if (!jwtService.isValidToken(token.getAccessToken(), account))
+            throw new VerifyResetTokenException();
 
         // Modifico la password
         PasswordConstraintValidator.isValid(request.password());
@@ -375,7 +376,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
         accountService.save(account);
 
         // Elimino il token di reset
-        tokenService.delete(tokenReset.get());
+        tokenService.delete(token);
 
         // Invio un evento quando viene resettata la password
         eventPublisher.publishEvent(new OnResetAccountCompletedEvent(this, account));
@@ -390,7 +391,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
         tokenService.revokeAllAccountTokens(account);
 
         // Salvo il token dell'utente
-        var token = tokenService.saveUserToken(
+        var tokenRW = tokenService.saveUserToken(
                 account,
                 accessToken,
                 refreshToken,
@@ -402,20 +403,25 @@ public class AuthenticationServiceImpl implements AuthenticationService {
         // Creo la risposta da inviare
         return ResponseAuthentication
                 .builder()
-                .accessToken(token.getAccessToken())
+                .accessToken(tokenRW.getAccessToken())
                 .expiresIn(appPropertiesConfig.getSecurity().getJwt().getExpiration())
-                .refreshToken(token.getRefreshToken())
+                .refreshToken(tokenRW.getRefreshToken())
                 .refreshExpiresIn(appPropertiesConfig.getSecurity().getJwt().getRefreshToken().getExpiration())
                 .build();
     }
 
     @Override
-    public Account getAccountAndVerifyToken(String token, int tokenScopeCategoryId) {
+    public void checkValidityOfUUIDAccessTokenForResetPassword(String uuidAccessToken) {
+        // Recupero il token in base al UUID
+        Token token = tokenService.findByUUIDAndTokenScopeCategoryId(uuidAccessToken, TokenScopeCategoryEnum.BTD_RESET.getTokenScopeCategoryId())
+                .orElseThrow(TokenException::new);
+
         // Estraggo lo username dal token
-        String username = jwtService.extractUsername(token);
+        String username = jwtService.extractUsername(token.getAccessToken());
 
         // Se lo username è nullo sollevo un'eccezione
-        if (username == null) throw new TokenException();
+        if (username == null)
+            throw new TokenException();
 
         // Recupero l'utente dal database
         var account = accountService
@@ -423,30 +429,25 @@ public class AuthenticationServiceImpl implements AuthenticationService {
                 .orElseThrow(() -> new AccountNotFoundException(ExceptionNameEnum.ACCOUNT_NOT_FOUND.name()));
 
         // Controllo che il token sia valido altrimenti sollevo un'eccezione
-        if (!jwtService.isValidToken(token, account)) throw new TokenException();
-
-        // Recupero il token in base all'account ID e allo scopo di reset
-        Optional<Token> optionalToken = tokenService.findByAccountIdAndTokenScopeCategoryId(
-                account.getId(), tokenScopeCategoryId
-        );
-
-        // Se il token è presente e uguale a quello che mi è arrivato
-        if (optionalToken.isEmpty() || !optionalToken.get().getAccessToken().equals(token))
+        if (!jwtService.isValidToken(token.getAccessToken(), account))
             throw new TokenException();
-
-        return account;
     }
 
     @Override
-    public void resendCodeRegistrationBySessionId(String sessionId, String appUrl) {
+    public void resendCodeRegistrationByUUIDAccessToken(String uuidAccessToken, String appUrl) {
         var token = tokenService
-                .findByUUIDAndTokenScopeCategoryId(sessionId, TokenScopeCategoryEnum.BTD_REGISTRATION.getTokenScopeCategoryId());
+                .findByUUIDAndTokenScopeCategoryId(
+                        uuidAccessToken,
+                        TokenScopeCategoryEnum.BTD_REGISTRATION.getTokenScopeCategoryId()
+                );
 
-        if(token.isEmpty()) throw new TokenException();
+        if(token.isEmpty())
+            throw new TokenException();
 
         var account = accountService.findById(token.get().getAccount().getId());
 
-        if(account.isEmpty()) throw new AccountNotFoundException(ExceptionNameEnum.ACCOUNT_NOT_FOUND.name());
+        if(account.isEmpty())
+            throw new AccountNotFoundException(ExceptionNameEnum.ACCOUNT_NOT_FOUND.name());
 
         temporaryCodeService.findByTokenId(token.get().getId()).ifPresent(temporaryCodeService::delete);
 
