@@ -197,8 +197,9 @@ public class AuthenticationServiceImpl implements AuthenticationService {
         );
 
         // Se arrivato a questo punto significa che l'utente è corretto quindi recuperiamolo
-        var user = accountService.findByEmail(request.email())
-                .orElseThrow();
+        var user = accountService
+                .findByEmail(request.email())
+                .orElseThrow(() -> new AccountNotFoundException(ExceptionNameEnum.ACCOUNT_NOT_FOUND.name()));
 
         // Creo un token con i dati dell'utente creato
         var accessToken = jwtService.generateToken(user);
