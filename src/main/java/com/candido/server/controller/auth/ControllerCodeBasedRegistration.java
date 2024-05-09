@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequestMapping("/api/v1/auth/register/code")
 @RequiredArgsConstructor
-public class CodeBasedRegistrationController {
+public class ControllerCodeBasedRegistration {
 
     private final AuthenticationService authenticationService;
 

@@ -12,7 +12,7 @@ import java.util.List;
 @EnableAsync
 @Configuration
 @ConfigurationProperties(prefix = "application")
-public class AppPropertiesConfig {
+public class ConfigAppProperties {
 
     private List<String> authorizedRedirectUris = new ArrayList<>();
 

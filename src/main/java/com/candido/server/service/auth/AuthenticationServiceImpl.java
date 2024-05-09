@@ -1,6 +1,6 @@
 package com.candido.server.service.auth;
 
-import com.candido.server.config.AppPropertiesConfig;
+import com.candido.server.config.ConfigAppProperties;
 import com.candido.server.domain.v1.account.*;
 import com.candido.server.domain.v1.token.Token;
 import com.candido.server.domain.v1.token.TokenScopeCategoryEnum;
@@ -56,7 +56,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 
     private final ApplicationEventPublisher eventPublisher;
 
-    private final AppPropertiesConfig appPropertiesConfig;
+    private final ConfigAppProperties configAppProperties;
 
     private final UserService userService;
 
@@ -224,9 +224,9 @@ public class AuthenticationServiceImpl implements AuthenticationService {
         return ResponseAuthentication
                 .builder()
                 .accessToken(accessToken)
-                .expiresIn(appPropertiesConfig.getSecurity().getJwt().getExpiration())
+                .expiresIn(configAppProperties.getSecurity().getJwt().getExpiration())
                 .refreshToken(refreshToken)
-                .refreshExpiresIn(appPropertiesConfig.getSecurity().getJwt().getRefreshToken().getExpiration())
+                .refreshExpiresIn(configAppProperties.getSecurity().getJwt().getRefreshToken().getExpiration())
                 .build();
     }
 
@@ -298,9 +298,9 @@ public class AuthenticationServiceImpl implements AuthenticationService {
         return ResponseAuthentication
                 .builder()
                 .accessToken(token.getAccessToken())
-                .expiresIn(appPropertiesConfig.getSecurity().getJwt().getExpiration())
+                .expiresIn(configAppProperties.getSecurity().getJwt().getExpiration())
                 .refreshToken(token.getRefreshToken())
-                .refreshExpiresIn(appPropertiesConfig.getSecurity().getJwt().getRefreshToken().getExpiration())
+                .refreshExpiresIn(configAppProperties.getSecurity().getJwt().getRefreshToken().getExpiration())
                 .build();
 
     }
@@ -405,9 +405,9 @@ public class AuthenticationServiceImpl implements AuthenticationService {
         return ResponseAuthentication
                 .builder()
                 .accessToken(tokenRW.getAccessToken())
-                .expiresIn(appPropertiesConfig.getSecurity().getJwt().getExpiration())
+                .expiresIn(configAppProperties.getSecurity().getJwt().getExpiration())
                 .refreshToken(tokenRW.getRefreshToken())
-                .refreshExpiresIn(appPropertiesConfig.getSecurity().getJwt().getRefreshToken().getExpiration())
+                .refreshExpiresIn(configAppProperties.getSecurity().getJwt().getRefreshToken().getExpiration())
                 .build();
     }
 

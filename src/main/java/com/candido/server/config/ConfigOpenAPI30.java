@@ -1,4 +1,4 @@
-package com.candido.server.config.openapi;
+package com.candido.server.config;
 
 import io.swagger.v3.oas.models.Components;
 import io.swagger.v3.oas.models.OpenAPI;
@@ -8,7 +8,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 @Configuration
-public class OpenAPI30Configuration {
+public class ConfigOpenAPI30 {
 
     @Bean
     public OpenAPI customizeOpenAPI() {

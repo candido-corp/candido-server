@@ -1,6 +1,6 @@
 package com.candido.server.security.config;
 
-import com.candido.server.config.AppPropertiesConfig;
+import com.candido.server.config.ConfigAppProperties;
 import com.candido.server.domain.v1.token.JWTStateEnum;
 import com.candido.server.exception._common.BTExceptionResolver;
 import com.candido.server.exception.security.jwt.SecurityJWTException;
@@ -27,7 +27,7 @@ public class JwtService {
     private BTExceptionResolver btExceptionResolver;
 
     @Autowired
-    private AppPropertiesConfig appPropertiesConfig;
+    private ConfigAppProperties configAppProperties;
 
     /**
      * Estrae lo username dal token inviato nel header della richiesta.
@@ -58,7 +58,7 @@ public class JwtService {
      * @return la stringa contenente il token.
      */
     public String generateRegistrationToken(UserDetails userDetails) {
-        int expirationTimeMillis = appPropertiesConfig.getSecurity().getJwt().getRegistrationToken().getExpiration();
+        int expirationTimeMillis = configAppProperties.getSecurity().getJwt().getRegistrationToken().getExpiration();
         return buildToken(new HashMap<>(), userDetails, expirationTimeMillis);
     }
 
@@ -69,7 +69,7 @@ public class JwtService {
      * @return la stringa contenente il token.
      */
     public String generateResetToken(UserDetails userDetails) {
-        int expirationTimeMillis = appPropertiesConfig.getSecurity().getJwt().getResetToken().getExpiration();
+        int expirationTimeMillis = configAppProperties.getSecurity().getJwt().getResetToken().getExpiration();
         return buildToken(new HashMap<>(), userDetails, expirationTimeMillis);
     }
 
@@ -91,7 +91,7 @@ public class JwtService {
      * @return la stringa contenente il token.
      */
     public String generateToken(Map<String, Object> extraClaims, UserDetails userDetails) {
-        int expirationTimeMillis = appPropertiesConfig.getSecurity().getJwt().getExpiration();
+        int expirationTimeMillis = configAppProperties.getSecurity().getJwt().getExpiration();
         extraClaims.put("roles", userDetails.getAuthorities());
         return buildToken(extraClaims, userDetails, expirationTimeMillis);
     }
@@ -103,7 +103,7 @@ public class JwtService {
      * @return la stringa contenente il token.
      */
     public String generateRefreshToken(UserDetails userDetails) {
-        int expirationTimeMillis = appPropertiesConfig.getSecurity().getJwt().getRefreshToken().getExpiration();
+        int expirationTimeMillis = configAppProperties.getSecurity().getJwt().getRefreshToken().getExpiration();
         return buildToken(new HashMap<>(), userDetails, expirationTimeMillis);
     }
 
@@ -212,7 +212,7 @@ public class JwtService {
      * @return chiave privata con algoritmo HMAC-SHA.
      */
     private SecretKey getSignInKey() {
-        String secretKey = appPropertiesConfig.getSecurity().getJwt().getSecretKey();
+        String secretKey = configAppProperties.getSecurity().getJwt().getSecretKey();
         byte[] keyBytes = Decoders.BASE64.decode(secretKey);
         return Keys.hmacShaKeyFor(keyBytes);
     }

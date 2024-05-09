@@ -13,7 +13,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping("/api/v1/me/password")
 @RequiredArgsConstructor
-public class AccountPasswordController {
+public class ControllerAccountPassword {
 
     private final AccountService accountService;
 

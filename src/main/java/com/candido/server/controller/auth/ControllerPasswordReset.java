@@ -1,6 +1,5 @@
 package com.candido.server.controller.auth;
 
-import com.candido.server.domain.v1.account.Account;
 import com.candido.server.dto.v1.request.auth.RequestPasswordReset;
 import com.candido.server.dto.v1.request.auth.RequestPasswordResetEmail;
 import com.candido.server.dto.v1.response.auth.ResponseAuthentication;
@@ -14,7 +13,7 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequestMapping("/api/v1/auth/reset-password")
 @RequiredArgsConstructor
-public class PasswordResetController {
+public class ControllerPasswordReset {
 
     private final AuthenticationService authenticationService;
 

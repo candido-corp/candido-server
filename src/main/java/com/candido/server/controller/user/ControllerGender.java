@@ -14,7 +14,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/v1/genders")
-public class GenderController {
+public class ControllerGender {
 
     @Autowired
     GenderService genderService;

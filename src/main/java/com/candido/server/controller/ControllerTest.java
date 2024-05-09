@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/docker/test")
-public class TestController {
+public class ControllerTest {
 
     @Autowired
     EmailService emailService;
