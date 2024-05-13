@@ -1,8 +1,8 @@
 package com.candido.server.exception.security.jwt;
 
-import com.candido.server.exception._common.BTException;
+import com.candido.server.exception._common.CustomRuntimeException;
 
-public class SecurityJWTException extends BTException {
+public class SecurityJWTException extends CustomRuntimeException {
 
     public SecurityJWTException(String message) {
         super(message);

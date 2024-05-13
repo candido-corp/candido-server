@@ -37,14 +37,14 @@ public class BTExceptionResolver {
     }
 
     public ResponseEntity<BTExceptionResponse> resolveAuthenticationBTException(
-            BTException ex, Locale locale, HttpStatus httpStatus
+            CustomRuntimeException ex, Locale locale, HttpStatus httpStatus
     ) {
         String errorMessage = authenticationMessageSource.getMessage(ex.getMessage(), ex.getArgs(), locale);
         return new ResponseEntity<>(new BTExceptionResponse(errorMessage, httpStatus), httpStatus);
     }
 
     public ResponseEntity<BTExceptionResponse> resolveBusinessBTException(
-            BTException ex, Locale locale, HttpStatus httpStatus
+            CustomRuntimeException ex, Locale locale, HttpStatus httpStatus
     ) {
         String errorMessage = businessMessageSource.getMessage(ex.getMessage(), ex.getArgs(), locale);
         return new ResponseEntity<>(new BTExceptionResponse(errorMessage, httpStatus), httpStatus);
@@ -62,7 +62,7 @@ public class BTExceptionResolver {
     }
 
     public ResponseEntity<BTExceptionResponse> resolveValidationBTException(
-            BTException ex, Locale locale, HttpStatus httpStatus
+            CustomRuntimeException ex, Locale locale, HttpStatus httpStatus
     ) {
         String errorMessage = validationMessageSource.getMessage(ex.getMessage(), ex.getArgs(), locale);
         return new ResponseEntity<>(new BTExceptionResponse(errorMessage, httpStatus), httpStatus);

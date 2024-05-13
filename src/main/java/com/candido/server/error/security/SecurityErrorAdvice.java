@@ -1,11 +1,10 @@
 package com.candido.server.error.security;
 
-import com.candido.server.exception._common.BTException;
+import com.candido.server.exception._common.CustomRuntimeException;
 import com.candido.server.exception._common.BTExceptionResolver;
 import com.candido.server.exception._common.BTExceptionResponse;
 import com.candido.server.exception.security.auth.*;
 import com.candido.server.exception.security.jwt.InvalidJWTTokenException;
-import io.swagger.v3.oas.annotations.Hidden;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -35,8 +34,8 @@ public class SecurityErrorAdvice {
             TemporaryCodeException.class
     })
     @ResponseStatus(HttpStatus.UNAUTHORIZED)
-    public ResponseEntity<Void> handleTokenException(BTException ex, Locale locale) {
-        log.info("[EXCEPTION] ({}) -> {}", BTException.class.getName(), LocalDateTime.now());
+    public ResponseEntity<Void> handleTokenException(CustomRuntimeException ex, Locale locale) {
+        log.info("[EXCEPTION] ({}) -> {}", CustomRuntimeException.class.getName(), LocalDateTime.now());
         return new ResponseEntity<>(null, HttpStatus.UNAUTHORIZED);
     }
 
