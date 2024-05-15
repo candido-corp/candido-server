@@ -2,9 +2,9 @@ package com.candido.server.error.security;
 
 import com.candido.server.exception._common.CustomRuntimeException;
 import com.candido.server.exception._common.BTExceptionResolver;
-import com.candido.server.exception._common.BTExceptionResponse;
+import com.candido.server.exception._common.ErrorResponse;
 import com.candido.server.exception.security.auth.*;
-import com.candido.server.exception.security.jwt.InvalidJWTTokenException;
+import com.candido.server.exception.security.jwt.ExceptionInvalidJWTToken;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,11 +27,11 @@ public class SecurityErrorAdvice {
     BTExceptionResolver btExceptionResolver;
 
     @ExceptionHandler({
-            VerifyRegistrationTokenException.class,
-            InvalidJWTTokenException.class,
-            VerifyResetTokenException.class,
-            TokenException.class,
-            TemporaryCodeException.class
+            ExceptionVerifyRegistrationToken.class,
+            ExceptionInvalidJWTToken.class,
+            ExceptionVerifyResetToken.class,
+            ExceptionToken.class,
+            ExceptionTemporaryCode.class
     })
     @ResponseStatus(HttpStatus.UNAUTHORIZED)
     public ResponseEntity<Void> handleTokenException(CustomRuntimeException ex, Locale locale) {
@@ -39,9 +39,9 @@ public class SecurityErrorAdvice {
         return new ResponseEntity<>(null, HttpStatus.UNAUTHORIZED);
     }
 
-    @ExceptionHandler({AuthException.class})
+    @ExceptionHandler({ExceptionAuth.class})
     @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public ResponseEntity<BTExceptionResponse> handleAuthenticationException(AuthException ex, Locale locale) {
+    public ResponseEntity<ErrorResponse> handleAuthenticationException(ExceptionAuth ex, Locale locale) {
         log.info("[EXCEPTION] ({}) -> {}", AuthenticationException.class.getName(), LocalDateTime.now());
         return btExceptionResolver.resolveAuthenticationBTException(ex, locale, HttpStatus.BAD_REQUEST);
     }

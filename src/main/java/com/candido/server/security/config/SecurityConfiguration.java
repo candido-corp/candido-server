@@ -58,13 +58,9 @@ public class SecurityConfiguration {
     @Bean
     public SecurityFilterChain jwtSecurityFilterChain(HttpSecurity httpSecurity) throws Exception {
         httpSecurity
-                // Disabilito il Cross-Site Request Forgery
                 .csrf(AbstractHttpConfigurer::disable)
-                .cors(httpSecurityCorsConfigurer -> httpSecurityCorsConfigurer
-                        .configurationSource(corsConfigurationSource())
-                )
+                .cors(httpSecurityCorsConfigurer -> httpSecurityCorsConfigurer.configurationSource(corsConfigurationSource()))
                 .authorizeHttpRequests(auth -> auth
-                        // Abilita una whitelist di url
                         // TODO: Elimina i path che non c'entrano
                         .requestMatchers(
                                 "/api/v1/auth/**", "/oauth2/**", "/",
@@ -77,28 +73,23 @@ public class SecurityConfiguration {
                         )
                         .permitAll()
 
-                        // Imposto la sicurezza per i path
+                        // Admin
                         .requestMatchers("/api/v1/admin/**").hasAnyRole(AccountRoleEnum.ADMIN.name())
                         .requestMatchers(HttpMethod.GET, "/api/v1/admin/**").hasAuthority(AccountPermissionEnum.ADMIN_READ.name())
                         .requestMatchers(HttpMethod.POST, "/api/v1/admin/**").hasAuthority(AccountPermissionEnum.ADMIN_CREATE.name())
 
-                        // Per tutti gli altri url bisogna essere autenticati
                         .anyRequest()
                         .authenticated()
                 )
                 .formLogin(AbstractAuthenticationFilterConfigurer::permitAll)
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-                // Forniamo AuthenticationProvider creato in ApplicationConfig
                 .authenticationProvider(authenticationProvider)
-                // Prima di tutto utilizziamo il filtro creato in JwtAuthenticationFilter
                 .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class)
-                // Aggiungo il path del logout con il suo handler
                 .logout(logout -> logout
                         .logoutUrl("/api/v1/auth/logout")
                         .addLogoutHandler(logoutHandler)
                         .logoutSuccessHandler(((request, response, authentication) -> SecurityContextHolder.clearContext()))
                 )
-                // Imposto come valore di status il 401 quando fallisce l'autenticazione
                 .exceptionHandling(httpSecurityExceptionHandlingConfigurer ->
                         httpSecurityExceptionHandlingConfigurer.authenticationEntryPoint(jwtAuthenticationEntryPoint)
                 );

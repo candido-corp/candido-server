@@ -7,11 +7,11 @@ import org.springframework.http.HttpStatus;
 import java.time.LocalDateTime;
 
 /**
- * BTExceptionResponse represents a response object for custom exceptions in the application.
+ * ErrorResponse represents a response object for custom exceptions in the application.
  * It contains information such as the exception message, HTTP status, and the timestamp when the object instance was created.
  */
 @Getter
-public class BTExceptionResponse {
+public class ErrorResponse {
 
     /**
      * The message associated with the exception.
@@ -32,12 +32,12 @@ public class BTExceptionResponse {
     private final LocalDateTime timestamp;
 
     /**
-     * Constructs a new BTExceptionResponse object with the provided message, HTTP status, and the current timestamp.
+     * Constructs a new ErrorResponse object with the provided message, HTTP status, and the current timestamp.
      *
      * @param message    The exception message.
      * @param httpStatus The HTTP status associated with the exception.
      */
-    public BTExceptionResponse(String message, HttpStatus httpStatus) {
+    public ErrorResponse(String message, HttpStatus httpStatus) {
         this.message = message;
         this.status = httpStatus.value();
         this.timestamp = LocalDateTime.now();

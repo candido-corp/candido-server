@@ -1,7 +1,7 @@
 package com.candido.server.validation.password;
 
-import com.candido.server.exception.account.InvalidPasswordAccountException;
-import com.candido.server.exception.account.InvalidPasswordAccountListException;
+import com.candido.server.exception.account.ExceptionInvalidPasswordAccount;
+import com.candido.server.exception.account.ExceptionInvalidPasswordAccountList;
 import org.passay.*;
 
 import java.util.ArrayList;
@@ -21,17 +21,17 @@ public class PasswordConstraintValidator {
         PasswordValidator validator = new PasswordValidator(rules);
         RuleResult result = validator.validate(new PasswordData(password));
 
-        List<InvalidPasswordAccountException> exceptions = new ArrayList<>();
+        List<ExceptionInvalidPasswordAccount> exceptions = new ArrayList<>();
         result.getDetails().forEach(ruleResultDetail -> {
             exceptions.add(
-                    new InvalidPasswordAccountException(
+                    new ExceptionInvalidPasswordAccount(
                             ruleResultDetail.getErrorCode(),
                             ruleResultDetail.getValues()
                     )
             );
         });
 
-        if(!result.isValid()) throw new InvalidPasswordAccountListException(exceptions);
+        if(!result.isValid()) throw new ExceptionInvalidPasswordAccountList(exceptions);
     }
 
 }

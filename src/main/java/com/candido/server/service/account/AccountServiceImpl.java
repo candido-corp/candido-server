@@ -4,11 +4,11 @@ import com.candido.server.domain.v1.account.*;
 import com.candido.server.domain.v1.provider.AuthProviderEnum;
 import com.candido.server.domain.v1.user.User;
 import com.candido.server.dto.v1.request.auth.RequestRegister;
-import com.candido.server.exception._common.ExceptionNameEnum;
-import com.candido.server.exception.account.AccountNotFoundException;
-import com.candido.server.exception.account.DuplicateAccountException;
-import com.candido.server.exception.account.InvalidEmailAccountException;
-import com.candido.server.exception.account.PasswordsDoNotMatchException;
+import com.candido.server.exception._common.EnumExceptionName;
+import com.candido.server.exception.account.ExceptionAccountNotFound;
+import com.candido.server.exception.account.ExceptionDuplicateAccount;
+import com.candido.server.exception.account.ExceptionInvalidEmailAccount;
+import com.candido.server.exception.account.ExceptionPasswordsDoNotMatch;
 import com.candido.server.service.auth.provider.AuthProviderService;
 import com.candido.server.service.auth.token.TokenService;
 import com.candido.server.service.user.UserService;
@@ -67,16 +67,16 @@ public class AccountServiceImpl implements AccountService {
     @Override
     public void editPassword(String email, String currentPassword, String password, String confirmPassword) {
         Account account = findByEmail(email)
-                .orElseThrow(() -> new AccountNotFoundException(ExceptionNameEnum.ACCOUNT_NOT_FOUND.name()));
+                .orElseThrow(() -> new ExceptionAccountNotFound(EnumExceptionName.ACCOUNT_NOT_FOUND.name()));
 
         // Controllo che l'email corrente sia giusta
         if(!passwordEncoder.matches(currentPassword, account.getPassword()))
-            throw new PasswordsDoNotMatchException(ExceptionNameEnum.CURRENT_PASSWORD_DOES_NOT_MATCH.name());
+            throw new ExceptionPasswordsDoNotMatch(EnumExceptionName.CURRENT_PASSWORD_DOES_NOT_MATCH.name());
 
         // Controllo che la password soddisfi i requisiti minimi
         PasswordConstraintValidator.isValid(password);
         if (!password.equals(confirmPassword))
-            throw new PasswordsDoNotMatchException(ExceptionNameEnum.AUTH_PASSWORDS_DO_NOT_MATCH.name());
+            throw new ExceptionPasswordsDoNotMatch(EnumExceptionName.AUTH_PASSWORDS_DO_NOT_MATCH.name());
 
         account.setPassword(passwordEncoder.encode(password));
         save(account);
@@ -95,16 +95,16 @@ public class AccountServiceImpl implements AccountService {
         // Verifica l'esistenza di un account duplicato
         var duplicateAccount = findByEmail(request.email());
         if (duplicateAccount.isPresent())
-            throw new DuplicateAccountException(ExceptionNameEnum.AUTH_REGISTRATION_DUPLICATE_USERNAME_ACCOUNT.name());
+            throw new ExceptionDuplicateAccount(EnumExceptionName.AUTH_REGISTRATION_DUPLICATE_USERNAME_ACCOUNT.name());
 
         // Verifica la validità dell'email
         if (!EmailConstraintValidator.isValid(request.email()))
-            throw new InvalidEmailAccountException(ExceptionNameEnum.INVALID_EMAIL.name());
+            throw new ExceptionInvalidEmailAccount(EnumExceptionName.INVALID_EMAIL.name());
 
         // Verifica che la password soddisfi i requisiti minimi e corrisponda alla conferma
         PasswordConstraintValidator.isValid(request.password());
         if (!request.password().equals(request.confirmPassword()))
-            throw new PasswordsDoNotMatchException(ExceptionNameEnum.AUTH_PASSWORDS_DO_NOT_MATCH.name());
+            throw new ExceptionPasswordsDoNotMatch(EnumExceptionName.AUTH_PASSWORDS_DO_NOT_MATCH.name());
 
         // Creazione dell'account
         var account = Account.builder()

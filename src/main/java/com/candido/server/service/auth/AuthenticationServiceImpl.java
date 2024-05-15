@@ -12,10 +12,10 @@ import com.candido.server.dto.v1.request.auth.RequestRegister;
 import com.candido.server.dto.v1.response.auth.ResponseAuthentication;
 import com.candido.server.dto.v1.response.auth.ResponseRegistration;
 import com.candido.server.event.auth.*;
-import com.candido.server.exception._common.ExceptionNameEnum;
+import com.candido.server.exception._common.EnumExceptionName;
 import com.candido.server.exception.account.*;
 import com.candido.server.exception.security.auth.*;
-import com.candido.server.exception.security.jwt.InvalidJWTTokenException;
+import com.candido.server.exception.security.jwt.ExceptionInvalidJWTToken;
 import com.candido.server.security.config.JwtService;
 import com.candido.server.service.account.AccountService;
 import com.candido.server.service.auth.provider.AuthProviderService;
@@ -104,15 +104,15 @@ public class AuthenticationServiceImpl implements AuthenticationService {
         Token token = tokenService.findByUUIDAndTokenScopeCategoryId(
                 uuidAccessToken,
                 TokenScopeCategoryEnum.BTD_REGISTRATION.getTokenScopeCategoryId()
-        ).orElseThrow(TokenException::new);
+        ).orElseThrow(ExceptionToken::new);
 
         String username = jwtService.extractUsername(token.getAccessToken());
         if (username == null)
-            throw new VerifyRegistrationTokenException();
+            throw new ExceptionVerifyRegistrationToken();
 
         var account = accountService
                 .findByEmail(username)
-                .orElseThrow(() -> new AccountNotFoundException(ExceptionNameEnum.ACCOUNT_NOT_FOUND.name()));
+                .orElseThrow(() -> new ExceptionAccountNotFound(EnumExceptionName.ACCOUNT_NOT_FOUND.name()));
 
         tokenService.validateToken(token.getAccessToken(), account);
         accountService.activateAccount(account);
@@ -136,7 +136,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
                         uuidAccessToken,
                         TokenScopeCategoryEnum.BTD_REGISTRATION.getTokenScopeCategoryId()
                 )
-                .orElseThrow(VerifyRegistrationTokenException::new);
+                .orElseThrow(ExceptionVerifyRegistrationToken::new);
 
         // Recupero il token di accesso
         String registrationToken = token.getAccessToken();
@@ -146,27 +146,27 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 
         // Se lo username è nullo sollevo un'eccezione
         if (username == null)
-            throw new VerifyRegistrationTokenException();
+            throw new ExceptionVerifyRegistrationToken();
 
         // Recupero l'utente dal database
         var account = accountService
                 .findByEmail(username)
-                .orElseThrow(() -> new AccountNotFoundException(ExceptionNameEnum.ACCOUNT_NOT_FOUND.name()));
+                .orElseThrow(() -> new ExceptionAccountNotFound(EnumExceptionName.ACCOUNT_NOT_FOUND.name()));
 
         // Controllo che il token sia valido altrimenti sollevo un'eccezione
         if (!jwtService.isValidToken(registrationToken, account))
-            throw new VerifyRegistrationTokenException();
+            throw new ExceptionVerifyRegistrationToken();
 
         // Recupero il codice temporaneo
         var code = temporaryCodeService.findByCode(temporaryCode);
 
         // Controllo che il codice temporaneo non sia scaduto
         if(code.isEmpty() || code.get().isExpired())
-            throw new VerifyRegistrationTokenException();
+            throw new ExceptionVerifyRegistrationToken();
 
         // Se l'ID del token è diverso dell'ID del token della sessione
         if(!Objects.equals(code.get().getTokenId(), token.getId()))
-            throw new VerifyRegistrationTokenException();
+            throw new ExceptionVerifyRegistrationToken();
 
         // Abilito l'account
         account.setStatus(new AccountStatus(AccountStatusEnum.VERIFIED.getStatusId()));
@@ -185,8 +185,8 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     @Override
     public ResponseAuthentication authenticate(RequestAuthentication request, String ipAddress) {
         // Controllo che l'email e la password non siano vuoti
-        if (request.email() == null) throw new AuthException(ExceptionNameEnum.EMAIL_CAN_NOT_BE_EMPTY.name());
-        if (request.password() == null) throw new AuthException(ExceptionNameEnum.PASSWORD_CAN_NOT_BE_EMPTY.name());
+        if (request.email() == null) throw new ExceptionAuth(EnumExceptionName.EMAIL_CAN_NOT_BE_EMPTY.name());
+        if (request.password() == null) throw new ExceptionAuth(EnumExceptionName.PASSWORD_CAN_NOT_BE_EMPTY.name());
 
         // Se non corretto AuthenticationManager si occupa già di sollevare eccezioni
         authenticationManager.authenticate(
@@ -199,7 +199,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
         // Se arrivato a questo punto significa che l'utente è corretto quindi recuperiamolo
         var user = accountService
                 .findByEmail(request.email())
-                .orElseThrow(() -> new AccountNotFoundException(ExceptionNameEnum.ACCOUNT_NOT_FOUND.name()));
+                .orElseThrow(() -> new ExceptionAccountNotFound(EnumExceptionName.ACCOUNT_NOT_FOUND.name()));
 
         // Creo un token con i dati dell'utente creato
         var accessToken = jwtService.generateToken(user);
@@ -242,7 +242,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
         final String userEmail;
 
         // Se header recuperato è null o non inizia con la parola chiave "Bearer ", chiudo la richiesta
-        if (authHeader == null || !authHeader.startsWith("Bearer ")) throw new InvalidJWTTokenException();
+        if (authHeader == null || !authHeader.startsWith("Bearer ")) throw new ExceptionInvalidJWTToken();
 
         // Recupero il token alla settima posizione che è la lunghezza della parola chiave "Bearer "
         refreshToken = authHeader.substring(7);
@@ -253,7 +253,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
         userEmail = jwtService.extractUsername(refreshToken);
 
         // Se lo username non è nullo
-        if (userEmail == null) throw new AccountNotFoundException(ExceptionNameEnum.ACCOUNT_NOT_FOUND.name());
+        if (userEmail == null) throw new ExceptionAccountNotFound(EnumExceptionName.ACCOUNT_NOT_FOUND.name());
 
         // Recupero l'utente dal database
         var user = accountService.findByEmail(userEmail).orElseThrow();
@@ -263,7 +263,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 
         // Controllo che il token sia presente
         if(optionalToken.isEmpty()) {
-            throw new InvalidJWTTokenException();
+            throw new ExceptionInvalidJWTToken();
         }
 
         // Controllo che il token non sia scaduto
@@ -272,7 +272,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
                 .orElse(false);
 
         // Controllo il token
-        if (!jwtService.isValidToken(refreshToken, user) || !isValidToken) throw new InvalidJWTTokenException();
+        if (!jwtService.isValidToken(refreshToken, user) || !isValidToken) throw new ExceptionInvalidJWTToken();
 
         // Genero il token di accesso
         var accessToken = jwtService.generateToken(user);
@@ -343,28 +343,28 @@ public class AuthenticationServiceImpl implements AuthenticationService {
                         uuidAccessToken,
                         TokenScopeCategoryEnum.BTD_RESET.getTokenScopeCategoryId()
                 )
-                .orElseThrow(VerifyRegistrationTokenException::new);
+                .orElseThrow(ExceptionVerifyRegistrationToken::new);
 
         // Estraggo lo username dal token
         String username = jwtService.extractUsername(token.getAccessToken());
 
         // Se lo username è nullo sollevo un'eccezione
         if (username == null)
-            throw new VerifyResetTokenException();
+            throw new ExceptionVerifyResetToken();
 
         // Recupero l'utente dal database
         var account = accountService
                 .findByEmail(username)
-                .orElseThrow(() -> new AccountNotFoundException(ExceptionNameEnum.ACCOUNT_NOT_FOUND.name()));
+                .orElseThrow(() -> new ExceptionAccountNotFound(EnumExceptionName.ACCOUNT_NOT_FOUND.name()));
 
         // Controllo che il token sia valido altrimenti sollevo un'eccezione
         if (!jwtService.isValidToken(token.getAccessToken(), account))
-            throw new VerifyResetTokenException();
+            throw new ExceptionVerifyResetToken();
 
         // Modifico la password
         PasswordConstraintValidator.isValid(request.password());
         if (!request.password().equals(request.confirmPassword()))
-            throw new PasswordsDoNotMatchException(ExceptionNameEnum.AUTH_PASSWORDS_DO_NOT_MATCH.name());
+            throw new ExceptionPasswordsDoNotMatch(EnumExceptionName.AUTH_PASSWORDS_DO_NOT_MATCH.name());
 
         account.setPassword(passwordEncoder.encode(request.password()));
 
@@ -415,23 +415,23 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     public void checkValidityOfUUIDAccessTokenForResetPassword(String uuidAccessToken) {
         // Recupero il token in base al UUID
         Token token = tokenService.findByUUIDAndTokenScopeCategoryId(uuidAccessToken, TokenScopeCategoryEnum.BTD_RESET.getTokenScopeCategoryId())
-                .orElseThrow(TokenException::new);
+                .orElseThrow(ExceptionToken::new);
 
         // Estraggo lo username dal token
         String username = jwtService.extractUsername(token.getAccessToken());
 
         // Se lo username è nullo sollevo un'eccezione
         if (username == null)
-            throw new TokenException();
+            throw new ExceptionToken();
 
         // Recupero l'utente dal database
         var account = accountService
                 .findByEmail(username)
-                .orElseThrow(() -> new AccountNotFoundException(ExceptionNameEnum.ACCOUNT_NOT_FOUND.name()));
+                .orElseThrow(() -> new ExceptionAccountNotFound(EnumExceptionName.ACCOUNT_NOT_FOUND.name()));
 
         // Controllo che il token sia valido altrimenti sollevo un'eccezione
         if (!jwtService.isValidToken(token.getAccessToken(), account))
-            throw new TokenException();
+            throw new ExceptionToken();
     }
 
     @Override
@@ -443,12 +443,12 @@ public class AuthenticationServiceImpl implements AuthenticationService {
                 );
 
         if(token.isEmpty())
-            throw new TokenException();
+            throw new ExceptionToken();
 
         var account = accountService.findById(token.get().getAccount().getId());
 
         if(account.isEmpty())
-            throw new AccountNotFoundException(ExceptionNameEnum.ACCOUNT_NOT_FOUND.name());
+            throw new ExceptionAccountNotFound(EnumExceptionName.ACCOUNT_NOT_FOUND.name());
 
         temporaryCodeService.findByTokenId(token.get().getId()).ifPresent(temporaryCodeService::delete);
 
@@ -471,7 +471,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
         // Recupero l'utente dal database
         var account = accountService
                 .findByEmail(email)
-                .orElseThrow(() -> new AccountNotFoundException(ExceptionNameEnum.ACCOUNT_NOT_FOUND.name()));
+                .orElseThrow(() -> new ExceptionAccountNotFound(EnumExceptionName.ACCOUNT_NOT_FOUND.name()));
 
         // Abilito l'account
         account.setStatus(new AccountStatus(AccountStatusEnum.VERIFIED.getStatusId()));
@@ -484,7 +484,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
         // Recupero l'utente dal database
         var account = accountService
                 .findByEmail(email)
-                .orElseThrow(() -> new AccountNotFoundException(ExceptionNameEnum.ACCOUNT_NOT_FOUND.name()));
+                .orElseThrow(() -> new ExceptionAccountNotFound(EnumExceptionName.ACCOUNT_NOT_FOUND.name()));
 
         return tokenService.findAllValidTokenByUser(account.getId());
     }

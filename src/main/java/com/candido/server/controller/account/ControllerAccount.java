@@ -5,9 +5,9 @@ import com.candido.server.domain.v1.user.User;
 import com.candido.server.dto.v1.request.account.RequestUpdateUserDto;
 import com.candido.server.dto.v1.util.AccountDto;
 import com.candido.server.dto.v1.util.UserDto;
-import com.candido.server.exception._common.ExceptionNameEnum;
-import com.candido.server.exception.account.AccountNotFoundException;
-import com.candido.server.exception.user.UserNotFoundException;
+import com.candido.server.exception._common.EnumExceptionName;
+import com.candido.server.exception.account.ExceptionAccountNotFound;
+import com.candido.server.exception.user.ExceptionUserNotFound;
 import com.candido.server.service.account.AccountService;
 import com.candido.server.service.mapper.UserMapperService;
 import com.candido.server.service.mapstruct.AccountMapper;
@@ -37,17 +37,17 @@ public class ControllerAccount {
     @GetMapping
     public ResponseEntity<AccountDto> getAccountInfo(Authentication authentication) {
         Account account = accountService.findByEmail(authentication.getName())
-                .orElseThrow(() -> new AccountNotFoundException(ExceptionNameEnum.ACCOUNT_NOT_FOUND.name()));
+                .orElseThrow(() -> new ExceptionAccountNotFound(EnumExceptionName.ACCOUNT_NOT_FOUND.name()));
         return ResponseEntity.ok(accountMapper.accountToAccountDto(account));
     }
 
     @GetMapping("/details")
     public ResponseEntity<UserDto> getUserInfo(Authentication authentication) {
         Account account = accountService.findByEmail(authentication.getName())
-                .orElseThrow(() -> new AccountNotFoundException(ExceptionNameEnum.ACCOUNT_NOT_FOUND.name()));
+                .orElseThrow(() -> new ExceptionAccountNotFound(EnumExceptionName.ACCOUNT_NOT_FOUND.name()));
 
         User user = userService.findByAccountId(account.getId())
-                .orElseThrow(() -> new UserNotFoundException(ExceptionNameEnum.USER_NOT_FOUND.name()));
+                .orElseThrow(() -> new ExceptionUserNotFound(EnumExceptionName.USER_NOT_FOUND.name()));
 
         UserDto userDto = userMapper.userToUserDto(user);
 
@@ -63,10 +63,10 @@ public class ControllerAccount {
         // TODO: Se c'è una candidatura aperta non può modificare il nome e cognome.
 
         Account account = accountService.findByEmail(authentication.getName())
-                .orElseThrow(() -> new AccountNotFoundException(ExceptionNameEnum.ACCOUNT_NOT_FOUND.name()));
+                .orElseThrow(() -> new ExceptionAccountNotFound(EnumExceptionName.ACCOUNT_NOT_FOUND.name()));
 
         User user = userService.findByAccountId(account.getId())
-                .orElseThrow(() -> new UserNotFoundException(ExceptionNameEnum.USER_NOT_FOUND.name()));
+                .orElseThrow(() -> new ExceptionUserNotFound(EnumExceptionName.USER_NOT_FOUND.name()));
 
         UserDto userDto = userMapper.userToUserDto(userService.save(user, requestUpdateUserDto));
 

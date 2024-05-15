@@ -1,10 +1,9 @@
 package com.candido.server.error.account;
 
 import com.candido.server.exception._common.BTExceptionResolver;
-import com.candido.server.exception._common.BTExceptionResponse;
-import com.candido.server.exception._common.BTExceptionResponseList;
+import com.candido.server.exception._common.ErrorResponse;
+import com.candido.server.exception._common.ErrorResponseList;
 import com.candido.server.exception.account.*;
-import io.swagger.v3.oas.annotations.Hidden;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -23,59 +22,59 @@ public class AccountErrorAdvice {
 
     private final BTExceptionResolver btExceptionResolver;
 
-    @ExceptionHandler({DuplicateAccountException.class})
+    @ExceptionHandler({ExceptionDuplicateAccount.class})
     @ResponseStatus(HttpStatus.CONFLICT)
-    public ResponseEntity<BTExceptionResponse> handleDuplicateAccountException(DuplicateAccountException ex, Locale locale) {
-        log.info("[EXCEPTION] ({}) -> {}", DuplicateAccountException.class.getName(), LocalDateTime.now());
+    public ResponseEntity<ErrorResponse> handleDuplicateAccountException(ExceptionDuplicateAccount ex, Locale locale) {
+        log.info("[EXCEPTION] ({}) -> {}", ExceptionDuplicateAccount.class.getName(), LocalDateTime.now());
         return btExceptionResolver.resolveBusinessBTException(ex, locale, HttpStatus.CONFLICT);
     }
 
-    @ExceptionHandler({PasswordsDoNotMatchException.class})
+    @ExceptionHandler({ExceptionPasswordsDoNotMatch.class})
     @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public ResponseEntity<BTExceptionResponse> handlePasswordsDoNotMatchException(PasswordsDoNotMatchException ex, Locale locale) {
-        log.info("[EXCEPTION] ({}) -> {}", PasswordsDoNotMatchException.class.getName(), LocalDateTime.now());
+    public ResponseEntity<ErrorResponse> handlePasswordsDoNotMatchException(ExceptionPasswordsDoNotMatch ex, Locale locale) {
+        log.info("[EXCEPTION] ({}) -> {}", ExceptionPasswordsDoNotMatch.class.getName(), LocalDateTime.now());
         return btExceptionResolver.resolveValidationBTException(ex, locale, HttpStatus.BAD_REQUEST);
     }
 
-    @ExceptionHandler({EmailsDoNotMatchException.class})
+    @ExceptionHandler({ExceptionEmailsDoNotMatch.class})
     @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public ResponseEntity<BTExceptionResponse> handleEmailsDoNotMatchException(EmailsDoNotMatchException ex, Locale locale) {
-        log.info("[EXCEPTION] ({}) -> {}", EmailsDoNotMatchException.class.getName(), LocalDateTime.now());
+    public ResponseEntity<ErrorResponse> handleEmailsDoNotMatchException(ExceptionEmailsDoNotMatch ex, Locale locale) {
+        log.info("[EXCEPTION] ({}) -> {}", ExceptionEmailsDoNotMatch.class.getName(), LocalDateTime.now());
         return btExceptionResolver.resolveValidationBTException(ex, locale, HttpStatus.BAD_REQUEST);
     }
 
-    @ExceptionHandler({AccountNotFoundException.class})
+    @ExceptionHandler({ExceptionAccountNotFound.class})
     @ResponseStatus(HttpStatus.NOT_FOUND)
-    public ResponseEntity<BTExceptionResponse> handleAccountNotFoundException(AccountNotFoundException ex, Locale locale) {
-        log.info("[EXCEPTION] ({}) -> {}", AccountNotFoundException.class.getName(), LocalDateTime.now());
+    public ResponseEntity<ErrorResponse> handleAccountNotFoundException(ExceptionAccountNotFound ex, Locale locale) {
+        log.info("[EXCEPTION] ({}) -> {}", ExceptionAccountNotFound.class.getName(), LocalDateTime.now());
         return btExceptionResolver.resolveBusinessBTException(ex, locale, HttpStatus.NOT_FOUND);
     }
 
-    @ExceptionHandler({InvalidEmailAccountException.class})
+    @ExceptionHandler({ExceptionInvalidEmailAccount.class})
     @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public ResponseEntity<BTExceptionResponse> handleInvalidEmailAccountException(InvalidEmailAccountException ex, Locale locale) {
-        log.info("[EXCEPTION] ({}) -> {}", InvalidEmailAccountException.class.getName(), LocalDateTime.now());
+    public ResponseEntity<ErrorResponse> handleInvalidEmailAccountException(ExceptionInvalidEmailAccount ex, Locale locale) {
+        log.info("[EXCEPTION] ({}) -> {}", ExceptionInvalidEmailAccount.class.getName(), LocalDateTime.now());
         return btExceptionResolver.resolveValidationBTException(ex, locale, HttpStatus.BAD_REQUEST);
     }
 
-    @ExceptionHandler({InvalidPasswordAccountListException.class})
+    @ExceptionHandler({ExceptionInvalidPasswordAccountList.class})
     @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public ResponseEntity<BTExceptionResponseList> handleInvalidPasswordAccountException(InvalidPasswordAccountListException ex, Locale locale) {
-        log.info("[EXCEPTION] ({}) -> {}", InvalidPasswordAccountListException.class.getName(), LocalDateTime.now());
+    public ResponseEntity<ErrorResponseList> handleInvalidPasswordAccountException(ExceptionInvalidPasswordAccountList ex, Locale locale) {
+        log.info("[EXCEPTION] ({}) -> {}", ExceptionInvalidPasswordAccountList.class.getName(), LocalDateTime.now());
         return btExceptionResolver.resolvePasswordValidationBTException(ex, locale, HttpStatus.BAD_REQUEST);
     }
 
-    @ExceptionHandler({FirstNameEmptyException.class})
+    @ExceptionHandler({ExceptionFirstNameEmpty.class})
     @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public ResponseEntity<BTExceptionResponse> handleFirstNameEmptyException(FirstNameEmptyException ex, Locale locale) {
-        log.info("[EXCEPTION] ({}) -> {}", FirstNameEmptyException.class.getName(), LocalDateTime.now());
+    public ResponseEntity<ErrorResponse> handleFirstNameEmptyException(ExceptionFirstNameEmpty ex, Locale locale) {
+        log.info("[EXCEPTION] ({}) -> {}", ExceptionFirstNameEmpty.class.getName(), LocalDateTime.now());
         return btExceptionResolver.resolveBusinessBTException(ex, locale, HttpStatus.BAD_REQUEST);
     }
 
-    @ExceptionHandler({LastNameEmptyException.class})
+    @ExceptionHandler({ExceptionLastNameEmpty.class})
     @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public ResponseEntity<BTExceptionResponse> handleLastNameEmptyException(LastNameEmptyException ex, Locale locale) {
-        log.info("[EXCEPTION] ({}) -> {}", LastNameEmptyException.class.getName(), LocalDateTime.now());
+    public ResponseEntity<ErrorResponse> handleLastNameEmptyException(ExceptionLastNameEmpty ex, Locale locale) {
+        log.info("[EXCEPTION] ({}) -> {}", ExceptionLastNameEmpty.class.getName(), LocalDateTime.now());
         return btExceptionResolver.resolveBusinessBTException(ex, locale, HttpStatus.BAD_REQUEST);
     }
 

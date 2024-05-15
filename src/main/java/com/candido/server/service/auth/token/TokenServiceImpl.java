@@ -2,7 +2,7 @@ package com.candido.server.service.auth.token;
 
 import com.candido.server.domain.v1.account.Account;
 import com.candido.server.domain.v1.token.*;
-import com.candido.server.exception.security.auth.VerifyRegistrationTokenException;
+import com.candido.server.exception.security.auth.ExceptionVerifyRegistrationToken;
 import com.candido.server.security.config.JwtService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -138,7 +138,7 @@ public class TokenServiceImpl implements TokenService {
     public void validateToken(String registrationToken, Account account) {
         // Controllo che il token sia valido altrimenti sollevo un'eccezione
         if (!jwtService.isValidToken(registrationToken, account))
-            throw new VerifyRegistrationTokenException();
+            throw new ExceptionVerifyRegistrationToken();
 
         // Recupero il token in base all'account ID e allo scopo di registrazione
         Optional<Token> token = findByAccountIdAndTokenScopeCategoryId(
@@ -147,7 +147,7 @@ public class TokenServiceImpl implements TokenService {
 
         // Se il token è presente e uguale a quello che mi è arrivato
         if (token.isEmpty() || !token.get().getAccessToken().equals(registrationToken))
-            throw new VerifyRegistrationTokenException();
+            throw new ExceptionVerifyRegistrationToken();
 
         // Elimino il token di registrazione
         delete(token.get());

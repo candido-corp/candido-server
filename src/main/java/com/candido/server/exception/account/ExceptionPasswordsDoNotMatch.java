@@ -2,8 +2,10 @@ package com.candido.server.exception.account;
 
 import com.candido.server.exception._common.CustomRuntimeException;
 
-public class FirstNameEmptyException extends CustomRuntimeException {
-    public FirstNameEmptyException(String message) {
+public class ExceptionPasswordsDoNotMatch extends CustomRuntimeException {
+
+    public ExceptionPasswordsDoNotMatch(String message) {
         super(message);
     }
+
 }

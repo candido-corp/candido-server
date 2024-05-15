@@ -1,6 +1,6 @@
 package com.candido.server.exception._common;
 
-import com.candido.server.exception.account.InvalidPasswordAccountListException;
+import com.candido.server.exception.account.ExceptionInvalidPasswordAccountList;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -27,45 +27,45 @@ public class BTExceptionResolver {
     @Qualifier("authenticationMessageSource")
     private final MessageSource authenticationMessageSource;
 
-    private ResponseEntity<BTExceptionResponse> resolveUnhandledBTException(String errorMessage, HttpStatus httpStatus) {
+    private ResponseEntity<ErrorResponse> resolveUnhandledBTException(String errorMessage, HttpStatus httpStatus) {
         // TODO: Scrivi a DB le eccezioni generate
-        return new ResponseEntity<>(new BTExceptionResponse(errorMessage, httpStatus), httpStatus);
+        return new ResponseEntity<>(new ErrorResponse(errorMessage, httpStatus), httpStatus);
     }
 
     public void resolveAuthBTException(String type, Exception ex, String token) {
         log.error("\n[{}] -> {}\nToken: {}", type, ex.getMessage(), token);
     }
 
-    public ResponseEntity<BTExceptionResponse> resolveAuthenticationBTException(
+    public ResponseEntity<ErrorResponse> resolveAuthenticationBTException(
             CustomRuntimeException ex, Locale locale, HttpStatus httpStatus
     ) {
         String errorMessage = authenticationMessageSource.getMessage(ex.getMessage(), ex.getArgs(), locale);
-        return new ResponseEntity<>(new BTExceptionResponse(errorMessage, httpStatus), httpStatus);
+        return new ResponseEntity<>(new ErrorResponse(errorMessage, httpStatus), httpStatus);
     }
 
-    public ResponseEntity<BTExceptionResponse> resolveBusinessBTException(
+    public ResponseEntity<ErrorResponse> resolveBusinessBTException(
             CustomRuntimeException ex, Locale locale, HttpStatus httpStatus
     ) {
         String errorMessage = businessMessageSource.getMessage(ex.getMessage(), ex.getArgs(), locale);
-        return new ResponseEntity<>(new BTExceptionResponse(errorMessage, httpStatus), httpStatus);
+        return new ResponseEntity<>(new ErrorResponse(errorMessage, httpStatus), httpStatus);
     }
 
-    public ResponseEntity<BTExceptionResponseList> resolvePasswordValidationBTException(
-            InvalidPasswordAccountListException ex, Locale locale, HttpStatus httpStatus
+    public ResponseEntity<ErrorResponseList> resolvePasswordValidationBTException(
+            ExceptionInvalidPasswordAccountList ex, Locale locale, HttpStatus httpStatus
     ) {
         List<String> messages = new ArrayList<>();
         ex.getExceptions().forEach(btException -> {
             String errorMessage = validationMessageSource.getMessage(btException.getMessage(), btException.getArgs(), locale);
             messages.add(errorMessage);
         });
-        return new ResponseEntity<>(new BTExceptionResponseList(messages, httpStatus), httpStatus);
+        return new ResponseEntity<>(new ErrorResponseList(messages, httpStatus), httpStatus);
     }
 
-    public ResponseEntity<BTExceptionResponse> resolveValidationBTException(
+    public ResponseEntity<ErrorResponse> resolveValidationBTException(
             CustomRuntimeException ex, Locale locale, HttpStatus httpStatus
     ) {
         String errorMessage = validationMessageSource.getMessage(ex.getMessage(), ex.getArgs(), locale);
-        return new ResponseEntity<>(new BTExceptionResponse(errorMessage, httpStatus), httpStatus);
+        return new ResponseEntity<>(new ErrorResponse(errorMessage, httpStatus), httpStatus);
     }
 
 }

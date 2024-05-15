@@ -1,6 +1,6 @@
 package com.candido.server.exception._common;
 
-public enum ExceptionNameEnum {
+public enum EnumExceptionName {
     AUTH_REGISTRATION_DUPLICATE_USERNAME_ACCOUNT,
     AUTH_PASSWORDS_DO_NOT_MATCH,
     AUTH_EMAILS_DO_NOT_MATCH,
