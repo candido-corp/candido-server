@@ -1,6 +1,8 @@
 package com.candido.server.security.config;
 
 import com.candido.server.domain.v1.account.AccountRepository;
+import com.candido.server.exception._common.EnumExceptionName;
+import com.candido.server.exception.account.ExceptionAccountNotFound;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -27,7 +29,7 @@ public class ApplicationConfig {
     @Bean
     public UserDetailsService userDetailsService() {
         return username -> accountRepository.findByEmail(username)
-                .orElseThrow(() -> new UsernameNotFoundException("User not found"));
+                .orElseThrow(() -> new ExceptionAccountNotFound(EnumExceptionName.ACCOUNT_NOT_FOUND.name()));
     }
 
     /**
