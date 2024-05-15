@@ -24,6 +24,7 @@ public class ConfigAppProperties {
 
         @Data
         public static class Jwt {
+            private String issuer;
             private String secretKey;
             private int expiration;
             private RefreshToken refreshToken = new RefreshToken();

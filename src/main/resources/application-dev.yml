@@ -4,6 +4,7 @@ application:
     domain: http://localhost:3000
   security:
     jwt:
+      issuer: Candido
       secret-key: 6150645367566B58703273357638792F423F4528482B4D6251655468576D5A71
       expiration: 86400000 # 1 day in ms
       refresh-token:

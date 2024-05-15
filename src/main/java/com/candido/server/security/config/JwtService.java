@@ -3,7 +3,7 @@ package com.candido.server.security.config;
 import com.candido.server.config.ConfigAppProperties;
 import com.candido.server.domain.v1.token.JWTStateEnum;
 import com.candido.server.exception._common.BTExceptionResolver;
-import com.candido.server.exception.security.jwt.SecurityJWTException;
+import com.candido.server.exception.security.jwt.ExceptionSecurityJWT;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
@@ -124,7 +124,7 @@ public class JwtService {
                 .setSubject(userDetails.getUsername())
                 .setIssuedAt(new Date(System.currentTimeMillis()))
                 .setExpiration(new Date(System.currentTimeMillis() + expirationTimeMillis))
-                .setIssuer("Candido")
+                .setIssuer(configAppProperties.getSecurity().getJwt().getIssuer())
                 .signWith(getSignInKey(), SignatureAlgorithm.HS256)
                 .compact();
     }
@@ -181,23 +181,23 @@ public class JwtService {
         } catch (ExpiredJwtException ex) {
             Object[] args = new Object[] {ex.getClaims()};
             btExceptionResolver.resolveAuthBTException(
-                    JWTStateEnum.JWT_EXPIRED.name(), new SecurityJWTException(ex.getMessage(), args), token
+                    JWTStateEnum.JWT_EXPIRED.name(), new ExceptionSecurityJWT(ex.getMessage(), args), token
             );
         } catch (IllegalArgumentException ex) {
             btExceptionResolver.resolveAuthBTException(
-                    JWTStateEnum.TOKEN_NULL_EMPTY_OR_WHITESPACE.name(), new SecurityJWTException(ex.getMessage()), token
+                    JWTStateEnum.TOKEN_NULL_EMPTY_OR_WHITESPACE.name(), new ExceptionSecurityJWT(ex.getMessage()), token
             );
         } catch (MalformedJwtException ex) {
             btExceptionResolver.resolveAuthBTException(
-                    JWTStateEnum.JWT_INVALID.name(), new SecurityJWTException(ex.getMessage()), token
+                    JWTStateEnum.JWT_INVALID.name(), new ExceptionSecurityJWT(ex.getMessage()), token
             );
         } catch (UnsupportedJwtException ex) {
             btExceptionResolver.resolveAuthBTException(
-                    JWTStateEnum.JWT_NOT_SUPPORTED.name(), new SecurityJWTException(ex.getMessage()), token
+                    JWTStateEnum.JWT_NOT_SUPPORTED.name(), new ExceptionSecurityJWT(ex.getMessage()), token
             );
         } catch (SignatureException ex) {
             btExceptionResolver.resolveAuthBTException(
-                    JWTStateEnum.SIGNATURE_VALIDATION_FAILED.name(), new SecurityJWTException(ex.getMessage()), token
+                    JWTStateEnum.SIGNATURE_VALIDATION_FAILED.name(), new ExceptionSecurityJWT(ex.getMessage()), token
             );
         }
 
