@@ -1,4 +1,4 @@
-package com.candido.server.service.mapstruct;
+package com.candido.server.service.base.mapstruct;
 
 import com.candido.server.domain.v1.account.Account;
 import com.candido.server.dto.v1.util.AccountDto;

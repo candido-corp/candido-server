@@ -1,4 +1,4 @@
-package com.candido.server.service.auth.token;
+package com.candido.server.service.base.auth.token;
 
 import com.candido.server.domain.v1.account.Account;
 import com.candido.server.domain.v1.token.Token;
@@ -14,6 +14,8 @@ public interface TokenService {
     Optional<Token> findByRefreshToken(String refreshToken);
     Optional<Token> findByUUIDAndTokenScopeCategoryId(String uuid, int tokenScopeCategoryId);
     Optional<Token> findByAccountIdAndTokenScopeCategoryId(int accountId, int tokenScopeCategoryId);
+
+    Token findTokenByUUIDAndTokenScopeCategoryIdOrThrow(String uuid, int tokenScopeCategoryId);
 
     Token saveUserToken(
             Account account,

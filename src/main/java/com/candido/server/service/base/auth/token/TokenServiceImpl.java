@@ -1,7 +1,8 @@
-package com.candido.server.service.auth.token;
+package com.candido.server.service.base.auth.token;
 
 import com.candido.server.domain.v1.account.Account;
 import com.candido.server.domain.v1.token.*;
+import com.candido.server.exception.security.auth.ExceptionToken;
 import com.candido.server.exception.security.auth.ExceptionVerifyRegistrationToken;
 import com.candido.server.security.config.JwtService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -45,6 +46,11 @@ public class TokenServiceImpl implements TokenService {
     @Override
     public Optional<Token> findByAccountIdAndTokenScopeCategoryId(int accountId, int tokenScopeCategoryId) {
         return tokenRepository.findByAccountIdAndTokenScopeCategoryId(accountId, tokenScopeCategoryId);
+    }
+
+    @Override
+    public Token findTokenByUUIDAndTokenScopeCategoryIdOrThrow(String uuid, int tokenScopeCategoryId) {
+        return findByUUIDAndTokenScopeCategoryId(uuid, tokenScopeCategoryId).orElseThrow(ExceptionToken::new);
     }
 
     public Token saveUserToken(

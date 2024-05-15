@@ -1,7 +1,7 @@
 package com.candido.server.event.auth;
 
 import com.candido.server.domain.v1.email.ConstEmailSubject;
-import com.candido.server.service.email.EmailService;
+import com.candido.server.service.base.email.EmailService;
 import com.candido.server.util.UtilService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;

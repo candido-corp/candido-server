@@ -1,4 +1,4 @@
-package com.candido.server.service.user;
+package com.candido.server.service.base.user;
 
 import com.candido.server.domain.v1.user.Gender;
 import com.candido.server.domain.v1.user.GenderRepository;

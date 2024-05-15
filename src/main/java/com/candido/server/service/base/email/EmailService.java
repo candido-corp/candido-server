@@ -1,4 +1,4 @@
-package com.candido.server.service.email;
+package com.candido.server.service.base.email;
 
 import com.candido.server.domain.v1.account.Account;
 import com.candido.server.domain.v1.user.User;

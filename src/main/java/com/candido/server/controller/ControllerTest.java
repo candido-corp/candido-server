@@ -1,6 +1,6 @@
 package com.candido.server.controller;
 
-import com.candido.server.service.email.EmailService;
+import com.candido.server.service.base.email.EmailService;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;

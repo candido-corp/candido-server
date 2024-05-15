@@ -1,4 +1,4 @@
-package com.candido.server.service.auth.token;
+package com.candido.server.service.base.auth.token;
 
 import com.candido.server.domain.v1.token.TemporaryCode;
 import com.candido.server.domain.v1.token.TemporaryCodeRepository;

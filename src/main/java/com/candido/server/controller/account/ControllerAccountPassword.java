@@ -1,7 +1,7 @@
 package com.candido.server.controller.account;
 
 import com.candido.server.dto.v1.request.account.RequestEditAccountPassword;
-import com.candido.server.service.account.AccountService;
+import com.candido.server.service.base.account.AccountService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;

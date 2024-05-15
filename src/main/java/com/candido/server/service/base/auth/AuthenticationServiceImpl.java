@@ -1,4 +1,4 @@
-package com.candido.server.service.auth;
+package com.candido.server.service.base.auth;
 
 import com.candido.server.config.ConfigAppProperties;
 import com.candido.server.domain.v1.account.*;
@@ -17,11 +17,11 @@ import com.candido.server.exception.account.*;
 import com.candido.server.exception.security.auth.*;
 import com.candido.server.exception.security.jwt.ExceptionInvalidJWTToken;
 import com.candido.server.security.config.JwtService;
-import com.candido.server.service.account.AccountService;
-import com.candido.server.service.auth.provider.AuthProviderService;
-import com.candido.server.service.auth.token.TemporaryCodeService;
-import com.candido.server.service.auth.token.TokenService;
-import com.candido.server.service.user.UserService;
+import com.candido.server.service.base.account.AccountService;
+import com.candido.server.service.base.auth.provider.AuthProviderService;
+import com.candido.server.service.base.auth.token.TemporaryCodeService;
+import com.candido.server.service.base.auth.token.TokenService;
+import com.candido.server.service.base.user.UserService;
 import com.candido.server.validation.password.PasswordConstraintValidator;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -101,31 +101,15 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 
     @Override
     public void verifyRegistrationByUUIDAccessToken(String uuidAccessToken) {
-        Token token = tokenService.findByUUIDAndTokenScopeCategoryId(
-                uuidAccessToken,
-                TokenScopeCategoryEnum.BTD_REGISTRATION.getTokenScopeCategoryId()
-        ).orElseThrow(ExceptionToken::new);
-
-        String username = jwtService.extractUsername(token.getAccessToken());
-        if (username == null)
-            throw new ExceptionVerifyRegistrationToken();
-
-        var account = accountService
-                .findByEmail(username)
-                .orElseThrow(() -> new ExceptionAccountNotFound(EnumExceptionName.ACCOUNT_NOT_FOUND.name()));
-
+        int tokenScopeCategoryId = TokenScopeCategoryEnum.BTD_REGISTRATION.getTokenScopeCategoryId();
+        Token token = tokenService.findTokenByUUIDAndTokenScopeCategoryIdOrThrow(uuidAccessToken, tokenScopeCategoryId);
+        String username = jwtService.extractAndValidateUsername(token.getAccessToken());
+        var account = accountService.findAccountByEmailOrThrow(username);
         tokenService.validateToken(token.getAccessToken(), account);
         accountService.activateAccount(account);
-
-        var user = userService.findByAccountId(account.getId()).orElse(new User());
-
-        var event = new OnRegistrationCompletedEvent(
-                this,
-                account,
-                user
-        );
+        var user = userService.findUserByAccountIdOrThrow(account.getId());
+        var event = new OnRegistrationCompletedEvent(this, account, user);
         eventPublisher.publishEvent(event);
-
     }
 
     @Override
@@ -176,7 +160,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
         tokenService.delete(token);
 
         // Recupero l'utente
-        var user = userService.findByAccountId(account.getId()).orElse(new User());
+        var user = userService.findUserByAccountId(account.getId()).orElse(new User());
 
         // Invio un evento quando viene confermata la registrazione
         eventPublisher.publishEvent(new OnRegistrationCompletedEvent(this, account, user));

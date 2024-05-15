@@ -1,4 +1,4 @@
-package com.candido.server.service.mapper;
+package com.candido.server.service.base.mapper;
 
 import com.candido.server.domain.v1.user.Address;
 import com.candido.server.domain.v1.user.Gender;

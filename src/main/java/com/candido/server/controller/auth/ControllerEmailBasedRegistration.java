@@ -1,7 +1,7 @@
 package com.candido.server.controller.auth;
 
 import com.candido.server.dto.v1.request.auth.RequestRegister;
-import com.candido.server.service.auth.AuthenticationService;
+import com.candido.server.service.base.auth.AuthenticationService;
 import com.candido.server.util.UtilService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;

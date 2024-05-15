@@ -1,12 +1,11 @@
-package com.candido.server.service.user;
+package com.candido.server.service.base.user;
 
-import com.candido.server.domain.v1.user.Gender;
 import com.candido.server.domain.v1.user.User;
 import com.candido.server.domain.v1.user.UserRepository;
 import com.candido.server.domain.v1.user.User_;
 import com.candido.server.dto.v1.request.account.RequestUpdateUserDto;
-import com.candido.server.dto.v1.util.GenderDto;
-import com.candido.server.service.mapper.UserMapperService;
+import com.candido.server.exception._common.EnumExceptionName;
+import com.candido.server.exception.account.ExceptionAccountNotFound;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
@@ -20,10 +19,16 @@ public class UserServiceImpl implements UserService {
     UserRepository userRepository;
 
     @Override
-    public Optional<User> findByAccountId(int accountId) {
+    public Optional<User> findUserByAccountId(int accountId) {
         Specification<User> byAccountId = ((root, query, criteriaBuilder) ->
                 criteriaBuilder.equal(root.get(User_.ACCOUNT_ID), accountId));
         return userRepository.findOne(byAccountId);
+    }
+
+    @Override
+    public User findUserByAccountIdOrThrow(int accountId) {
+        return findUserByAccountId(accountId)
+                .orElseThrow(() -> new ExceptionAccountNotFound(EnumExceptionName.USER_NOT_FOUND.name()));
     }
 
     @Override

@@ -1,4 +1,4 @@
-package com.candido.server.service.auth;
+package com.candido.server.service.base.auth;
 
 import com.candido.server.domain.v1.token.Token;
 import com.candido.server.dto.v1.request.auth.RequestAuthentication;

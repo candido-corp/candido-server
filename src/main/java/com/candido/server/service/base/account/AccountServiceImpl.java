@@ -1,4 +1,4 @@
-package com.candido.server.service.account;
+package com.candido.server.service.base.account;
 
 import com.candido.server.domain.v1.account.*;
 import com.candido.server.domain.v1.provider.AuthProviderEnum;
@@ -9,9 +9,9 @@ import com.candido.server.exception.account.ExceptionAccountNotFound;
 import com.candido.server.exception.account.ExceptionDuplicateAccount;
 import com.candido.server.exception.account.ExceptionInvalidEmailAccount;
 import com.candido.server.exception.account.ExceptionPasswordsDoNotMatch;
-import com.candido.server.service.auth.provider.AuthProviderService;
-import com.candido.server.service.auth.token.TokenService;
-import com.candido.server.service.user.UserService;
+import com.candido.server.service.base.auth.provider.AuthProviderService;
+import com.candido.server.service.base.auth.token.TokenService;
+import com.candido.server.service.base.user.UserService;
 import com.candido.server.validation.email.EmailConstraintValidator;
 import com.candido.server.validation.password.PasswordConstraintValidator;
 import jakarta.transaction.Transactional;
@@ -48,6 +48,13 @@ public class AccountServiceImpl implements AccountService {
     @Override
     public Optional<Account> findByEmail(String email) {
         return accountRepository.findByEmail(email);
+    }
+
+    @Override
+    public Account findAccountByEmailOrThrow(String email) {
+        return findByEmail(email).orElseThrow(() ->
+                new ExceptionAccountNotFound(EnumExceptionName.ACCOUNT_NOT_FOUND.name(), "Email: " + email)
+        );
     }
 
     @Override
