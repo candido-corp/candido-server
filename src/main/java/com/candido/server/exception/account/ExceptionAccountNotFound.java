@@ -6,4 +6,8 @@ public class ExceptionAccountNotFound extends CustomRuntimeException {
     public ExceptionAccountNotFound(String message) {
         super(message);
     }
+
+    public ExceptionAccountNotFound(String ...message) {
+        super(message);
+    }
 }
