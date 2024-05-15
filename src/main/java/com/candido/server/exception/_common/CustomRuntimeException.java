@@ -50,6 +50,17 @@ public class CustomRuntimeException extends RuntimeException {
     }
 
     /**
+     * Constructs a new CustomRuntimeException by concatenating multiple detail messages into a single message.
+     *
+     * @param messages The array of detail messages to be concatenated.
+     */
+    public CustomRuntimeException(String ...messages) {
+        super(String.join(" | ", messages));
+        this.message = super.getMessage();
+        this.timestamp = LocalDateTime.now();
+    }
+
+    /**
      * Constructs a new CustomRuntimeException with the specified detail message and arguments.
      *
      * @param message The detail message.
