@@ -7,12 +7,13 @@ import org.springframework.context.MessageSource;
 import org.springframework.stereotype.Service;
 
 import java.util.Locale;
+import java.util.Optional;
 
 /**
  * Service for resolving messages related to validation exceptions.
  */
 @Service
-public class MessageResolverValidationException implements ExceptionMessageResolver {
+public class MessageResolverValidationException extends MessageResolverException {
 
     private final MessageSource messageSource;
 
@@ -35,6 +36,8 @@ public class MessageResolverValidationException implements ExceptionMessageResol
      */
     @Override
     public String resolveMessage(CustomRuntimeException ex, Locale locale) {
-        return messageSource.getMessage(ex.getMessage(), ex.getArgs(), locale);
+        return Optional.ofNullable(ex.getMessage())
+                .map(message -> messageSource.getMessage(message, ex.getArgs(), locale))
+                .orElse(super.resolveMessage(ex, locale));
     }
 }

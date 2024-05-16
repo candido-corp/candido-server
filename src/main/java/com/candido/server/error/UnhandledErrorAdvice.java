@@ -1,6 +1,6 @@
 package com.candido.server.error;
 
-import com.candido.server.exception._common.BTExceptionResolver;
+import com.candido.server.exception._common.CustomExceptionResolver;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
@@ -11,7 +11,7 @@ import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExcep
 @RequiredArgsConstructor
 public class UnhandledErrorAdvice extends ResponseEntityExceptionHandler {
 
-    private final BTExceptionResolver btExceptionResolver;
+    private final CustomExceptionResolver customExceptionResolver;
 
 //    @ExceptionHandler({Exception.class})
 //    public ResponseEntity<BTExceptionResponse> exception(Exception ex) {

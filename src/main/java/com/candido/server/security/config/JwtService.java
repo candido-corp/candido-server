@@ -2,10 +2,11 @@ package com.candido.server.security.config;
 
 import com.candido.server.config.ConfigAppProperties;
 import com.candido.server.domain.v1.token.EnumJwtExceptionState;
-import com.candido.server.exception._common.BTExceptionResolver;
+import com.candido.server.exception._common.CustomExceptionResolver;
+import com.candido.server.exception._common.resolver.DispatchMessageResolverException;
 import com.candido.server.exception.security.auth.ExceptionVerifyRegistrationToken;
 import com.candido.server.exception.security.jwt.ExceptionInvalidJWTToken;
-import com.candido.server.exception.security.jwt.ExceptionSecurityJWT;
+import com.candido.server.exception.security.jwt.ExceptionSecurityJwt;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
@@ -29,7 +30,10 @@ import java.util.function.Function;
 public class JwtService {
 
     @Autowired
-    private BTExceptionResolver btExceptionResolver;
+    private CustomExceptionResolver customExceptionResolver;
+
+    @Autowired
+    private DispatchMessageResolverException dispatchMessageResolverException;
 
     @Autowired
     private ConfigAppProperties configAppProperties;
@@ -197,7 +201,7 @@ public class JwtService {
             handleJwtException(ex, token);
             return null;
         } catch (IllegalArgumentException ex) {
-            handleIllegalArgumentException(ex, token);
+            handleIllegalArgumentException(ex);
             return null;
         }
     }
@@ -206,12 +210,11 @@ public class JwtService {
      * Handles IllegalArgumentException specifically for token parsing issues.
      *
      * @param ex the IllegalArgumentException that was caught.
-     * @param token the token that caused the exception.
      */
-    private void handleIllegalArgumentException(IllegalArgumentException ex, String token) {
-        btExceptionResolver.resolveAuthBTException(
-                EnumJwtExceptionState.TOKEN_NULL_EMPTY_OR_WHITESPACE.name(), new ExceptionSecurityJWT(ex.getMessage()), token
-        );
+    private void handleIllegalArgumentException(IllegalArgumentException ex) {
+        String jwtState = EnumJwtExceptionState.TOKEN_NULL_EMPTY_OR_WHITESPACE.name();
+        customExceptionResolver.printException(ex, "JWT_STATE: " + jwtState);
+        throw new ExceptionSecurityJwt(ex.getMessage());
     }
 
     /**
@@ -222,9 +225,8 @@ public class JwtService {
      */
     private void handleJwtException(JwtException ex, String token) {
         String jwtState = determineJwtExceptionState(ex);
-        btExceptionResolver.resolveAuthBTException(
-                jwtState, new ExceptionSecurityJWT(ex.getMessage()), token
-        );
+        customExceptionResolver.printException(ex, "JWT_STATE: " + jwtState, "TOKEN: " + token);
+        throw new ExceptionSecurityJwt(ex.getMessage());
     }
 
     /**

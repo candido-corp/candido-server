@@ -1,12 +1,13 @@
 package com.candido.server.exception.account;
 
+import com.candido.server.exception._common.CustomRuntimeException;
 import lombok.Getter;
 
 import java.util.List;
 
-public class ExceptionInvalidPasswordAccountList extends RuntimeException {
+@Getter
+public class ExceptionInvalidPasswordAccountList extends CustomRuntimeException {
 
-    @Getter
     private final List<ExceptionInvalidPasswordAccount> exceptions;
 
     public ExceptionInvalidPasswordAccountList(List<ExceptionInvalidPasswordAccount> exceptions) {

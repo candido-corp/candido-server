@@ -59,7 +59,12 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         jwt = authHeader.substring(7);
 
         // Tramite una classe di supporto estraggo lo username dal token
-        userEmail = jwtService.extractUsername(jwt);
+        try {
+            userEmail = jwtService.extractUsername(jwt);
+        } catch (Exception e) {
+            filterChain.doFilter(request, response);
+            return;
+        }
 
         // Controllo che lo username non sia null e controllo nel contesto di sicurezza di spring che
         // l'utente non sia già autenticato
