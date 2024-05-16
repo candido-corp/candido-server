@@ -1,6 +1,6 @@
 package com.candido.server.domain.v1.token;
 
-public enum JWTStateEnum {
+public enum EnumJwtExceptionState {
     JWT_EXPIRED,
     TOKEN_NULL_EMPTY_OR_WHITESPACE,
     JWT_INVALID,

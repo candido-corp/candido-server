@@ -36,7 +36,7 @@ public class SecurityConfiguration {
 
     private final LogoutHandler logoutHandler;
 
-    private final JWTAuthenticationEntryPoint jwtAuthenticationEntryPoint;
+    private final JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint;
 
     CorsConfigurationSource corsConfigurationSource() {
         final var configuration = new CorsConfiguration();

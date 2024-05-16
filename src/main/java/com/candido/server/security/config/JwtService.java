@@ -1,7 +1,7 @@
 package com.candido.server.security.config;
 
 import com.candido.server.config.ConfigAppProperties;
-import com.candido.server.domain.v1.token.JWTStateEnum;
+import com.candido.server.domain.v1.token.EnumJwtExceptionState;
 import com.candido.server.exception._common.BTExceptionResolver;
 import com.candido.server.exception.security.auth.ExceptionVerifyRegistrationToken;
 import com.candido.server.exception.security.jwt.ExceptionInvalidJWTToken;
@@ -210,7 +210,7 @@ public class JwtService {
      */
     private void handleIllegalArgumentException(IllegalArgumentException ex, String token) {
         btExceptionResolver.resolveAuthBTException(
-                JWTStateEnum.TOKEN_NULL_EMPTY_OR_WHITESPACE.name(), new ExceptionSecurityJWT(ex.getMessage()), token
+                EnumJwtExceptionState.TOKEN_NULL_EMPTY_OR_WHITESPACE.name(), new ExceptionSecurityJWT(ex.getMessage()), token
         );
     }
 
@@ -235,15 +235,15 @@ public class JwtService {
      */
     private String determineJwtExceptionState(JwtException ex) {
         if (ex instanceof ExpiredJwtException) {
-            return JWTStateEnum.JWT_EXPIRED.name();
+            return EnumJwtExceptionState.JWT_EXPIRED.name();
         } else if (ex instanceof MalformedJwtException) {
-            return JWTStateEnum.JWT_INVALID.name();
+            return EnumJwtExceptionState.JWT_INVALID.name();
         } else if (ex instanceof UnsupportedJwtException) {
-            return JWTStateEnum.JWT_NOT_SUPPORTED.name();
+            return EnumJwtExceptionState.JWT_NOT_SUPPORTED.name();
         } else if (ex instanceof SignatureException) {
-            return JWTStateEnum.SIGNATURE_VALIDATION_FAILED.name();
+            return EnumJwtExceptionState.SIGNATURE_VALIDATION_FAILED.name();
         }
-        return JWTStateEnum.UNKNOWN.name();
+        return EnumJwtExceptionState.UNKNOWN.name();
     }
 
     /**
