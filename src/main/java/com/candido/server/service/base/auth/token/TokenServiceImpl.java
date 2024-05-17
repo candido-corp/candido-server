@@ -3,7 +3,7 @@ package com.candido.server.service.base.auth.token;
 import com.candido.server.domain.v1.account.Account;
 import com.candido.server.domain.v1.token.*;
 import com.candido.server.exception.security.auth.ExceptionToken;
-import com.candido.server.exception.security.auth.ExceptionVerifyRegistrationToken;
+import com.candido.server.exception.security.jwt.ExceptionInvalidJWTToken;
 import com.candido.server.security.config.JwtService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -51,6 +51,11 @@ public class TokenServiceImpl implements TokenService {
     @Override
     public Token findTokenByUUIDAndTokenScopeCategoryIdOrThrow(String uuid, int tokenScopeCategoryId) {
         return findByUUIDAndTokenScopeCategoryId(uuid, tokenScopeCategoryId).orElseThrow(ExceptionToken::new);
+    }
+
+    @Override
+    public Token findTokenByRefreshTokenOrThrow(String refreshToken) {
+        return findByRefreshToken(refreshToken).orElseThrow(ExceptionToken::new);
     }
 
     public Token saveUserToken(
@@ -101,9 +106,7 @@ public class TokenServiceImpl implements TokenService {
 
     @Override
     public void delete(Token token) {
-        // Elimino le dipendenze del token prima di eliminarlo
-        temporaryCodeService.findByTokenId(token.getId()).ifPresent(temporaryCode -> temporaryCodeService.delete(temporaryCode));
-
+        temporaryCodeService.deleteTemporaryCodeByTokenId(token.getId());
         tokenRepository.delete(token);
     }
 
@@ -141,22 +144,51 @@ public class TokenServiceImpl implements TokenService {
     }
 
     @Override
-    public void validateToken(String registrationToken, Account account) {
-        // Controllo che il token sia valido altrimenti sollevo un'eccezione
-        if (!jwtService.isValidToken(registrationToken, account))
-            throw new ExceptionVerifyRegistrationToken();
+    public Token createLoginToken(Account account, String ipAddress) {
+        // Creo un token con i dati dell'utente creato
+        var accessToken = jwtService.generateToken(account);
 
-        // Recupero il token in base all'account ID e allo scopo di registrazione
-        Optional<Token> token = findByAccountIdAndTokenScopeCategoryId(
-                account.getId(), TokenScopeCategoryEnum.BTD_REGISTRATION.getTokenScopeCategoryId()
+        // Creo il token di refresh
+        var refreshToken = jwtService.generateRefreshToken(account);
+
+        // Salva il token dell'utente
+        return saveUserToken(
+                account,
+                accessToken,
+                refreshToken,
+                ipAddress,
+                TokenTypeEnum.BEARER,
+                TokenScopeCategoryEnum.BTD_RW
         );
+    }
 
-        // Se il token è presente e uguale a quello che mi è arrivato
-        if (token.isEmpty() || !token.get().getAccessToken().equals(registrationToken))
-            throw new ExceptionVerifyRegistrationToken();
+    @Override
+    public Token createResetToken(Account account, String ipAddress) {
+        // Creo un token per il reset
+        var accessToken = jwtService.generateResetToken(account);
 
-        // Elimino il token di registrazione
-        delete(token.get());
+        // Salva il token dell'utente
+        return saveUserToken(
+                account,
+                accessToken,
+                null,
+                ipAddress,
+                TokenTypeEnum.BEARER,
+                TokenScopeCategoryEnum.BTD_RESET
+        );
+    }
+
+    @Override
+    public void validateTokenAndDelete(String token, int tokenScopeCategoryId, Account account) {
+        if (!jwtService.isValidToken(token, account)) throw new ExceptionInvalidJWTToken();
+
+        Optional<Token> currToken = findByAccountIdAndTokenScopeCategoryId(account.getId(), tokenScopeCategoryId);
+
+        boolean isCurrTokenPresent = currToken.isPresent();
+        boolean isCurrTokenEqualsToToken = isCurrTokenPresent && currToken.get().getAccessToken().equals(token);
+        if (!isCurrTokenPresent || !isCurrTokenEqualsToToken) throw new ExceptionToken();
+
+        delete(currToken.get());
     }
 
 }

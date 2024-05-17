@@ -9,6 +9,7 @@ public interface AccountService {
     Optional<Account> findById(int accountId);
     Optional<Account> findByEmail(String email);
     Account findAccountByEmailOrThrow(String email);
+    Account findAccountByIdOrThrow(int accountId);
     Account save(Account account);
     void enableAccount(int accountId);
     void editPassword(String email, String currentPassword, String password, String confirmPassword);

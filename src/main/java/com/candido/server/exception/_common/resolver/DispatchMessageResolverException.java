@@ -28,7 +28,6 @@ public class DispatchMessageResolverException extends MessageResolverException {
      */
     @Override
     public String resolveMessage(CustomRuntimeException ex, Locale locale, EnumMessageResolverExceptionType type) {
-        System.out.println("------------ M");
         return switch (type) {
             case AUTHENTICATION -> messageResolverAuthenticationException.resolveMessage(ex, locale);
             case BUSINESS -> messageResolverBusinessException.resolveMessage(ex, locale);
@@ -45,7 +44,6 @@ public class DispatchMessageResolverException extends MessageResolverException {
      * @return the resolved message as a string
      */
     public List<String> resolveMessage(List<CustomRuntimeException> exs, Locale locale, EnumMessageResolverExceptionType type) {
-        System.out.println("----------- Messages");
         return exs
                 .stream()
                 .map(exception -> resolveMessage(exception, locale, type))

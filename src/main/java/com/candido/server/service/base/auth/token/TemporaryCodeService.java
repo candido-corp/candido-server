@@ -3,7 +3,6 @@ package com.candido.server.service.base.auth.token;
 import com.candido.server.domain.v1.token.TemporaryCode;
 import org.springframework.data.jpa.domain.Specification;
 
-import java.time.LocalDateTime;
 import java.util.Optional;
 
 public interface TemporaryCodeService {
@@ -14,11 +13,12 @@ public interface TemporaryCodeService {
     
     TemporaryCode generateCode(Long tokenId);
 
-    void delete(String code);
-    void delete(TemporaryCode temporaryCode);
+    void deleteTemporaryCodeByCodeString(String code);
+    void deleteTemporaryCodeByTokenId(long tokenId);
+    void deleteTemporaryCodeInstance(TemporaryCode temporaryCode);
 
     TemporaryCode assignCode(long tokenId);
 
-
     void checkTemporaryCodePoolSize();
+    void validateTemporaryCode(String temporaryCode, long tokenId);
 }

@@ -19,7 +19,7 @@ import java.util.stream.Collectors;
 @RestController
 @RequestMapping("/api/v1/auth")
 @RequiredArgsConstructor
-public class ControllerAuthentication {
+public class ControllerAuth {
 
     private final AuthenticationService authenticationService;
 

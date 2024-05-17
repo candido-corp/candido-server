@@ -25,6 +25,7 @@ public interface AuthenticationService {
     void sendResetPassword(String email, String ipAddress, String appUrl);
     ResponseAuthentication resetPassword(String uuidAccessToken, RequestPasswordReset request, String ipAddress);
 
+    String getTokenFromAuthorizationHeaderRequest(HttpServletRequest request);
 
     // TODO: Elimina i servizi qui sotto
     void verifyRegistrationByEmail(String email);

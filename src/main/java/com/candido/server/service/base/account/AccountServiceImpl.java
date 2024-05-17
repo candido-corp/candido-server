@@ -58,6 +58,13 @@ public class AccountServiceImpl implements AccountService {
     }
 
     @Override
+    public Account findAccountByIdOrThrow(int accountId) {
+        return findById(accountId).orElseThrow(() ->
+                new ExceptionAccountNotFound(EnumExceptionName.ACCOUNT_NOT_FOUND.name(), "ID: " + accountId)
+        );
+    }
+
+    @Override
     public Account save(Account account) {
         return accountRepository.save(account);
     }

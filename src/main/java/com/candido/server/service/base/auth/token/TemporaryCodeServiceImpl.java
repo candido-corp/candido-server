@@ -3,6 +3,7 @@ package com.candido.server.service.base.auth.token;
 import com.candido.server.domain.v1.token.TemporaryCode;
 import com.candido.server.domain.v1.token.TemporaryCodeRepository;
 import com.candido.server.domain.v1.token.TemporaryCode_;
+import com.candido.server.exception.security.auth.ExceptionTemporaryCode;
 import com.candido.server.util.UtilService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.jpa.domain.Specification;
@@ -11,6 +12,7 @@ import org.springframework.stereotype.Service;
 
 import java.security.SecureRandom;
 import java.time.LocalDateTime;
+import java.util.Objects;
 import java.util.Optional;
 
 @Service
@@ -86,12 +88,17 @@ public class TemporaryCodeServiceImpl implements TemporaryCodeService {
     }
 
     @Override
-    public void delete(String code) {
+    public void deleteTemporaryCodeByCodeString(String code) {
         findByCode(code).ifPresent(temporaryCode -> temporaryCodeRepository.delete(temporaryCode));
     }
 
     @Override
-    public void delete(TemporaryCode temporaryCode) {
+    public void deleteTemporaryCodeByTokenId(long tokenId) {
+        findByTokenId(tokenId).ifPresent(temporaryCode -> temporaryCodeRepository.delete(temporaryCode));
+    }
+
+    @Override
+    public void deleteTemporaryCodeInstance(TemporaryCode temporaryCode) {
         temporaryCodeRepository.delete(temporaryCode);
     }
 
@@ -116,6 +123,20 @@ public class TemporaryCodeServiceImpl implements TemporaryCodeService {
                 generateCode(null);
             }
         }
+    }
+
+    @Override
+    public void validateTemporaryCode(String temporaryCode, long tokenId) {
+        // Recupero il codice temporaneo
+        var code = findByCode(temporaryCode);
+
+        // Controllo che il codice temporaneo non sia scaduto
+        if(code.isEmpty() || code.get().isExpired())
+            throw new ExceptionTemporaryCode();
+
+        // Se l'ID del token è diverso dell'ID del token della sessione
+        if(!Objects.equals(code.get().getTokenId(), tokenId))
+            throw new ExceptionTemporaryCode();
     }
 
 }

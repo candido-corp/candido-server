@@ -16,6 +16,7 @@ public interface TokenService {
     Optional<Token> findByAccountIdAndTokenScopeCategoryId(int accountId, int tokenScopeCategoryId);
 
     Token findTokenByUUIDAndTokenScopeCategoryIdOrThrow(String uuid, int tokenScopeCategoryId);
+    Token findTokenByRefreshTokenOrThrow(String refreshToken);
 
     Token saveUserToken(
             Account account,
@@ -34,7 +35,9 @@ public interface TokenService {
 
 
     Token createRegistrationToken(Account account, String ipAddress);
+    Token createLoginToken(Account account, String ipAddress);
+    Token createResetToken(Account account, String ipAddress);
 
-    void validateToken(String registrationToken, Account account);
+    void validateTokenAndDelete(String token, int tokenScopeCategoryId, Account account);
 
 }
