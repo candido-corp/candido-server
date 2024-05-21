@@ -5,16 +5,12 @@ import com.candido.server.exception._common.resolver.EnumMessageResolverExceptio
 import com.candido.server.exception.account.ExceptionInvalidPasswordAccountList;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.context.MessageSource;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
-import javax.naming.AuthenticationException;
 import java.time.LocalDateTime;
 import java.util.*;
-import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -52,7 +48,7 @@ public class CustomExceptionResolver implements ExceptionResolver {
      * @return a ResponseEntity containing an ErrorResponse with the resolved message and the provided HttpStatus.
      */
     @Override
-    public ResponseEntity<ErrorResponse> resolveException(
+    public ResponseEntity<ApiErrorResponse> resolveException(
             CustomRuntimeException ex,
             Locale locale,
             HttpStatus httpStatus,
@@ -60,7 +56,8 @@ public class CustomExceptionResolver implements ExceptionResolver {
     ) {
         printException(ex);
         String errorMessage = dispatchMessageResolverException.resolveMessage(ex, locale, type);
-        return new ResponseEntity<>(new ErrorResponse(errorMessage, httpStatus), httpStatus);
+        var apiError = ApiError.builder().code(ex.getMessage()).data(ex.getDetails()).build();
+        return new ResponseEntity<>(new ApiErrorResponse(httpStatus, List.of(apiError)), httpStatus);
     }
 
     /**

@@ -16,7 +16,7 @@ public class StartUpEvent {
     public void afterStartUpRun() {
         log.info("[EVENT] (Start Up) -> {}", LocalDateTime.now());
 
-        // Imposto la lingua di default a US
+        // Set the default locale to US
         Locale.setDefault(Locale.US);
     }
 

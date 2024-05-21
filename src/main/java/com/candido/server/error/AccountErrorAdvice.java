@@ -2,7 +2,7 @@ package com.candido.server.error;
 
 import com.candido.server.exception._common.CustomExceptionResolver;
 import com.candido.server.exception._common.CustomRuntimeException;
-import com.candido.server.exception._common.ErrorResponse;
+import com.candido.server.exception._common.ApiErrorResponse;
 import com.candido.server.exception._common.ErrorResponseList;
 import com.candido.server.exception._common.resolver.EnumMessageResolverExceptionType;
 import com.candido.server.exception.account.*;
@@ -14,7 +14,6 @@ import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 
-import java.time.LocalDateTime;
 import java.util.Locale;
 
 @Slf4j
@@ -26,7 +25,7 @@ public class AccountErrorAdvice {
 
     @ExceptionHandler({ExceptionDuplicateAccount.class})
     @ResponseStatus(HttpStatus.CONFLICT)
-    public ResponseEntity<ErrorResponse> handleDuplicateAccountException(CustomRuntimeException ex, Locale locale) {
+    public ResponseEntity<ApiErrorResponse> handleDuplicateAccountException(CustomRuntimeException ex, Locale locale) {
         return customExceptionResolver.resolveException(
                 ex,
                 locale,
@@ -37,7 +36,7 @@ public class AccountErrorAdvice {
 
     @ExceptionHandler({ExceptionAccountNotFound.class})
     @ResponseStatus(HttpStatus.NOT_FOUND)
-    public ResponseEntity<ErrorResponse> handleAccountNotFoundException(CustomRuntimeException ex, Locale locale) {
+    public ResponseEntity<ApiErrorResponse> handleAccountNotFoundException(CustomRuntimeException ex, Locale locale) {
         return customExceptionResolver.resolveException(
                 ex,
                 locale,
@@ -54,7 +53,7 @@ public class AccountErrorAdvice {
             ExceptionFirstNameEmpty.class,
     })
     @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public ResponseEntity<ErrorResponse> handleAccountEmailPasswordException(CustomRuntimeException ex, Locale locale) {
+    public ResponseEntity<ApiErrorResponse> handleAccountEmailPasswordException(CustomRuntimeException ex, Locale locale) {
         return customExceptionResolver.resolveException(
                 ex,
                 locale,

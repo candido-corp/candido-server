@@ -2,21 +2,19 @@ package com.candido.server.error;
 
 import com.candido.server.exception._common.CustomExceptionResolver;
 import com.candido.server.exception._common.CustomRuntimeException;
-import com.candido.server.exception._common.ErrorResponse;
+import com.candido.server.exception._common.ApiErrorResponse;
 import com.candido.server.exception._common.resolver.EnumMessageResolverExceptionType;
+import com.candido.server.exception.account.ExceptionAccountDisabled;
 import com.candido.server.exception.security.auth.*;
 import com.candido.server.exception.security.jwt.ExceptionInvalidJWTToken;
 import com.candido.server.exception.security.jwt.ExceptionSecurityJwt;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 
-import java.time.LocalDateTime;
 import java.util.Locale;
 
 @ControllerAdvice
@@ -31,7 +29,8 @@ public class SecurityErrorAdvice {
             ExceptionVerifyResetToken.class,
             ExceptionToken.class,
             ExceptionTemporaryCode.class,
-            ExceptionSecurityJwt.class
+            ExceptionSecurityJwt.class,
+            ExceptionAccountDisabled.class
     })
     @ResponseStatus(HttpStatus.UNAUTHORIZED)
     public ResponseEntity<Void> handleTokenException(CustomRuntimeException ex) {
@@ -41,7 +40,7 @@ public class SecurityErrorAdvice {
 
     @ExceptionHandler({ ExceptionAuth.class })
     @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public ResponseEntity<ErrorResponse> handleAuthenticationException(ExceptionAuth ex, Locale locale) {
+    public ResponseEntity<ApiErrorResponse> handleAuthenticationException(ExceptionAuth ex, Locale locale) {
         return customExceptionResolver.resolveException(
                 ex,
                 locale,

@@ -100,7 +100,8 @@ public class Account implements UserDetails {
 
     @Override
     public boolean isEnabled() {
-        return status.getId() == AccountStatusEnum.VERIFIED.getStatusId();
+        return status.getId() == AccountStatusEnum.VERIFIED.getStatusId()
+                && deletedAt == null;
     }
 
 }

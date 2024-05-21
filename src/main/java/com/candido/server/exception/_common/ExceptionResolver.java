@@ -11,7 +11,7 @@ public interface ExceptionResolver {
 
     void printException(Exception ex, String ...extraMessage);
 
-    ResponseEntity<ErrorResponse> resolveException(
+    ResponseEntity<ApiErrorResponse> resolveException(
             CustomRuntimeException ex,
             Locale locale,
             HttpStatus httpStatus,

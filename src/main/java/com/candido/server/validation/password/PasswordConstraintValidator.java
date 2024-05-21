@@ -26,7 +26,8 @@ public class PasswordConstraintValidator {
             exceptions.add(
                     new ExceptionInvalidPasswordAccount(
                             ruleResultDetail.getErrorCode(),
-                            ruleResultDetail.getValues()
+                            ruleResultDetail.getValues(),
+                            ruleResultDetail.getParameters()
                     )
             );
         });

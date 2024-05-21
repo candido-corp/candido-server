@@ -17,7 +17,6 @@ import com.candido.server.exception.account.ExceptionAccountNotFound;
 import com.candido.server.exception.security.jwt.ExceptionInvalidJWTToken;
 import com.candido.server.security.config.JwtService;
 import com.candido.server.service.base.account.AccountService;
-import com.candido.server.service.base.auth.provider.AuthProviderService;
 import com.candido.server.service.base.auth.token.TemporaryCodeService;
 import com.candido.server.service.base.auth.token.TokenService;
 import com.candido.server.service.base.user.UserService;
@@ -45,8 +44,6 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     private final AuthenticationManager authenticationManager;
 
     private final TokenService tokenService;
-
-    private final AuthProviderService authProviderService;
 
     private final AccountService accountService;
 
@@ -114,14 +111,14 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     public void verifyRegistrationByUUIDAccessTokenAndTemporaryCode(String uuidAccessToken, String temporaryCode) {
         int tokenScopeCategoryId = TokenScopeCategoryEnum.BTD_REGISTRATION.getTokenScopeCategoryId();
         Token token = tokenService.findTokenByUUIDAndTokenScopeCategoryIdOrThrow(uuidAccessToken, tokenScopeCategoryId);
-        String registrationToken = token.getAccessToken();
-        String username = jwtService.extractAndValidateUsername(registrationToken);
+        String username = jwtService.extractAndValidateUsername(token.getAccessToken());
         var account = accountService.findAccountByEmailOrThrow(username);
         temporaryCodeService.validateTemporaryCode(temporaryCode, token.getId());
-        tokenService.validateTokenAndDelete(registrationToken, tokenScopeCategoryId, account);
+        tokenService.validateTokenAndDelete(token.getAccessToken(), tokenScopeCategoryId, account);
         accountService.activateAccount(account);
         var user = userService.findUserByAccountIdOrThrow(account.getId());
-        eventPublisher.publishEvent(new OnRegistrationCompletedEvent(this, account, user));
+        var event = new OnRegistrationCompletedEvent(this, account, user);
+        eventPublisher.publishEvent(event);
     }
 
     @Override
@@ -177,7 +174,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
         // per evitare che si sappia quale email esistono nel sistema
         // Non controlliamo che sia abilitato per far si che possa attivarsi
         // se non ha completato la registrazione
-        if(account.isPresent()) {
+        if(account.isPresent() && account.get().isEnabled()) {
             Token token = tokenService.createResetToken(account.get(), ipAddress);
             var event = new OnResetAccountEvent(this, account.get(), token.getUuidAccessToken(), appUrl);
             eventPublisher.publishEvent(event);

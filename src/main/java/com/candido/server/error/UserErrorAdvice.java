@@ -2,7 +2,7 @@ package com.candido.server.error;
 
 import com.candido.server.exception._common.CustomExceptionResolver;
 import com.candido.server.exception._common.CustomRuntimeException;
-import com.candido.server.exception._common.ErrorResponse;
+import com.candido.server.exception._common.ApiErrorResponse;
 import com.candido.server.exception._common.resolver.EnumMessageResolverExceptionType;
 import com.candido.server.exception.user.ExceptionUserNotFound;
 import lombok.RequiredArgsConstructor;
@@ -13,7 +13,6 @@ import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 
-import java.time.LocalDateTime;
 import java.util.Locale;
 
 @Slf4j
@@ -25,7 +24,7 @@ public class UserErrorAdvice {
 
     @ExceptionHandler({ExceptionUserNotFound.class})
     @ResponseStatus(HttpStatus.NOT_FOUND)
-    public ResponseEntity<ErrorResponse> handleUserNotFoundException(CustomRuntimeException ex, Locale locale) {
+    public ResponseEntity<ApiErrorResponse> handleUserNotFoundException(CustomRuntimeException ex, Locale locale) {
         return customExceptionResolver.resolveException(
                 ex,
                 locale,

@@ -36,21 +36,16 @@ public class ControllerAccount {
 
     @GetMapping
     public ResponseEntity<AccountDto> getAccountInfo(Authentication authentication) {
-        Account account = accountService.findByEmail(authentication.getName())
-                .orElseThrow(() -> new ExceptionAccountNotFound(EnumExceptionName.ACCOUNT_NOT_FOUND.name()));
+        System.out.println(authentication.isAuthenticated());
+        Account account = accountService.findAccountByEmailOrThrow(authentication.getName());
         return ResponseEntity.ok(accountMapper.accountToAccountDto(account));
     }
 
     @GetMapping("/details")
     public ResponseEntity<UserDto> getUserInfo(Authentication authentication) {
-        Account account = accountService.findByEmail(authentication.getName())
-                .orElseThrow(() -> new ExceptionAccountNotFound(EnumExceptionName.ACCOUNT_NOT_FOUND.name()));
-
-        User user = userService.findUserByAccountId(account.getId())
-                .orElseThrow(() -> new ExceptionUserNotFound(EnumExceptionName.USER_NOT_FOUND.name()));
-
+        Account account = accountService.findAccountByEmailOrThrow(authentication.getName());
+        User user = userService.findUserByAccountIdOrThrow(account.getId());
         UserDto userDto = userMapper.userToUserDto(user);
-
         return ResponseEntity.ok(userDto);
     }
 
@@ -62,12 +57,8 @@ public class ControllerAccount {
         // TODO: Modifica nome e cognome ogni X giorni. La prima volta è possibile cambiarlo subito.
         // TODO: Se c'è una candidatura aperta non può modificare il nome e cognome.
 
-        Account account = accountService.findByEmail(authentication.getName())
-                .orElseThrow(() -> new ExceptionAccountNotFound(EnumExceptionName.ACCOUNT_NOT_FOUND.name()));
-
-        User user = userService.findUserByAccountId(account.getId())
-                .orElseThrow(() -> new ExceptionUserNotFound(EnumExceptionName.USER_NOT_FOUND.name()));
-
+        Account account = accountService.findAccountByEmailOrThrow(authentication.getName());
+        User user = userService.findUserByAccountIdOrThrow(account.getId());
         UserDto userDto = userMapper.userToUserDto(userService.save(user, requestUpdateUserDto));
 
         return ResponseEntity.ok(userDto);

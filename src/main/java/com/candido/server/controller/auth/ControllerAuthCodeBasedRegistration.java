@@ -33,11 +33,11 @@ public class ControllerAuthCodeBasedRegistration {
 
     @PostMapping("/resend")
     public ResponseEntity<Void> resendCodeForCodeVerification(
-            @RequestParam("s") String sessionId,
+            @RequestParam("t") String uuidAccessToken,
             HttpServletRequest httpRequest
     ) {
         String appURL = utilService.getAppUrl(httpRequest);
-        authenticationService.resendCodeRegistrationByUUIDAccessToken(sessionId, appURL);
+        authenticationService.resendCodeRegistrationByUUIDAccessToken(uuidAccessToken, appURL);
         return ResponseEntity.noContent().build();
     }
 

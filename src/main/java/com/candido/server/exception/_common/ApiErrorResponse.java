@@ -5,19 +5,15 @@ import lombok.Getter;
 import org.springframework.http.HttpStatus;
 
 import java.time.LocalDateTime;
+import java.util.List;
+import java.util.Map;
 
 /**
- * ErrorResponse represents a response object for custom exceptions in the application.
- * It contains information such as the exception message, HTTP status, and the timestamp when the object instance was created.
+ * ApiError represents a response object for custom exceptions in the application.
+ * It contains information such as the error code, data, category, and sub-category.
  */
 @Getter
-public class ErrorResponse {
-
-    /**
-     * The message associated with the exception.
-     */
-    @JsonProperty("message")
-    private final String message;
+public class ApiErrorResponse {
 
     /**
      * The HTTP status associated with the exception.
@@ -32,15 +28,21 @@ public class ErrorResponse {
     private final LocalDateTime timestamp;
 
     /**
-     * Constructs a new ErrorResponse object with the provided message, HTTP status, and the current timestamp.
-     *
-     * @param message    The exception message.
-     * @param httpStatus The HTTP status associated with the exception.
+     * Additional details about the exception.
      */
-    public ErrorResponse(String message, HttpStatus httpStatus) {
-        this.message = message;
+    @JsonProperty("errors")
+    private final List<ApiError> errors;
+
+    /**
+     * Constructs a new ApiErrorResponse object with the provided exception message, HTTP status, and timestamp.
+     *
+     * @param httpStatus The HTTP status associated with the exception.
+     * @param errors     The list of error messages.
+     */
+    public ApiErrorResponse(HttpStatus httpStatus, List<ApiError> errors) {
         this.status = httpStatus.value();
         this.timestamp = LocalDateTime.now();
+        this.errors = errors;
     }
 
 }

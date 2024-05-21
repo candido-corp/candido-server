@@ -52,16 +52,26 @@ public class AccountServiceImpl implements AccountService {
 
     @Override
     public Account findAccountByEmailOrThrow(String email) {
-        return findByEmail(email).orElseThrow(() ->
+        var account = findByEmail(email).orElseThrow(() ->
                 new ExceptionAccountNotFound(EnumExceptionName.ACCOUNT_NOT_FOUND.name(), "Email: " + email)
         );
+
+        if (!account.isEnabled())
+            throw new ExceptionAccountNotFound(EnumExceptionName.ACCOUNT_DISABLED.name(), "Email: " + email);
+
+        return account;
     }
 
     @Override
     public Account findAccountByIdOrThrow(int accountId) {
-        return findById(accountId).orElseThrow(() ->
+        var account = findById(accountId).orElseThrow(() ->
                 new ExceptionAccountNotFound(EnumExceptionName.ACCOUNT_NOT_FOUND.name(), "ID: " + accountId)
         );
+
+        if (!account.isEnabled())
+            throw new ExceptionAccountNotFound(EnumExceptionName.ACCOUNT_DISABLED.name(), "ID: " + accountId);
+
+        return account;
     }
 
     @Override

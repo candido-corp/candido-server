@@ -4,6 +4,8 @@ import lombok.Getter;
 import org.springframework.http.HttpStatus;
 
 import java.time.LocalDateTime;
+import java.util.List;
+import java.util.Map;
 
 /**
  * CustomRuntimeException is a base class for custom runtime exceptions in the application.
@@ -21,6 +23,11 @@ public class CustomRuntimeException extends RuntimeException {
      * Arguments associated with the exception message.
      */
     private Object[] args;
+
+    /**
+     * Details associated with the exception.
+     */
+    private Map<String, Object> details;
 
     /**
      * The HTTP status associated with the exception.
@@ -70,6 +77,20 @@ public class CustomRuntimeException extends RuntimeException {
         super();
         this.message = message;
         this.args = args;
+    }
+
+    /**
+     * Constructs a new CustomRuntimeException with the specified detail message, arguments, and details.
+     *
+     * @param message The detail message.
+     * @param args    Arguments associated with the detail message.
+     * @param details Details associated with the exception.
+     */
+    public CustomRuntimeException(String message, Object[] args, Map<String, Object> details) {
+        super();
+        this.message = message;
+        this.args = args;
+        this.details = details;
     }
 
     /**
