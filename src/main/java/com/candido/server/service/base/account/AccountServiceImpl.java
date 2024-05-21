@@ -124,7 +124,7 @@ public class AccountServiceImpl implements AccountService {
         var account = Account.builder()
                 .email(request.email())
                 .password(passwordEncoder.encode(request.password()))
-                .accountRole(new AccountRole(AccountRoleEnum.USER.getRoleId()))
+                .role(new AccountRole(AccountRoleEnum.USER.getRoleId()))
                 .createdAt(LocalDateTime.now())
                 .status(new AccountStatus(AccountStatusEnum.PENDING.getStatusId()))
                 .build();
