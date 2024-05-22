@@ -64,7 +64,7 @@ public class AccountErrorAdvice {
 
     @ExceptionHandler({ExceptionInvalidPasswordAccountList.class})
     @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public ResponseEntity<ErrorResponseList> handleInvalidPasswordAccountException(ExceptionInvalidPasswordAccountList ex, Locale locale) {
+    public ResponseEntity<ApiErrorResponse> handleInvalidPasswordAccountException(ExceptionInvalidPasswordAccountList ex, Locale locale) {
         return customExceptionResolver.resolveException(
                 ex,
                 locale,

@@ -1,5 +1,6 @@
 package com.candido.server.exception._common;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Getter;
 import org.springframework.http.HttpStatus;
@@ -13,6 +14,7 @@ import java.util.Map;
  * It contains information such as the error code, data, category, and sub-category.
  */
 @Getter
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class ApiErrorResponse {
 
     /**

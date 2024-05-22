@@ -18,7 +18,7 @@ public interface ExceptionResolver {
             EnumMessageResolverExceptionType type
     );
 
-    ResponseEntity<ErrorResponseList> resolveException(
+    ResponseEntity<ApiErrorResponse> resolveException(
             ExceptionInvalidPasswordAccountList ex,
             Locale locale,
             HttpStatus httpStatus,

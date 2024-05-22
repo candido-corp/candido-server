@@ -58,6 +58,8 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     @Transactional
     @Override
     public void registerByEmail(RequestRegister request, String ipAddress, String appUrl) {
+        request.checkFields();
+
         var account = accountService.createAccount(request);
         var token = tokenService.createRegistrationToken(account, ipAddress);
 
@@ -73,6 +75,8 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     @Transactional
     @Override
     public ResponseRegistration registerByCode(RequestRegister request, String ipAddress, String appUrl) {
+        request.checkFields();
+
         var account = accountService.createAccount(request);
         var token = tokenService.createRegistrationToken(account, ipAddress);
         var temporaryCode = temporaryCodeService.assignCode(token.getId());
@@ -124,6 +128,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     @Override
     public ResponseAuthentication authenticate(RequestAuthentication request, String ipAddress) {
         request.checkFields();
+
         authenticationManager.authenticate(request.toUsernamePasswordAuthenticationToken());
         var account = accountService.findAccountByEmailOrThrow(request.email());
         Token token = tokenService.createLoginToken(account, ipAddress);

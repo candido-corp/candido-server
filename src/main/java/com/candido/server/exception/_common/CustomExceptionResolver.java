@@ -37,6 +37,20 @@ public class CustomExceptionResolver implements ExceptionResolver {
         );
     }
 
+    public ApiError createApiErrorResponse(
+            CustomRuntimeException ex,
+            Locale locale,
+            EnumMessageResolverExceptionType type
+    ) {
+        String errorMessage = dispatchMessageResolverException.resolveMessage(ex, locale, type);
+        return ApiError
+                .builder()
+                .code(ex.getMessage())
+                .data(ex.getDetails())
+                .message(errorMessage)
+                .build();
+    }
+
     /**
      * Resolves the message for a given exception based on the provided locale and type of exception.
      * It then wraps the resolved message in an ErrorResponse object and returns it within a ResponseEntity.
@@ -55,8 +69,7 @@ public class CustomExceptionResolver implements ExceptionResolver {
             EnumMessageResolverExceptionType type
     ) {
         printException(ex);
-        String errorMessage = dispatchMessageResolverException.resolveMessage(ex, locale, type);
-        var apiError = ApiError.builder().code(ex.getMessage()).data(ex.getDetails()).build();
+        var apiError = createApiErrorResponse(ex, locale, type);
         return new ResponseEntity<>(new ApiErrorResponse(httpStatus, List.of(apiError)), httpStatus);
     }
 
@@ -71,7 +84,7 @@ public class CustomExceptionResolver implements ExceptionResolver {
      * @return a ResponseEntity containing an ErrorResponse with the resolved message and the provided HttpStatus.
      */
     @Override
-    public ResponseEntity<ErrorResponseList> resolveException(
+    public ResponseEntity<ApiErrorResponse> resolveException(
             ExceptionInvalidPasswordAccountList ex,
             Locale locale,
             HttpStatus httpStatus,
@@ -79,9 +92,9 @@ public class CustomExceptionResolver implements ExceptionResolver {
     ) {
         ex.getExceptions().forEach(this::printException);
         List<CustomRuntimeException> customRuntimeExceptions = new ArrayList<>(ex.getExceptions());
-        List<String> messages = dispatchMessageResolverException.resolveMessage(customRuntimeExceptions, locale, type);
-        var errorResponseList = new ErrorResponseList(messages, httpStatus);
-        return new ResponseEntity<>(errorResponseList, httpStatus);
+        List<ApiError> apiErrorList = new ArrayList<>();
+        customRuntimeExceptions.forEach(cre -> apiErrorList.add(createApiErrorResponse(cre, locale, type)));
+        return new ResponseEntity<>(new ApiErrorResponse(httpStatus, apiErrorList), httpStatus);
     }
 
 }

@@ -6,7 +6,11 @@ import lombok.extern.slf4j.Slf4j;
 import java.util.Map;
 
 public class ExceptionInvalidPasswordAccount extends CustomRuntimeException {
-    public ExceptionInvalidPasswordAccount(String messages, Object[] args, Map<String, Object> details) {
-        super(messages, args, details);
+    public ExceptionInvalidPasswordAccount(String message) {
+        super(message);
+    }
+
+    public ExceptionInvalidPasswordAccount(String message, Object[] args, Map<String, Object> details) {
+        super(message, args, details);
     }
 }
