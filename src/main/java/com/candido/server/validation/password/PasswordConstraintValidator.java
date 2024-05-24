@@ -10,6 +10,9 @@ import java.util.List;
 public class PasswordConstraintValidator {
 
     public static void isValid(String password) {
+    public static boolean isValid(String password) {
+        if(password == null) return false;
+
         List<Rule> rules = new ArrayList<>();
         rules.add(new LengthRule(8, 16));
         rules.add(new WhitespaceRule());
@@ -33,6 +36,7 @@ public class PasswordConstraintValidator {
         });
 
         if(!result.isValid()) throw new ExceptionInvalidPasswordAccountList(exceptions);
+        return result.isValid();
     }
 
 }
