@@ -61,13 +61,11 @@ public class Account implements UserDetails {
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        // Mappo tutti i permessi del ruolo richiesto in SimpleGrantedAuthority
         var authorities = role.getAccountPermissions()
                 .stream()
                 .map(permission -> new SimpleGrantedAuthority(permission.getDescription()))
                 .collect(Collectors.toList());
 
-        // Aggiungo il ruolo richiamato
         authorities.add(new SimpleGrantedAuthority("ROLE_" + role.getDescription()));
 
         return authorities;
