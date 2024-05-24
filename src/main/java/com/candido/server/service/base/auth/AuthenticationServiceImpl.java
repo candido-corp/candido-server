@@ -14,6 +14,7 @@ import com.candido.server.dto.v1.response.auth.ResponseRegistration;
 import com.candido.server.event.auth.*;
 import com.candido.server.exception._common.EnumExceptionName;
 import com.candido.server.exception.account.ExceptionAccountNotFound;
+import com.candido.server.exception.security.auth.ExceptionAuth;
 import com.candido.server.exception.security.jwt.ExceptionInvalidJWTToken;
 import com.candido.server.security.config.JwtService;
 import com.candido.server.service.base.account.AccountService;
@@ -31,6 +32,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 
 @Service
@@ -58,8 +60,6 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     @Transactional
     @Override
     public void registerByEmail(RequestRegister request, String ipAddress, String appUrl) {
-        request.checkFields();
-
         var account = accountService.createAccount(request);
         var token = tokenService.createRegistrationToken(account, ipAddress);
 
@@ -75,8 +75,6 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     @Transactional
     @Override
     public ResponseRegistration registerByCode(RequestRegister request, String ipAddress, String appUrl) {
-        request.checkFields();
-
         var account = accountService.createAccount(request);
         var token = tokenService.createRegistrationToken(account, ipAddress);
         var temporaryCode = temporaryCodeService.assignCode(token.getId());
@@ -98,37 +96,41 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 
     @Transactional
     @Override
-    public void verifyRegistrationByUUIDAccessToken(String uuidAccessToken) {
-        int tokenScopeCategoryId = TokenScopeCategoryEnum.BTD_REGISTRATION.getTokenScopeCategoryId();
+    public void verifyEmailRegistration(String uuidAccessToken, String email) {
+        int tokenScopeCategoryId = TokenScopeCategoryEnum.REGISTRATION.getTokenScopeCategoryId();
         Token token = tokenService.findTokenByUUIDAndTokenScopeCategoryIdOrThrow(uuidAccessToken, tokenScopeCategoryId);
-        String username = jwtService.extractAndValidateUsername(token.getAccessToken());
-        var account = accountService.findAccountByEmailOrThrow(username);
-        tokenService.validateTokenAndDelete(token.getAccessToken(), tokenScopeCategoryId, account);
-        accountService.activateAccount(account);
-        var user = userService.findUserByAccountIdOrThrow(account.getId());
-        var event = new OnRegistrationCompletedEvent(this, account, user);
+        var account = accountService.findByEmail(email);
+
+        if(account.isEmpty() || !Objects.equals(token.getAccount().getId(), account.get().getId()))
+            throw new ExceptionAuth(EnumExceptionName.ERROR_AUTH_VERIFICATION.name());
+
+        tokenService.validateTokenAndDelete(token.getAccessToken(), tokenScopeCategoryId, account.get());
+        accountService.activateAccount(account.get());
+        var user = userService.findUserByAccountIdOrThrow(account.get().getId());
+        var event = new OnRegistrationCompletedEvent(this, account.get(), user);
         eventPublisher.publishEvent(event);
     }
 
     @Transactional
     @Override
-    public void verifyRegistrationByUUIDAccessTokenAndTemporaryCode(String uuidAccessToken, String temporaryCode) {
-        int tokenScopeCategoryId = TokenScopeCategoryEnum.BTD_REGISTRATION.getTokenScopeCategoryId();
+    public void verifyCodeRegistration(String uuidAccessToken, String temporaryCode, String email) {
+        int tokenScopeCategoryId = TokenScopeCategoryEnum.REGISTRATION.getTokenScopeCategoryId();
         Token token = tokenService.findTokenByUUIDAndTokenScopeCategoryIdOrThrow(uuidAccessToken, tokenScopeCategoryId);
-        String username = jwtService.extractAndValidateUsername(token.getAccessToken());
-        var account = accountService.findAccountByEmailOrThrow(username);
+        var account = accountService.findByEmail(email);
+
+        if(account.isEmpty() || !Objects.equals(token.getAccount().getId(), account.get().getId()))
+            throw new ExceptionAuth(EnumExceptionName.ERROR_AUTH_VERIFICATION.name());
+
         temporaryCodeService.validateTemporaryCode(temporaryCode, token.getId());
-        tokenService.validateTokenAndDelete(token.getAccessToken(), tokenScopeCategoryId, account);
-        accountService.activateAccount(account);
-        var user = userService.findUserByAccountIdOrThrow(account.getId());
-        var event = new OnRegistrationCompletedEvent(this, account, user);
+        tokenService.validateTokenAndDelete(token.getAccessToken(), tokenScopeCategoryId, account.get());
+        accountService.activateAccount(account.get());
+        var user = userService.findUserByAccountIdOrThrow(account.get().getId());
+        var event = new OnRegistrationCompletedEvent(this, account.get(), user);
         eventPublisher.publishEvent(event);
     }
 
     @Override
     public ResponseAuthentication authenticate(RequestAuthentication request, String ipAddress) {
-        request.checkFields();
-
         authenticationManager.authenticate(request.toUsernamePasswordAuthenticationToken());
         var account = accountService.findAccountByEmailOrThrow(request.email());
         Token token = tokenService.createLoginToken(account, ipAddress);
@@ -153,7 +155,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
         var account = accountService.findAccountByEmailOrThrow(username);
         Token currToken = tokenService.findTokenByRefreshTokenOrThrow(refreshToken);
 
-        if (!jwtService.isValidToken(currToken.getRefreshToken(), account) || !currToken.isRefreshTokenExpired())
+        if (!jwtService.isValidToken(currToken.getRefreshToken(), account) || currToken.isRefreshTokenExpired())
             throw new ExceptionInvalidJWTToken();
 
         String ipAddress = request.getRemoteAddr();
@@ -175,10 +177,11 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     public void sendResetPassword(String email, String ipAddress, String appUrl) {
         Optional<Account> account = accountService.findByEmail(email);
 
-        // Se non esiste l'account non solleviamo un'eccezione
-        // per evitare che si sappia quale email esistono nel sistema
-        // Non controlliamo che sia abilitato per far si che possa attivarsi
-        // se non ha completato la registrazione
+        // If the account doesn't exist, we don't throw an exception
+        // to avoid revealing which emails are registered in the system.
+
+        // We don't check whether the account is enabled,
+        // allowing it to be activated even if registration isn't complete.
         if(account.isPresent() && account.get().isEnabled()) {
             Token token = tokenService.createResetToken(account.get(), ipAddress);
             var event = new OnResetAccountEvent(this, account.get(), token.getUuidAccessToken(), appUrl);
@@ -187,24 +190,26 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     }
 
     @Override
-    public ResponseAuthentication resetPassword(String uuidAccessToken, RequestPasswordReset request, String ipAddress) {
-        request.checkFields();
-        int tokenScopeCategoryId = TokenScopeCategoryEnum.BTD_RESET.getTokenScopeCategoryId();
+    public ResponseAuthentication resetPassword(String uuidAccessToken, String email, RequestPasswordReset request, String ipAddress) {
+        int tokenScopeCategoryId = TokenScopeCategoryEnum.RESET.getTokenScopeCategoryId();
         Token currToken = tokenService.findTokenByUUIDAndTokenScopeCategoryIdOrThrow(uuidAccessToken, tokenScopeCategoryId);
-        String username = jwtService.extractAndValidateUsername(currToken.getAccessToken());
-        var account = accountService.findAccountByEmailOrThrow(username);
-        tokenService.validateTokenAndDelete(currToken.getAccessToken(), tokenScopeCategoryId, account);
+        var account = accountService.findByEmail(email);
 
-        account.setPassword(passwordEncoder.encode(request.password()));
-        if(account.getStatus().getId() == AccountStatusEnum.PENDING.getStatusId()) {
-            account.setStatus(new AccountStatus(AccountStatusEnum.VERIFIED.getStatusId()));
+        if(account.isEmpty() || !Objects.equals(currToken.getAccount().getId(), account.get().getId()))
+            throw new ExceptionAuth(EnumExceptionName.ERROR_AUTH_VERIFICATION.name());
+
+        tokenService.validateTokenAndDelete(currToken.getAccessToken(), tokenScopeCategoryId, account.get());
+
+        account.get().setPassword(passwordEncoder.encode(request.password()));
+        if(account.get().getStatus().getId() == AccountStatusEnum.PENDING.getStatusId()) {
+            account.get().setStatus(new AccountStatus(AccountStatusEnum.VERIFIED.getStatusId()));
         }
-        accountService.save(account);
+        accountService.save(account.get());
 
-        var event = new OnResetAccountCompletedEvent(this, account);
+        var event = new OnResetAccountCompletedEvent(this, account.get());
         eventPublisher.publishEvent(event);
 
-        Token token = tokenService.createLoginToken(account, ipAddress);
+        Token token = tokenService.createLoginToken(account.get(), ipAddress);
 
         var expires = configAppProperties.getSecurity().getJwt().getExpiration();
         var refreshExpires = configAppProperties.getSecurity().getJwt().getRefreshToken().getExpiration();
@@ -227,9 +232,8 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 
     @Override
     public void checkValidityOfUUIDAccessTokenForResetPassword(String uuidAccessToken) {
-        Token token = tokenService.findTokenByUUIDAndTokenScopeCategoryIdOrThrow(
-                uuidAccessToken, TokenScopeCategoryEnum.BTD_RESET.getTokenScopeCategoryId()
-        );
+        int tokenScopeCategoryId = TokenScopeCategoryEnum.RESET.getTokenScopeCategoryId();
+        var token = tokenService.findTokenByUUIDAndTokenScopeCategoryIdOrThrow(uuidAccessToken, tokenScopeCategoryId);
         String username = jwtService.extractAndValidateUsername(token.getAccessToken());
         var account = accountService.findAccountByEmailOrThrow(username);
         if (!jwtService.isValidToken(token.getAccessToken(), account))
@@ -238,7 +242,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 
     @Override
     public void resendCodeRegistrationByUUIDAccessToken(String uuidAccessToken, String appUrl) {
-        int tokenScopeCategoryId = TokenScopeCategoryEnum.BTD_REGISTRATION.getTokenScopeCategoryId();
+        int tokenScopeCategoryId = TokenScopeCategoryEnum.REGISTRATION.getTokenScopeCategoryId();
         var token = tokenService.findTokenByUUIDAndTokenScopeCategoryIdOrThrow(uuidAccessToken, tokenScopeCategoryId);
         var account = accountService.findAccountByIdOrThrow(token.getAccount().getId());
         temporaryCodeService.deleteTemporaryCodeByTokenId(token.getId());
@@ -254,12 +258,12 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     }
 
     @Override
-    public void verifyRegistrationByEmail(String email) {
+    public void temp_verifyRegistrationByEmail(String email) {
         // TODO: Delete this service
         // Recupero l'utente dal database
         var account = accountService
                 .findByEmail(email)
-                .orElseThrow(() -> new ExceptionAccountNotFound(EnumExceptionName.ACCOUNT_NOT_FOUND.name()));
+                .orElseThrow(() -> new ExceptionAccountNotFound(EnumExceptionName.ERROR_BUSINESS_ACCOUNT_NOT_FOUND.name()));
 
         // Abilito l'account
         account.setStatus(new AccountStatus(AccountStatusEnum.VERIFIED.getStatusId()));
@@ -267,12 +271,12 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     }
 
     @Override
-    public List<Token> getListOfTokenByEmail(String email) {
+    public List<Token> temp_getListOfTokenByEmail(String email) {
         // TODO: Delete this service
         // Recupero l'utente dal database
         var account = accountService
                 .findByEmail(email)
-                .orElseThrow(() -> new ExceptionAccountNotFound(EnumExceptionName.ACCOUNT_NOT_FOUND.name()));
+                .orElseThrow(() -> new ExceptionAccountNotFound(EnumExceptionName.ERROR_BUSINESS_ACCOUNT_NOT_FOUND.name()));
 
         return tokenService.findAllValidTokenByUser(account.getId());
     }

@@ -28,7 +28,7 @@ public class UserServiceImpl implements UserService {
     @Override
     public User findUserByAccountIdOrThrow(int accountId) {
         return findUserByAccountId(accountId)
-                .orElseThrow(() -> new ExceptionAccountNotFound(EnumExceptionName.USER_NOT_FOUND.name()));
+                .orElseThrow(() -> new ExceptionAccountNotFound(EnumExceptionName.ERROR_BUSINESS_USER_NOT_FOUND.name()));
     }
 
     @Override

@@ -1,26 +1,30 @@
 package com.candido.server.dto.v1.request.auth;
 
 import com.candido.server.exception._common.EnumExceptionName;
+import com.candido.server.exception._common.validation.CustomNotBlank;
+import com.candido.server.exception._common.validation.PasswordsMatch;
+import com.candido.server.exception._common.validation.ValidPassword;
+import com.candido.server.exception.account.ExceptionInvalidPasswordAccount;
+import com.candido.server.exception.account.ExceptionPasswordsDoNotMatch;
 import com.candido.server.exception.security.auth.ExceptionAuth;
-import com.candido.server.validation.password.PasswordConstraintValidator;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import jakarta.validation.constraints.NotBlank;
 
+@PasswordsMatch(
+        passwordField = "password",
+        confirmPasswordField = "confirmPassword",
+        exception = ExceptionPasswordsDoNotMatch.class,
+        exceptionName = EnumExceptionName.ERROR_VALIDATION_PASSWORDS_DO_NOT_MATCH
+)
 public record RequestPasswordReset (
-        @JsonProperty("password") String password,
-        @JsonProperty("confirm_password") String confirmPassword
-) {
-
-    public void checkPasswordIsNotBlank() {
-        if (this.password == null)
-            throw new ExceptionAuth(EnumExceptionName.PASSWORD_CAN_NOT_BE_EMPTY.name());
-    }
-
-    public void checkFields() {
-        PasswordConstraintValidator.isValid(this.password);
-        checkPasswordIsNotBlank();
-        if(!this.password.equals(this.confirmPassword))
-            throw new ExceptionAuth(EnumExceptionName.AUTH_PASSWORDS_DO_NOT_MATCH.name());
-    }
-
-}
+        @JsonProperty("password")
+        @CustomNotBlank(
+                exception = ExceptionInvalidPasswordAccount.class,
+                exceptionName = EnumExceptionName.ERROR_VALIDATION_PASSWORD_CAN_NOT_BE_EMPTY
+        )
+        @ValidPassword String password,
+        @JsonProperty("confirm_password")
+        @CustomNotBlank(
+                exception = ExceptionInvalidPasswordAccount.class,
+                exceptionName = EnumExceptionName.ERROR_VALIDATION_CONFIRM_PASSWORD_CAN_NOT_BE_EMPTY
+        )  String confirmPassword
+) {}

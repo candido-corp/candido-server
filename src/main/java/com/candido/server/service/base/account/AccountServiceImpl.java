@@ -53,11 +53,11 @@ public class AccountServiceImpl implements AccountService {
     @Override
     public Account findAccountByEmailOrThrow(String email) {
         var account = findByEmail(email).orElseThrow(() ->
-                new ExceptionAccountNotFound(EnumExceptionName.ACCOUNT_NOT_FOUND.name(), "Email: " + email)
+                new ExceptionAccountNotFound(EnumExceptionName.ERROR_BUSINESS_ACCOUNT_NOT_FOUND.name(), "Email: " + email)
         );
 
         if (!account.isEnabled())
-            throw new ExceptionAccountNotFound(EnumExceptionName.ACCOUNT_DISABLED.name(), "Email: " + email);
+            throw new ExceptionAccountNotFound(EnumExceptionName.ERROR_BUSINESS_ACCOUNT_DISABLED.name(), "Email: " + email);
 
         return account;
     }
@@ -65,11 +65,11 @@ public class AccountServiceImpl implements AccountService {
     @Override
     public Account findAccountByIdOrThrow(int accountId) {
         var account = findById(accountId).orElseThrow(() ->
-                new ExceptionAccountNotFound(EnumExceptionName.ACCOUNT_NOT_FOUND.name(), "ID: " + accountId)
+                new ExceptionAccountNotFound(EnumExceptionName.ERROR_BUSINESS_ACCOUNT_NOT_FOUND.name(), "ID: " + accountId)
         );
 
         if (!account.isEnabled())
-            throw new ExceptionAccountNotFound(EnumExceptionName.ACCOUNT_DISABLED.name(), "ID: " + accountId);
+            throw new ExceptionAccountNotFound(EnumExceptionName.ERROR_BUSINESS_ACCOUNT_DISABLED.name(), "ID: " + accountId);
 
         return account;
     }
@@ -91,16 +91,16 @@ public class AccountServiceImpl implements AccountService {
     @Override
     public void editPassword(String email, String currentPassword, String password, String confirmPassword) {
         Account account = findByEmail(email)
-                .orElseThrow(() -> new ExceptionAccountNotFound(EnumExceptionName.ACCOUNT_NOT_FOUND.name()));
+                .orElseThrow(() -> new ExceptionAccountNotFound(EnumExceptionName.ERROR_BUSINESS_ACCOUNT_NOT_FOUND.name()));
 
         // Controllo che l'email corrente sia giusta
         if(!passwordEncoder.matches(currentPassword, account.getPassword()))
-            throw new ExceptionPasswordsDoNotMatch(EnumExceptionName.CURRENT_PASSWORD_DOES_NOT_MATCH.name());
+            throw new ExceptionPasswordsDoNotMatch(EnumExceptionName.ERROR_VALIDATION_CURRENT_PASSWORD_DOES_NOT_MATCH.name());
 
         // Controllo che la password soddisfi i requisiti minimi
         PasswordConstraintValidator.isValid(password);
         if (!password.equals(confirmPassword))
-            throw new ExceptionPasswordsDoNotMatch(EnumExceptionName.AUTH_PASSWORDS_DO_NOT_MATCH.name());
+            throw new ExceptionPasswordsDoNotMatch(EnumExceptionName.ERROR_VALIDATION_PASSWORDS_DO_NOT_MATCH.name());
 
         account.setPassword(passwordEncoder.encode(password));
         save(account);
@@ -119,16 +119,16 @@ public class AccountServiceImpl implements AccountService {
         // Verifica l'esistenza di un account duplicato
         var duplicateAccount = findByEmail(request.email());
         if (duplicateAccount.isPresent())
-            throw new ExceptionDuplicateAccount(EnumExceptionName.AUTH_REGISTRATION_DUPLICATE_USERNAME_ACCOUNT.name());
+            throw new ExceptionDuplicateAccount(EnumExceptionName.ERROR_BUSINESS_DUPLICATE_USERNAME_ACCOUNT.name());
 
         // Verifica la validità dell'email
         if (!EmailConstraintValidator.isValid(request.email()))
-            throw new ExceptionInvalidEmailAccount(EnumExceptionName.INVALID_EMAIL.name());
+            throw new ExceptionInvalidEmailAccount(EnumExceptionName.ERROR_VALIDATION_INVALID_EMAIL.name());
 
         // Verifica che la password soddisfi i requisiti minimi e corrisponda alla conferma
         PasswordConstraintValidator.isValid(request.password());
         if (!request.password().equals(request.confirmPassword()))
-            throw new ExceptionPasswordsDoNotMatch(EnumExceptionName.AUTH_PASSWORDS_DO_NOT_MATCH.name());
+            throw new ExceptionPasswordsDoNotMatch(EnumExceptionName.ERROR_VALIDATION_PASSWORDS_DO_NOT_MATCH.name());
 
         // Creazione dell'account
         var account = Account.builder()

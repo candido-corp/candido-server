@@ -139,7 +139,7 @@ public class TokenServiceImpl implements TokenService {
                 null,
                 ipAddress,
                 TokenTypeEnum.BEARER,
-                TokenScopeCategoryEnum.BTD_REGISTRATION
+                TokenScopeCategoryEnum.REGISTRATION
         );
     }
 
@@ -158,7 +158,7 @@ public class TokenServiceImpl implements TokenService {
                 refreshToken,
                 ipAddress,
                 TokenTypeEnum.BEARER,
-                TokenScopeCategoryEnum.BTD_RW
+                TokenScopeCategoryEnum.RW
         );
     }
 
@@ -174,7 +174,7 @@ public class TokenServiceImpl implements TokenService {
                 null,
                 ipAddress,
                 TokenTypeEnum.BEARER,
-                TokenScopeCategoryEnum.BTD_RESET
+                TokenScopeCategoryEnum.RESET
         );
     }
 

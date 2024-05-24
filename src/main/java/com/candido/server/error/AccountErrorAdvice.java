@@ -1,11 +1,11 @@
 package com.candido.server.error;
 
+import com.candido.server.exception._common.ApiErrorResponse;
 import com.candido.server.exception._common.CustomExceptionResolver;
 import com.candido.server.exception._common.CustomRuntimeException;
-import com.candido.server.exception._common.ApiErrorResponse;
-import com.candido.server.exception._common.ErrorResponseList;
 import com.candido.server.exception._common.resolver.EnumMessageResolverExceptionType;
 import com.candido.server.exception.account.*;
+import com.candido.server.exception.security.auth.ExceptionTemporaryCode;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -51,6 +51,8 @@ public class AccountErrorAdvice {
             ExceptionPasswordsDoNotMatch.class,
             ExceptionLastNameEmpty.class,
             ExceptionFirstNameEmpty.class,
+            ExceptionInvalidPasswordAccount.class,
+            ExceptionTemporaryCode.class
     })
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public ResponseEntity<ApiErrorResponse> handleAccountEmailPasswordException(CustomRuntimeException ex, Locale locale) {

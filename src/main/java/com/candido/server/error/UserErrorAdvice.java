@@ -15,7 +15,6 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 
 import java.util.Locale;
 
-@Slf4j
 @RequiredArgsConstructor
 @ControllerAdvice
 public class UserErrorAdvice {

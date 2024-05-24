@@ -6,4 +6,7 @@ public class ExceptionTemporaryCode extends CustomRuntimeException {
     public ExceptionTemporaryCode() {
         super();
     }
+    public ExceptionTemporaryCode(String message) {
+        super(message);
+    }
 }

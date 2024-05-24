@@ -1,6 +1,7 @@
 package com.candido.server.util;
 
 import jakarta.servlet.http.HttpServletRequest;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.ClassPathResource;
@@ -12,8 +13,11 @@ import java.nio.charset.StandardCharsets;
 import java.time.LocalDateTime;
 
 @Slf4j
+@RequiredArgsConstructor
 @Service
 public class UtilServiceImpl implements UtilService {
+
+    private final EncryptionService encryptionService;
 
     @Value("${application.client.domain}")
     private String clientDomain;
@@ -57,29 +61,32 @@ public class UtilServiceImpl implements UtilService {
     }
 
     @Override
-    public String buildEmailVerificationLink(String token) {
+    public String buildEmailVerificationLink(String token, String email) {
         return UriComponentsBuilder
                 .fromHttpUrl(clientDomain)
                 .path("/auth/register/email/verify")
                 .queryParam("t", token)
+                .queryParam("e", encryptionService.encrypt(email))
                 .toUriString();
     }
 
     @Override
-    public String buildCodeVerificationLink(String token) {
+    public String buildCodeVerificationLink(String token, String email) {
         return UriComponentsBuilder
                 .fromHttpUrl(clientDomain)
                 .path("/auth/register/code/verify")
                 .queryParam("t", token)
+                .queryParam("e", encryptionService.encrypt(email))
                 .toUriString();
     }
 
     @Override
-    public String buildResetPasswordLink(String token) {
+    public String buildResetPasswordLink(String token, String email) {
         return UriComponentsBuilder
                 .fromHttpUrl(clientDomain)
                 .path("/auth/reset-password/verify")
                 .queryParam("t", token)
+                .queryParam("e", encryptionService.encrypt(email))
                 .toUriString();
     }
 

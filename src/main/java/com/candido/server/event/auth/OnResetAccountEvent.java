@@ -1,8 +1,10 @@
 package com.candido.server.event.auth;
 
 import com.candido.server.domain.v1.account.Account;
+import lombok.Getter;
 import org.springframework.context.ApplicationEvent;
 
+@Getter
 public class OnResetAccountEvent extends ApplicationEvent {
 
     private final Account account;
@@ -18,15 +20,4 @@ public class OnResetAccountEvent extends ApplicationEvent {
         this.appUrl = appUrl;
     }
 
-    public Account getAccount() {
-        return account;
-    }
-
-    public String getResetToken() {
-        return resetToken;
-    }
-
-    public String getAppUrl() {
-        return appUrl;
-    }
 }

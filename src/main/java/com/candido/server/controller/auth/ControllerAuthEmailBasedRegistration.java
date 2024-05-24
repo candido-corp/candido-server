@@ -2,13 +2,16 @@ package com.candido.server.controller.auth;
 
 import com.candido.server.dto.v1.request.auth.RequestRegister;
 import com.candido.server.service.base.auth.AuthenticationService;
+import com.candido.server.util.EncryptionService;
 import com.candido.server.util.UtilService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
+@Validated
 @RestController
 @RequestMapping("/api/v1/auth/register/email")
 @RequiredArgsConstructor
@@ -17,6 +20,8 @@ public class ControllerAuthEmailBasedRegistration {
     private final AuthenticationService authenticationService;
 
     private final UtilService utilService;
+
+    private final EncryptionService encryptionService;
 
     @PostMapping
     public ResponseEntity<Void> registerByEmail(
@@ -31,9 +36,11 @@ public class ControllerAuthEmailBasedRegistration {
 
     @PostMapping("/verify")
     public ResponseEntity<Void> verifyEmailRegistrationByUUIDAccessToken(
-            @RequestParam("t") String uuidAccessToken
+            @RequestParam("t") String uuidAccessToken,
+            @RequestParam("e") String encryptedEmail
     ) {
-        authenticationService.verifyRegistrationByUUIDAccessToken(uuidAccessToken);
+        String email = encryptionService.decrypt(encryptedEmail);
+        authenticationService.verifyEmailRegistration(uuidAccessToken, email);
         return ResponseEntity.noContent().build();
     }
 

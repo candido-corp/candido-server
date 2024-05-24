@@ -20,6 +20,11 @@ public class CustomRuntimeException extends RuntimeException {
     private String message;
 
     /**
+     * Extra messages associated with the exception.
+     */
+    private String[] extraMessages;
+
+    /**
      * Arguments associated with the exception message.
      */
     private Object[] args;
@@ -61,9 +66,9 @@ public class CustomRuntimeException extends RuntimeException {
      *
      * @param messages The array of detail messages to be concatenated.
      */
-    public CustomRuntimeException(String ...messages) {
-        super(String.join(" | ", messages));
-        this.message = super.getMessage();
+    public CustomRuntimeException(String message, String ...messages) {
+        this.message = message;
+        this.extraMessages = messages;
         this.timestamp = LocalDateTime.now();
     }
 

@@ -10,6 +10,7 @@ import java.util.Locale;
 public interface ExceptionResolver {
 
     void printException(Exception ex, String ...extraMessage);
+    void printException(CustomRuntimeException ex);
 
     ResponseEntity<ApiErrorResponse> resolveException(
             CustomRuntimeException ex,

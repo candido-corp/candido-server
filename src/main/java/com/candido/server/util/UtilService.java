@@ -8,7 +8,7 @@ public interface UtilService {
     int countDigits(long number);
     String getTemplateContentFromLocalResources(String pathResource, String functionError);
 
-    String buildEmailVerificationLink(String token);
-    String buildCodeVerificationLink(String token);
-    String buildResetPasswordLink(String token);
+    String buildEmailVerificationLink(String token, String email);
+    String buildCodeVerificationLink(String token, String email);
+    String buildResetPasswordLink(String token, String email);
 }

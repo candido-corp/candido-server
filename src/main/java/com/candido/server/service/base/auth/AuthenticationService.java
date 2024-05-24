@@ -15,19 +15,19 @@ public interface AuthenticationService {
     void registerByEmail(RequestRegister request, String ipAddress, String appUrl);
     ResponseRegistration registerByCode(RequestRegister request, String ipAddress, String appUrl);
 
-    void verifyRegistrationByUUIDAccessToken(String uuidAccessToken);
-    void verifyRegistrationByUUIDAccessTokenAndTemporaryCode(String uuidAccessToken, String temporaryCode);
+    void verifyEmailRegistration(String uuidAccessToken, String email);
+    void verifyCodeRegistration(String uuidAccessToken, String temporaryCode, String email);
     void checkValidityOfUUIDAccessTokenForResetPassword(String uuidAccessToken);
     void resendCodeRegistrationByUUIDAccessToken(String uuidAccessToken, String appUrl);
 
     ResponseAuthentication authenticate(RequestAuthentication request, String ipAddress);
     ResponseAuthentication refreshToken(HttpServletRequest request, HttpServletResponse response);
     void sendResetPassword(String email, String ipAddress, String appUrl);
-    ResponseAuthentication resetPassword(String uuidAccessToken, RequestPasswordReset request, String ipAddress);
+    ResponseAuthentication resetPassword(String uuidAccessToken, String email, RequestPasswordReset request, String ipAddress);
 
     String getTokenFromAuthorizationHeaderRequest(HttpServletRequest request);
 
     // TODO: Elimina i servizi qui sotto
-    void verifyRegistrationByEmail(String email);
-    List<Token> getListOfTokenByEmail(String email);
+    void temp_verifyRegistrationByEmail(String email);
+    List<Token> temp_getListOfTokenByEmail(String email);
 }

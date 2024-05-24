@@ -4,12 +4,16 @@ import com.candido.server.dto.v1.request.auth.RequestPasswordReset;
 import com.candido.server.dto.v1.request.auth.RequestPasswordResetEmail;
 import com.candido.server.dto.v1.response.auth.ResponseAuthentication;
 import com.candido.server.service.base.auth.AuthenticationService;
+import com.candido.server.util.EncryptionService;
 import com.candido.server.util.UtilService;
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
+@Validated
 @RestController
 @RequestMapping("/api/v1/auth/reset-password")
 @RequiredArgsConstructor
@@ -19,9 +23,11 @@ public class ControllerAuthPasswordReset {
 
     private final UtilService utilService;
 
+    private final EncryptionService encryptionService;
+
     @PostMapping("/send")
     public ResponseEntity<Void> sendResetPassword(
-            @RequestBody RequestPasswordResetEmail requestPasswordResetEmail,
+            @Valid @RequestBody RequestPasswordResetEmail requestPasswordResetEmail,
             HttpServletRequest httpRequest
     ) {
         authenticationService.sendResetPassword(
@@ -34,7 +40,7 @@ public class ControllerAuthPasswordReset {
     }
 
     @GetMapping("/check-validity")
-    public ResponseEntity<Void> verifyResetPasswordByUUIDAccessToken(
+    public ResponseEntity<Void> checkValidityOfUUIDAccessTokenForResetPassword(
             @RequestParam("t") String uuidAccessToken
     ) {
         authenticationService.checkValidityOfUUIDAccessTokenForResetPassword(uuidAccessToken);
@@ -44,14 +50,16 @@ public class ControllerAuthPasswordReset {
     @PostMapping("/change-password")
     public ResponseEntity<ResponseAuthentication> resetPassword(
             @RequestParam("t") String uuidAccessToken,
-            @RequestBody RequestPasswordReset request,
+            @RequestParam("e") String encryptedEmail,
+            @Valid @RequestBody RequestPasswordReset request,
             HttpServletRequest httpRequest
     ) {
+        String email = encryptionService.decrypt(encryptedEmail);
         ResponseAuthentication authentication = authenticationService.resetPassword(
                 uuidAccessToken,
+                email,
                 request,
-                utilService.getClientIP(httpRequest)
-        );
+                utilService.getClientIP(httpRequest));
         
         return ResponseEntity.ok(authentication);
     }

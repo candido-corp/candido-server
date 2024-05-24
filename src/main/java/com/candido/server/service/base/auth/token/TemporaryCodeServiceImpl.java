@@ -3,6 +3,7 @@ package com.candido.server.service.base.auth.token;
 import com.candido.server.domain.v1.token.TemporaryCode;
 import com.candido.server.domain.v1.token.TemporaryCodeRepository;
 import com.candido.server.domain.v1.token.TemporaryCode_;
+import com.candido.server.exception._common.EnumExceptionName;
 import com.candido.server.exception.security.auth.ExceptionTemporaryCode;
 import com.candido.server.util.UtilService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -127,16 +128,14 @@ public class TemporaryCodeServiceImpl implements TemporaryCodeService {
 
     @Override
     public void validateTemporaryCode(String temporaryCode, long tokenId) {
-        // Recupero il codice temporaneo
         var code = findByCode(temporaryCode);
 
-        // Controllo che il codice temporaneo non sia scaduto
-        if(code.isEmpty() || code.get().isExpired())
-            throw new ExceptionTemporaryCode();
+        var isCodePresent = code.isPresent();
+        var isCodeExpired = isCodePresent && code.get().isExpired();
+        var isCodeAssignedToToken = isCodePresent && Objects.equals(code.get().getTokenId(), tokenId);
 
-        // Se l'ID del token è diverso dell'ID del token della sessione
-        if(!Objects.equals(code.get().getTokenId(), tokenId))
-            throw new ExceptionTemporaryCode();
+        if(!isCodePresent || isCodeExpired || !isCodeAssignedToToken)
+            throw new ExceptionTemporaryCode(EnumExceptionName.ERROR_VALIDATION_INVALID_TEMPORARY_CODE.name());
     }
 
 }

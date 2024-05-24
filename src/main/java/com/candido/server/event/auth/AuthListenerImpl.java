@@ -35,13 +35,14 @@ public class AuthListenerImpl implements AuthListenerService {
     public void handleOnEmailRegistrationEvent(OnEmailRegistrationEvent event) {
         log.info("[Candido::EmailRegistration] Account -> {}", event.getAccount());
 
-        String linkToVerify = utilService.buildEmailVerificationLink(event.getRegistrationToken());
+        String email = event.getAccount().getEmail();
+        String linkToVerify = utilService.buildEmailVerificationLink(event.getRegistrationToken(), email);
         String content = emailService.buildRegistrationEmailContent(event.getAccount(), linkToVerify);
 
         emailService.sendSimpleMessage(
                 noReply,
                 applicationName,
-                event.getAccount().getEmail(),
+                email,
                 ConstEmailSubject.EMAIL_VERIFICATION_SUBJECT,
                 content
         );
@@ -53,13 +54,14 @@ public class AuthListenerImpl implements AuthListenerService {
     public void handleOnCodeRegistrationEvent(OnCodeRegistrationEvent event) {
         log.info("[Candido::CodeRegistration] Account -> {}", event.getAccount());
 
-        String linkToVerify = utilService.buildCodeVerificationLink(event.getRegistrationToken());
+        String email = event.getAccount().getEmail();
+        String linkToVerify = utilService.buildCodeVerificationLink(event.getRegistrationToken(), email);
         String content = emailService.buildCodeVerificationEmailContent(event.getAccount(), event.getTemporaryCode(), linkToVerify);
 
         emailService.sendSimpleMessage(
                 noReply,
                 applicationName,
-                event.getAccount().getEmail(),
+                email,
                 ConstEmailSubject.CODE_VERIFICATION_SUBJECT + " " + event.getTemporaryCode(),
                 content
         );
@@ -90,7 +92,8 @@ public class AuthListenerImpl implements AuthListenerService {
     public void handleOnResetPasswordEvent(OnResetAccountEvent event) {
         log.info("[Candido::ResetPassword] Account -> {}", event.getAccount());
 
-        String linkToVerify = utilService.buildResetPasswordLink(event.getResetToken());
+        String email = event.getAccount().getEmail();
+        String linkToVerify = utilService.buildResetPasswordLink(event.getResetToken(), email);
         String content = emailService.buildResetPasswordEmailContent(
                 event.getAccount(), linkToVerify
         );
@@ -98,7 +101,7 @@ public class AuthListenerImpl implements AuthListenerService {
         emailService.sendSimpleMessage(
                 noReply,
                 applicationName,
-                event.getAccount().getEmail(),
+                email,
                 ConstEmailSubject.RESET_PASSWORD_SUBJECT,
                 content
         );

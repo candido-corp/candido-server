@@ -9,6 +9,7 @@ import com.candido.server.service.base.mapstruct.TokenMapper;
 import com.candido.server.util.UtilService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -29,7 +30,8 @@ public class ControllerAuth {
 
     @PostMapping("/login")
     public ResponseEntity<ResponseAuthentication> login(
-            @RequestBody RequestAuthentication request, HttpServletRequest httpRequest
+            @Valid @RequestBody RequestAuthentication request,
+            HttpServletRequest httpRequest
     ) {
         String clientIP = utilService.getClientIP(httpRequest);
         ResponseAuthentication authentication = authenticationService.authenticate(request, clientIP);
@@ -37,7 +39,10 @@ public class ControllerAuth {
     }
 
     @PostMapping("/token/refresh")
-    public ResponseEntity<ResponseAuthentication> refreshToken(HttpServletRequest request, HttpServletResponse response) {
+    public ResponseEntity<ResponseAuthentication> refreshToken(
+            HttpServletRequest request,
+            HttpServletResponse response
+    ) {
         ResponseAuthentication authentication = authenticationService.refreshToken(request, response);
         return ResponseEntity.ok(authentication);
     }
@@ -47,7 +52,7 @@ public class ControllerAuth {
             @PathVariable("email") String email
     ) {
         // TODO: Delete this endpoint
-        authenticationService.verifyRegistrationByEmail(email);
+        authenticationService.temp_verifyRegistrationByEmail(email);
         return ResponseEntity.noContent().build();
     }
 
@@ -56,7 +61,7 @@ public class ControllerAuth {
             @PathVariable("email") String email
     ) {
         // TODO: Delete this endpoint
-        List<Token> tokenList = authenticationService.getListOfTokenByEmail(email);
+        List<Token> tokenList = authenticationService.temp_getListOfTokenByEmail(email);
         List<ResponseToken> responseTokenList = tokenList
                 .stream().map(token -> tokenMapper.tokenToTokenDto(token)).collect(Collectors.toList());
 

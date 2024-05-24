@@ -28,7 +28,6 @@ public class SecurityErrorAdvice {
             ExceptionInvalidJWTToken.class,
             ExceptionVerifyResetToken.class,
             ExceptionToken.class,
-            ExceptionTemporaryCode.class,
             ExceptionSecurityJwt.class,
             ExceptionAccountDisabled.class
     })

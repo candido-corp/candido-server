@@ -32,7 +32,7 @@ public class PasswordConstraintValidator {
         rules.add(new CharacterRule(EnglishCharacterData.UpperCase, 1));
         rules.add(new CharacterRule(EnglishCharacterData.LowerCase, 1));
         rules.add(new CharacterRule(EnglishCharacterData.Digit, 1));
-        rules.add(new CharacterRule(EnglishCharacterData.Special, 1));
+        rules.add(new CharacterRule(getCustomInsufficientSpecialCharacterData(), 1));
 
         PasswordValidator validator = new PasswordValidator(rules);
         RuleResult result = validator.validate(new PasswordData(password));
@@ -41,7 +41,7 @@ public class PasswordConstraintValidator {
         result.getDetails().forEach(ruleResultDetail -> {
             exceptions.add(
                     new ExceptionInvalidPasswordAccount(
-                            ruleResultDetail.getErrorCode(),
+                            "ERROR_VALIDATION_PASSWORD_" + ruleResultDetail.getErrorCode(),
                             ruleResultDetail.getValues(),
                             ruleResultDetail.getParameters()
                     )

@@ -23,6 +23,7 @@ public class CustomExceptionResolver implements ExceptionResolver {
      * Logs the exception to the console.
      *
      * @param ex the Exception to log.
+     * @param extraMessage additional messages to log.
      */
     @Override
     public void printException(Exception ex, String... extraMessage) {
@@ -37,6 +38,24 @@ public class CustomExceptionResolver implements ExceptionResolver {
         );
     }
 
+    /**
+     * Logs the exception to the console.
+     *
+     * @param ex the CustomRuntimeException to log.
+     */
+    @Override
+    public void printException(CustomRuntimeException ex) {
+        printException(ex, ex.getExtraMessages());
+    }
+
+    /**
+     * Creates an ApiError object from the provided CustomRuntimeException and locale.
+     *
+     * @param ex    the CustomRuntimeException to create the ApiError from.
+     * @param locale the Locale to use for message resolution.
+     * @param type the EnumMessageResolverExceptionType indicating the type of exception to resolve the message for.
+     * @return an ApiError object created from the provided CustomRuntimeException.
+     */
     public ApiError createApiErrorResponse(
             CustomRuntimeException ex,
             Locale locale,
