@@ -12,8 +12,7 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import java.time.LocalDateTime;
-import java.util.Collection;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Data
@@ -61,14 +60,19 @@ public class Account implements UserDetails {
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        var authorities = role.getAccountPermissions()
+        var permissions = role.getAccountPermissions()
                 .stream()
                 .map(permission -> new SimpleGrantedAuthority(permission.getDescription()))
-                .collect(Collectors.toList());
+                .toList();
 
-        authorities.add(new SimpleGrantedAuthority("ROLE_" + role.getDescription()));
+        var roles = new ArrayList<GrantedAuthority>();
+        roles.add(new SimpleGrantedAuthority("ROLE_" + role.getDescription()));
 
-        return authorities;
+        var combined = new ArrayList<GrantedAuthority>();
+        combined.addAll(permissions);
+        combined.addAll(roles);
+
+        return combined;
     }
 
     @Override
@@ -98,7 +102,20 @@ public class Account implements UserDetails {
 
     @Override
     public boolean isEnabled() {
-        return deletedAt == null;
+        return deletedAt == null
+                && status != null
+                && status.getId() != AccountStatusEnum.DISABLED.getStatusId();
+    }
+
+    public List<String> getRoles() {
+        return Collections.singletonList("ROLE_" + role.getDescription());
+    }
+
+    public List<String> getPermissions() {
+        return role.getAccountPermissions()
+                .stream()
+                .map(AccountPermission::getDescription)
+                .collect(Collectors.toList());
     }
 
 }

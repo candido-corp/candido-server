@@ -1,6 +1,7 @@
 package com.candido.server.security.config;
 
 import com.candido.server.config.ConfigAppProperties;
+import com.candido.server.domain.v1.account.Account;
 import com.candido.server.domain.v1.token.EnumJwtExceptionState;
 import com.candido.server.exception._common.CustomExceptionResolver;
 import com.candido.server.exception._common.resolver.DispatchMessageResolverException;
@@ -115,7 +116,12 @@ public class JwtService {
      */
     public String generateToken(Map<String, Object> extraClaims, UserDetails userDetails) {
         int expirationTimeMillis = configAppProperties.getSecurity().getJwt().getExpiration();
-        extraClaims.put("roles", userDetails.getAuthorities());
+        if (userDetails instanceof Account account) {
+            extraClaims.put("roles", account.getRoles());
+            extraClaims.put("permissions", account.getPermissions());
+        } else {
+            extraClaims.put("authorities", userDetails.getAuthorities());
+        }
         return buildToken(extraClaims, userDetails, expirationTimeMillis);
     }
 
