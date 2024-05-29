@@ -49,7 +49,7 @@ public class ControllerAccount {
         return ResponseEntity.ok(userDto);
     }
 
-    @PostMapping("/details")
+    @PutMapping("/details")
     public ResponseEntity<UserDto> postUserInfo(
             Authentication authentication,
             @RequestBody RequestUpdateUserDto requestUpdateUserDto
