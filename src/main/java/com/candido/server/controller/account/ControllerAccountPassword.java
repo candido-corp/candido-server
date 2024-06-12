@@ -18,7 +18,10 @@ public class ControllerAccountPassword {
     private final AccountService accountService;
 
     @PutMapping
-    public ResponseEntity<Void> editAccountPassword(@RequestBody RequestEditAccountPassword request, Authentication authentication) {
+    public ResponseEntity<Void> editAccountPassword(
+            @RequestBody RequestEditAccountPassword request,
+            Authentication authentication
+    ) {
         accountService.editPassword(authentication.getName(), request.currentPassword(), request.password(), request.confirmPassword());
         return ResponseEntity.noContent().build();
     }

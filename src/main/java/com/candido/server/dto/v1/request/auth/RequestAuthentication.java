@@ -2,7 +2,7 @@ package com.candido.server.dto.v1.request.auth;
 
 import com.candido.server.exception._common.EnumExceptionName;
 import com.candido.server.exception._common.validation.CustomNotBlank;
-import com.candido.server.exception.security.auth.ExceptionAuth;
+import com.candido.server.exception.security.auth.ExceptionValidationAuth;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 
@@ -10,12 +10,12 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 public record RequestAuthentication (
         @JsonProperty("email")
         @CustomNotBlank(
-                exception = ExceptionAuth.class,
+                exception = ExceptionValidationAuth.class,
                 exceptionName = EnumExceptionName.ERROR_VALIDATION_EMAIL_CAN_NOT_BE_EMPTY
         ) String email,
         @JsonProperty("password")
         @CustomNotBlank(
-                exception = ExceptionAuth.class,
+                exception = ExceptionValidationAuth.class,
                 exceptionName = EnumExceptionName.ERROR_VALIDATION_PASSWORD_CAN_NOT_BE_EMPTY
         ) String password
 ) {

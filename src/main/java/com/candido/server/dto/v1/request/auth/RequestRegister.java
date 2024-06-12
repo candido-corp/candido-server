@@ -17,25 +17,34 @@ public record RequestRegister (
         @CustomNotBlank(
                 exception = ExceptionInvalidEmailAccount.class,
                 exceptionName = EnumExceptionName.ERROR_VALIDATION_EMAIL_CAN_NOT_BE_EMPTY
-        ) String email,
+        )
+        String email,
+
         @JsonProperty("password")
         @CustomNotBlank(
                 exception = ExceptionInvalidPasswordAccount.class,
                 exceptionName = EnumExceptionName.ERROR_VALIDATION_PASSWORD_CAN_NOT_BE_EMPTY
-        ) String password,
+        )
+        String password,
+
         @JsonProperty("confirm_password")
         @CustomNotBlank(
                 exception = ExceptionInvalidPasswordAccount.class,
                 exceptionName = EnumExceptionName.ERROR_VALIDATION_CONFIRM_PASSWORD_CAN_NOT_BE_EMPTY
-        ) String confirmPassword,
+        )
+        String confirmPassword,
+
         @JsonProperty("first_name")
         @CustomNotBlank(
                 exception = ExceptionFirstNameEmpty.class,
                 exceptionName = EnumExceptionName.ERROR_VALIDATION_FIRST_NAME_CAN_NOT_BE_EMPTY
-        ) String firstName,
+        )
+        String firstName,
+
         @JsonProperty("last_name")
         @CustomNotBlank(
                 exception = ExceptionLastNameEmpty.class,
                 exceptionName = EnumExceptionName.ERROR_VALIDATION_LAST_NAME_CAN_NOT_BE_EMPTY
-        ) String lastName
+        )
+        String lastName
 ) {}

@@ -60,6 +60,7 @@ public class ConfigMessageSource implements WebMvcConfigurer {
     public MessageSource validationMessageSource() {
         ReloadableResourceBundleMessageSource messageSource = new ReloadableResourceBundleMessageSource();
         messageSource.setBasenames(
+                "classpath:/messages/validation/_common/message",
                 "classpath:/messages/validation/account/message",
                 "classpath:/messages/validation/password/message"
         );

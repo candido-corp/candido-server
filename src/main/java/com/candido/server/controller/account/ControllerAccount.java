@@ -14,6 +14,7 @@ import com.candido.server.service.base.mapstruct.AccountMapper;
 import com.candido.server.service.base.user.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
@@ -36,7 +37,6 @@ public class ControllerAccount {
 
     @GetMapping
     public ResponseEntity<AccountDto> getAccountInfo(Authentication authentication) {
-        System.out.println(authentication.isAuthenticated());
         Account account = accountService.findAccountByEmailOrThrow(authentication.getName());
         return ResponseEntity.ok(accountMapper.accountToAccountDto(account));
     }

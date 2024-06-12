@@ -49,17 +49,19 @@ public class ControllerAuthPasswordReset {
 
     @PostMapping("/change-password")
     public ResponseEntity<ResponseAuthentication> resetPassword(
-            @RequestParam("t") String uuidAccessToken,
-            @RequestParam("e") String encryptedEmail,
             @Valid @RequestBody RequestPasswordReset request,
             HttpServletRequest httpRequest
     ) {
+        String uuidAccessToken = request.uuidAccessToken();
+        String encryptedEmail = request.encryptedEmail();
+
         String email = encryptionService.decrypt(encryptedEmail);
         ResponseAuthentication authentication = authenticationService.resetPassword(
                 uuidAccessToken,
                 email,
                 request,
-                utilService.getClientIP(httpRequest));
+                utilService.getClientIP(httpRequest)
+        );
         
         return ResponseEntity.ok(authentication);
     }

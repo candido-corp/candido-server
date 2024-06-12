@@ -8,7 +8,7 @@ import lombok.Getter;
 @Getter
 public class ResponseRegistration {
 
-    @JsonProperty("session_id")
-    private String sessionId;
+    @JsonProperty("t")
+    private String t;
 
 }

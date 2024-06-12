@@ -1,6 +1,7 @@
 package com.candido.server.controller.auth;
 
 import com.candido.server.dto.v1.request.auth.RequestRegister;
+import com.candido.server.dto.v1.request.auth.RequestRegisterEmailVerify;
 import com.candido.server.service.base.auth.AuthenticationService;
 import com.candido.server.util.EncryptionService;
 import com.candido.server.util.UtilService;
@@ -36,9 +37,11 @@ public class ControllerAuthEmailBasedRegistration {
 
     @PostMapping("/verify")
     public ResponseEntity<Void> verifyEmailRegistrationByUUIDAccessToken(
-            @RequestParam("t") String uuidAccessToken,
-            @RequestParam("e") String encryptedEmail
+            @Valid @RequestBody RequestRegisterEmailVerify request
     ) {
+        String uuidAccessToken = request.uuidAccessToken();
+        String encryptedEmail = request.encryptedEmail();
+
         String email = encryptionService.decrypt(encryptedEmail);
         authenticationService.verifyEmailRegistration(uuidAccessToken, email);
         return ResponseEntity.noContent().build();

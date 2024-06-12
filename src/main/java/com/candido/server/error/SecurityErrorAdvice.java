@@ -37,6 +37,17 @@ public class SecurityErrorAdvice {
         return null;
     }
 
+    @ExceptionHandler({ ExceptionValidationAuth.class })
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public ResponseEntity<ApiErrorResponse> handleAuthenticationException(ExceptionValidationAuth ex, Locale locale) {
+        return customExceptionResolver.resolveException(
+                ex,
+                locale,
+                HttpStatus.BAD_REQUEST,
+                EnumMessageResolverExceptionType.VALIDATION
+        );
+    }
+
     @ExceptionHandler({ ExceptionAuth.class })
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public ResponseEntity<ApiErrorResponse> handleAuthenticationException(ExceptionAuth ex, Locale locale) {

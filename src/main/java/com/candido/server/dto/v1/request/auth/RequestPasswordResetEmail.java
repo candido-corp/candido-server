@@ -10,5 +10,6 @@ public record RequestPasswordResetEmail (
         @CustomNotBlank(
                 exception = ExceptionInvalidEmailAccount.class,
                 exceptionName = EnumExceptionName.ERROR_VALIDATION_EMAIL_CAN_NOT_BE_EMPTY
-        ) String email
+        )
+        String email
 ) {}

@@ -33,7 +33,7 @@ public class AuthListenerImpl implements AuthListenerService {
     @Override
     @EventListener
     public void handleOnEmailRegistrationEvent(OnEmailRegistrationEvent event) {
-        log.info("[Candido::EmailRegistration] Account -> {}", event.getAccount());
+        log.info("[Event::EmailRegistration] Account -> {}", event.getAccount());
 
         String email = event.getAccount().getEmail();
         String linkToVerify = utilService.buildEmailVerificationLink(event.getRegistrationToken(), email);
@@ -52,7 +52,7 @@ public class AuthListenerImpl implements AuthListenerService {
     @Override
     @EventListener
     public void handleOnCodeRegistrationEvent(OnCodeRegistrationEvent event) {
-        log.info("[Candido::CodeRegistration] Account -> {}", event.getAccount());
+        log.info("[Event::CodeRegistration] Account -> {}", event.getAccount());
 
         String email = event.getAccount().getEmail();
         String linkToVerify = utilService.buildCodeVerificationLink(event.getRegistrationToken(), email);
@@ -71,7 +71,7 @@ public class AuthListenerImpl implements AuthListenerService {
     @Override
     @EventListener
     public void handleOnRegistrationCompletedEvent(OnRegistrationCompletedEvent event) {
-        log.info("[Candido::RegistrationCompleted] Account -> {}", event.getAccount());
+        log.info("[Event::RegistrationCompleted] Account -> {}", event.getAccount());
 
         String content = emailService.buildRegistrationCompletedEmailContent(
                 event.getAccount(), event.getUser()
@@ -90,7 +90,7 @@ public class AuthListenerImpl implements AuthListenerService {
     @Override
     @EventListener
     public void handleOnResetPasswordEvent(OnResetAccountEvent event) {
-        log.info("[Candido::ResetPassword] Account -> {}", event.getAccount());
+        log.info("[Event::ResetPassword] Account -> {}", event.getAccount());
 
         String email = event.getAccount().getEmail();
         String linkToVerify = utilService.buildResetPasswordLink(event.getResetToken(), email);
@@ -111,7 +111,7 @@ public class AuthListenerImpl implements AuthListenerService {
     @Override
     @EventListener
     public void handleOnResetPasswordCompletedEvent(OnResetAccountCompletedEvent event) {
-        log.info("[Candido::ResetPasswordCompleted] Account -> {}", event.getAccount());
+        log.info("[Event::ResetPasswordCompleted] Account -> {}", event.getAccount());
 
         String content = emailService.buildResetPasswordCompletedEmailContent(
                 event.getAccount()

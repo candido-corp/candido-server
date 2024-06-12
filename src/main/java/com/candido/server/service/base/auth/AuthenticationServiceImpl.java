@@ -90,7 +90,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 
         return ResponseRegistration
                 .builder()
-                .sessionId(token.getUuidAccessToken())
+                .t(token.getUuidAccessToken())
                 .build();
     }
 
