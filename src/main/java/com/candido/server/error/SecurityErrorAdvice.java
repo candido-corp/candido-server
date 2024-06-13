@@ -59,5 +59,16 @@ public class SecurityErrorAdvice {
         );
     }
 
+    @ExceptionHandler({ ExceptionInvalidToken.class })
+    @ResponseStatus(HttpStatus.UNPROCESSABLE_ENTITY)
+    public ResponseEntity<ApiErrorResponse> handleInvalidTokenException(ExceptionInvalidToken ex, Locale locale) {
+        return customExceptionResolver.resolveException(
+                ex,
+                locale,
+                HttpStatus.UNPROCESSABLE_ENTITY,
+                EnumMessageResolverExceptionType.VALIDATION
+        );
+    }
+
 
 }

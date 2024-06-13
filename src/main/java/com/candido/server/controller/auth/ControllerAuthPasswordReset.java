@@ -3,6 +3,8 @@ package com.candido.server.controller.auth;
 import com.candido.server.dto.v1.request.auth.RequestPasswordReset;
 import com.candido.server.dto.v1.request.auth.RequestPasswordResetEmail;
 import com.candido.server.dto.v1.response.auth.ResponseAuthentication;
+import com.candido.server.exception._common.EnumExceptionName;
+import com.candido.server.exception.security.auth.ExceptionAuth;
 import com.candido.server.service.base.auth.AuthenticationService;
 import com.candido.server.util.EncryptionService;
 import com.candido.server.util.UtilService;
@@ -65,6 +67,5 @@ public class ControllerAuthPasswordReset {
         
         return ResponseEntity.ok(authentication);
     }
-
 
 }

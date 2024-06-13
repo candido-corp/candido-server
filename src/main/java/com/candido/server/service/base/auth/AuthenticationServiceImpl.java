@@ -15,6 +15,7 @@ import com.candido.server.event.auth.*;
 import com.candido.server.exception._common.EnumExceptionName;
 import com.candido.server.exception.account.ExceptionAccountNotFound;
 import com.candido.server.exception.security.auth.ExceptionAuth;
+import com.candido.server.exception.security.auth.ExceptionInvalidToken;
 import com.candido.server.exception.security.jwt.ExceptionInvalidJWTToken;
 import com.candido.server.security.config.JwtService;
 import com.candido.server.service.base.account.AccountService;
@@ -233,10 +234,11 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     @Override
     public void checkValidityOfUUIDAccessTokenForResetPassword(String uuidAccessToken) {
         int tokenScopeCategoryId = TokenScopeCategoryEnum.RESET.getTokenScopeCategoryId();
-        var token = tokenService.findTokenByUUIDAndTokenScopeCategoryIdOrThrow(uuidAccessToken, tokenScopeCategoryId);
-        String username = jwtService.extractAndValidateUsername(token.getAccessToken());
+        var token = tokenService.findByUUIDAndTokenScopeCategoryId(uuidAccessToken, tokenScopeCategoryId);
+        if(token.isEmpty()) throw new ExceptionInvalidToken(EnumExceptionName.ERROR_VALIDATION_INVALID_TOKEN.name());
+        String username = jwtService.extractAndValidateUsername(token.get().getAccessToken());
         var account = accountService.findAccountByEmailOrThrow(username);
-        if (!jwtService.isValidToken(token.getAccessToken(), account))
+        if (!jwtService.isValidToken(token.get().getAccessToken(), account))
             throw new ExceptionInvalidJWTToken();
     }
 

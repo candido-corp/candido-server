@@ -12,12 +12,15 @@ public record RequestAuthentication (
         @CustomNotBlank(
                 exception = ExceptionValidationAuth.class,
                 exceptionName = EnumExceptionName.ERROR_VALIDATION_EMAIL_CAN_NOT_BE_EMPTY
-        ) String email,
+        )
+        String email,
+
         @JsonProperty("password")
         @CustomNotBlank(
                 exception = ExceptionValidationAuth.class,
                 exceptionName = EnumExceptionName.ERROR_VALIDATION_PASSWORD_CAN_NOT_BE_EMPTY
-        ) String password
+        )
+        String password
 ) {
 
     /**

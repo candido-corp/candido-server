@@ -2,14 +2,17 @@ package com.candido.server.controller.account;
 
 import com.candido.server.dto.v1.request.account.RequestEditAccountPassword;
 import com.candido.server.service.base.account.AccountService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+@Validated
 @RestController
 @RequestMapping("/api/v1/me/password")
 @RequiredArgsConstructor
@@ -19,7 +22,7 @@ public class ControllerAccountPassword {
 
     @PutMapping
     public ResponseEntity<Void> editAccountPassword(
-            @RequestBody RequestEditAccountPassword request,
+            @Valid @RequestBody RequestEditAccountPassword request,
             Authentication authentication
     ) {
         accountService.editPassword(authentication.getName(), request.currentPassword(), request.password(), request.confirmPassword());
