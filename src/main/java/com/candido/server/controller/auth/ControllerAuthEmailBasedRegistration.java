@@ -1,7 +1,9 @@
 package com.candido.server.controller.auth;
 
+import com.candido.server.dto.v1.request.auth.RequestAuthentication;
 import com.candido.server.dto.v1.request.auth.RequestRegister;
 import com.candido.server.dto.v1.request.auth.RequestRegisterEmailVerify;
+import com.candido.server.dto.v1.response.auth.ResponseAuthentication;
 import com.candido.server.service.base.auth.AuthenticationService;
 import com.candido.server.util.EncryptionService;
 import com.candido.server.util.UtilService;
@@ -25,14 +27,18 @@ public class ControllerAuthEmailBasedRegistration {
     private final EncryptionService encryptionService;
 
     @PostMapping
-    public ResponseEntity<Void> registerByEmail(
+    public ResponseEntity<ResponseAuthentication> registerByEmail(
             @Valid @RequestBody RequestRegister request,
             HttpServletRequest httpRequest
     ) {
         String clientIP = utilService.getClientIP(httpRequest);
         String appURL = utilService.getAppUrl(httpRequest);
         authenticationService.registerByEmail(request, clientIP, appURL);
-        return ResponseEntity.noContent().build();
+
+        var requestAuthentication = new RequestAuthentication(request.email(), request.password());
+        var responseAuthentication = authenticationService.authenticate(requestAuthentication, clientIP);
+
+        return ResponseEntity.ok(responseAuthentication);
     }
 
     @PostMapping("/verify")

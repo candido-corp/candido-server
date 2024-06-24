@@ -66,19 +66,15 @@ public class TokenServiceImpl implements TokenService {
             TokenTypeEnum tokenType,
             TokenScopeCategoryEnum tokenScopeCategoryEnum
     ) {
-        // Prima di crearlo elimino tutti i token
         revokeAllAccountTokens(account);
 
-        // Estraggo la data di scadenza
         Date accessTokenExpirationDate = jwtService.extractExpiration(accessToken);
         LocalDateTime accessTokenExpiration = Instant.ofEpochMilli(accessTokenExpirationDate.getTime())
                 .atZone(ZoneId.systemDefault())
                 .toLocalDateTime();
 
-        // UUID access token
         String uuidAccessToken = UUID.randomUUID().toString().replaceAll("-", "");
 
-        // Creo il token per l'utente
         var token = Token
                 .builder()
                 .account(account)
@@ -90,7 +86,6 @@ public class TokenServiceImpl implements TokenService {
                 .uuidAccessToken(uuidAccessToken)
                 .build();
 
-        // Imposto il refresh token se non nullo
         if(refreshToken != null) {
             Date refreshTokenExpirationDate = jwtService.extractExpiration(refreshToken);
             LocalDateTime refreshTokenExpiration = Instant.ofEpochMilli(refreshTokenExpirationDate.getTime())
@@ -100,7 +95,6 @@ public class TokenServiceImpl implements TokenService {
             token.setRefreshTokenExpiration(refreshTokenExpiration);
         }
 
-        // Salvo il token per l'utente
         return tokenRepository.save(token);
     }
 
@@ -117,22 +111,14 @@ public class TokenServiceImpl implements TokenService {
 
     @Override
     public void revokeAllAccountTokens(Account account) {
-        // Recupero tutti i token validi dell'account
         var validAccountTokens = findAllValidTokenByUser(account.getId());
-
-        // Se non ce ne sono esco dalla funzione
         if(validAccountTokens.isEmpty()) return;
-
-        // Revoco ogni token dell'utente
         validAccountTokens.forEach(this::delete);
     }
 
     @Override
     public Token createRegistrationToken(Account account, String ipAddress) {
-        // Creo un token per la verifica della registrazione
         var accessToken = jwtService.generateRegistrationToken(account);
-
-        // Salva il token dell'utente
         return saveUserToken(
                 account,
                 accessToken,
@@ -145,13 +131,8 @@ public class TokenServiceImpl implements TokenService {
 
     @Override
     public Token createLoginToken(Account account, String ipAddress) {
-        // Creo un token con i dati dell'utente creato
         var accessToken = jwtService.generateToken(account);
-
-        // Creo il token di refresh
         var refreshToken = jwtService.generateRefreshToken(account);
-
-        // Salva il token dell'utente
         return saveUserToken(
                 account,
                 accessToken,
@@ -164,10 +145,7 @@ public class TokenServiceImpl implements TokenService {
 
     @Override
     public Token createResetToken(Account account, String ipAddress) {
-        // Creo un token per il reset
         var accessToken = jwtService.generateResetToken(account);
-
-        // Salva il token dell'utente
         return saveUserToken(
                 account,
                 accessToken,
