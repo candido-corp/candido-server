@@ -58,6 +58,8 @@ public class ControllerAuthCodeBasedRegistration {
 
         String email = encryptionService.decrypt(encryptedEmail);
         authenticationService.verifyCodeRegistration(uuidAccessToken, request.temporaryCode(), email);
+
+        // TODO: Return access token
         return ResponseEntity.noContent().build();
     }
 
