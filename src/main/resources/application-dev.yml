@@ -1,64 +1,64 @@
 application:
-  name: candido
-  client:
-    domain: http://localhost:3000
-  security:
-    jwt:
-      issuer: Candido
-      secret-key: 6150645367566B58703273357638792F423F4528482B4D6251655468576D5A71
-      expiration: 86400000 # 1 day in ms
-      refresh-token:
-        expiration: 604800000 # 7 days in ms
-      registration-token:
-        expiration: 864000000 # 10 days in ms
-      reset-token:
-        expiration: 864000000 # 10 days in ms
-  email:
-    host: ${SMTPHOST}
-    port: 587
-    username: apikey
-    password: ${SMTPPASSWORD}
-    protocol: smtp
-    smtp:
-      auth: true
-      starttls:
-        enable: true
-    debug: false
-    no-reply: ${SMTPNOREPLY}
-    can-send: ${SMTPCANSEND}
-  support:
-    phone: 1234567890
-    email: support@candido.com
-  api:
-    version: 0.0.1
-    description: API for managing the entire online application project.
-    server:
-      development:
-        url: http://localhost:8080/
-      production:
-        url: http://candido.com:8080/
-  tos:
-    uri: http://localhost:8080/terms-of-service
+    name: candido
+    client:
+        domain: http://localhost:3000
+    security:
+        jwt:
+            issuer: Candido
+            secret-key: 6150645367566B58703273357638792F423F4528482B4D6251655468576D5A71
+            expiration: 86400000 # 1 day in ms
+            refresh-token:
+                expiration: 604800000 # 7 days in ms
+            registration-token:
+                expiration: 864000000 # 10 days in ms
+            reset-token:
+                expiration: 864000000 # 10 days in ms
+    email:
+        host: ${SMTP_HOST}
+        port: 587
+        username: apikey
+        password: ${SMTP_PASSWORD}
+        protocol: smtp
+        smtp:
+            auth: true
+            starttls:
+                enable: true
+        debug: false
+        no-reply: ${SMTP_NO_REPLY}
+        can-send: ${SMTP_CAN_SEND}
+    support:
+        phone: 1234567890
+        email: support@candido.com
+    api:
+        version: 0.0.1
+        description: API for managing the entire online application project.
+        server:
+            development:
+                url: http://localhost:8080/
+            production:
+                url: http://candido.com:8080/
+    tos:
+        uri: http://localhost:8080/terms-of-service
 
 spring:
-  main:
-    allow-bean-definition-overriding: true
-  mvc:
-    view:
-      prefix: /templates
-      suffix: .html
-    pathpattern:
-      matching-strategy: ANT_PATH_MATCHER
-  datasource:
-    url: jdbc:mariadb://${DBHOST}:${DBPORT}/${DBNAME}
-    username: ${DBUSER}
-    password: ${DBPASSWORD}
-    driver-class-name: org.mariadb.jdbc.Driver
-  jpa:
-    open-in-view: false
-    hibernate:
-      ddl-auto: none
-    show-sql: false
-    properties:
-      hibernate:
-        format_sql: true
+    main:
+        allow-bean-definition-overriding: true
+    mvc:
+        view:
+            prefix: /templates
+            suffix: .html
+        pathpattern:
+            matching-strategy: ANT_PATH_MATCHER
+    datasource:
+        url: jdbc:mariadb://${DB_HOST}:${DB_PORT}/${DB_NAME}
+        username: ${DB_USER}
+        password: ${DB_PASSWORD}
+        driver-class-name: org.mariadb.jdbc.Driver
+    jpa:
+        open-in-view: false
+        hibernate:
+            ddl-auto: none
+        show-sql: false
+        properties:
+            hibernate:
+                format_sql: true
