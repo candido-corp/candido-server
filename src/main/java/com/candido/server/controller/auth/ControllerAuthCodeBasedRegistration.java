@@ -3,6 +3,7 @@ package com.candido.server.controller.auth;
 import com.candido.server.dto.v1.request.auth.RequestRegister;
 import com.candido.server.dto.v1.request.auth.RequestRegisterCodeResend;
 import com.candido.server.dto.v1.request.auth.RequestRegisterCodeVerify;
+import com.candido.server.dto.v1.response.auth.ResponseAuthentication;
 import com.candido.server.dto.v1.response.auth.ResponseRegistration;
 import com.candido.server.service.base.auth.AuthenticationService;
 import com.candido.server.util.EncryptionService;
@@ -50,17 +51,21 @@ public class ControllerAuthCodeBasedRegistration {
     }
 
     @PostMapping("/verify")
-    public ResponseEntity<Void> verifyCodeRegistrationBySessionIdAndTemporaryCode(
-            @Valid @RequestBody RequestRegisterCodeVerify request
+    public ResponseEntity<ResponseAuthentication> verifyCodeRegistrationBySessionIdAndTemporaryCode(
+            @Valid @RequestBody RequestRegisterCodeVerify request,
+            HttpServletRequest httpRequest
     ) {
+        String clientIP = utilService.getClientIP(httpRequest);
+
         String uuidAccessToken = request.uuidAccessToken();
         String encryptedEmail = request.encryptedEmail();
 
         String email = encryptionService.decrypt(encryptedEmail);
-        authenticationService.verifyCodeRegistration(uuidAccessToken, request.temporaryCode(), email);
+        var responseAuthentication = authenticationService.verifyCodeRegistration(
+                uuidAccessToken, request.temporaryCode(), email, clientIP
+        );
 
-        // TODO: Return access token
-        return ResponseEntity.noContent().build();
+        return ResponseEntity.ok(responseAuthentication);
     }
 
 }

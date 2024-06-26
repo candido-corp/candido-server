@@ -33,11 +33,7 @@ public class ControllerAuthEmailBasedRegistration {
     ) {
         String clientIP = utilService.getClientIP(httpRequest);
         String appURL = utilService.getAppUrl(httpRequest);
-        authenticationService.registerByEmail(request, clientIP, appURL);
-
-        var requestAuthentication = new RequestAuthentication(request.email(), request.password());
-        var responseAuthentication = authenticationService.authenticate(requestAuthentication, clientIP);
-
+        var responseAuthentication = authenticationService.registerByEmail(request, clientIP, appURL);
         return ResponseEntity.ok(responseAuthentication);
     }
 

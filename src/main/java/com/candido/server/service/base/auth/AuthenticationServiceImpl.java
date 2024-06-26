@@ -60,7 +60,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 
     @Transactional
     @Override
-    public void registerByEmail(RequestRegister request, String ipAddress, String appUrl) {
+    public ResponseAuthentication registerByEmail(RequestRegister request, String ipAddress, String appUrl) {
         var account = accountService.createAccount(request);
         var token = tokenService.createRegistrationToken(account, ipAddress);
 
@@ -71,6 +71,8 @@ public class AuthenticationServiceImpl implements AuthenticationService {
                 appUrl
         );
         eventPublisher.publishEvent(event);
+
+        return createAuthentication(account, ipAddress);
     }
 
     @Transactional
@@ -114,7 +116,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 
     @Transactional
     @Override
-    public void verifyCodeRegistration(String uuidAccessToken, String temporaryCode, String email) {
+    public ResponseAuthentication verifyCodeRegistration(String uuidAccessToken, String temporaryCode, String email, String ipAddress) {
         int tokenScopeCategoryId = TokenScopeCategoryEnum.REGISTRATION.getTokenScopeCategoryId();
         Token token = tokenService.findTokenByUUIDAndTokenScopeCategoryIdOrThrow(uuidAccessToken, tokenScopeCategoryId);
         var account = accountService.findByEmail(email);
@@ -128,24 +130,15 @@ public class AuthenticationServiceImpl implements AuthenticationService {
         var user = userService.findUserByAccountIdOrThrow(account.get().getId());
         var event = new OnRegistrationCompletedEvent(this, account.get(), user);
         eventPublisher.publishEvent(event);
+
+        return createAuthentication(account.get(), ipAddress);
     }
 
     @Override
     public ResponseAuthentication authenticate(RequestAuthentication request, String ipAddress) {
         authenticationManager.authenticate(request.toUsernamePasswordAuthenticationToken());
         var account = accountService.findAccountByEmailOrThrow(request.email());
-        Token token = tokenService.createLoginToken(account, ipAddress);
-
-        var expires = configAppProperties.getSecurity().getJwt().getExpiration();
-        var refreshExpires = configAppProperties.getSecurity().getJwt().getRefreshToken().getExpiration();
-
-        return ResponseAuthentication
-                .builder()
-                .accessToken(token.getAccessToken())
-                .expiresIn(expires)
-                .refreshToken(token.getRefreshToken())
-                .refreshExpiresIn(refreshExpires)
-                .build();
+        return createAuthentication(account, ipAddress);
     }
 
     @Override
@@ -257,6 +250,22 @@ public class AuthenticationServiceImpl implements AuthenticationService {
                 appUrl
         );
         eventPublisher.publishEvent(event);
+    }
+
+    @Override
+    public ResponseAuthentication createAuthentication(Account account, String ipAddress) {
+        Token token = tokenService.createLoginToken(account, ipAddress);
+
+        var expires = configAppProperties.getSecurity().getJwt().getExpiration();
+        var refreshExpires = configAppProperties.getSecurity().getJwt().getRefreshToken().getExpiration();
+
+        return ResponseAuthentication
+                .builder()
+                .accessToken(token.getAccessToken())
+                .expiresIn(expires)
+                .refreshToken(token.getRefreshToken())
+                .refreshExpiresIn(refreshExpires)
+                .build();
     }
 
     @Override

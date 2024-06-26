@@ -1,5 +1,6 @@
 package com.candido.server.service.base.auth;
 
+import com.candido.server.domain.v1.account.Account;
 import com.candido.server.domain.v1.token.Token;
 import com.candido.server.dto.v1.request.auth.RequestAuthentication;
 import com.candido.server.dto.v1.request.auth.RequestPasswordReset;
@@ -12,14 +13,15 @@ import jakarta.servlet.http.HttpServletResponse;
 import java.util.List;
 
 public interface AuthenticationService {
-    void registerByEmail(RequestRegister request, String ipAddress, String appUrl);
+    ResponseAuthentication registerByEmail(RequestRegister request, String ipAddress, String appUrl);
     ResponseRegistration registerByCode(RequestRegister request, String ipAddress, String appUrl);
 
     void verifyEmailRegistration(String uuidAccessToken, String email);
-    void verifyCodeRegistration(String uuidAccessToken, String temporaryCode, String email);
+    ResponseAuthentication verifyCodeRegistration(String uuidAccessToken, String temporaryCode, String email, String ipAddress);
     void checkValidityOfUUIDAccessTokenForResetPassword(String uuidAccessToken);
     void resendCodeRegistrationByUUIDAccessToken(String uuidAccessToken, String appUrl);
 
+    ResponseAuthentication createAuthentication(Account account, String ipAddress);
     ResponseAuthentication authenticate(RequestAuthentication request, String ipAddress);
     ResponseAuthentication refreshToken(HttpServletRequest request, HttpServletResponse response);
     void sendResetPassword(String email, String ipAddress, String appUrl);
