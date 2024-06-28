@@ -34,7 +34,10 @@ public class AccountErrorAdvice {
         );
     }
 
-    @ExceptionHandler({ExceptionAccountNotFound.class})
+    @ExceptionHandler({
+            ExceptionAccountNotFound.class,
+            ExceptionAccountRoleNotFound.class
+    })
     @ResponseStatus(HttpStatus.NOT_FOUND)
     public ResponseEntity<ApiErrorResponse> handleAccountNotFoundException(CustomRuntimeException ex, Locale locale) {
         return customExceptionResolver.resolveException(

@@ -50,7 +50,7 @@ public class ConfigMessageSource implements WebMvcConfigurer {
     public MessageSource businessMessageSource() {
         ReloadableResourceBundleMessageSource messageSource = new ReloadableResourceBundleMessageSource();
         messageSource.setBasenames(
-                "classpath:/messages/business/account/message"
+                "classpath:/messages/business/message"
         );
         messageSource.setDefaultEncoding("utf-8");
         return messageSource;

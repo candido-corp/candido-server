@@ -5,10 +5,7 @@ import com.candido.server.domain.v1.provider.AuthProviderEnum;
 import com.candido.server.domain.v1.user.User;
 import com.candido.server.dto.v1.request.auth.RequestRegister;
 import com.candido.server.exception._common.EnumExceptionName;
-import com.candido.server.exception.account.ExceptionAccountNotFound;
-import com.candido.server.exception.account.ExceptionDuplicateAccount;
-import com.candido.server.exception.account.ExceptionInvalidEmailAccount;
-import com.candido.server.exception.account.ExceptionPasswordsDoNotMatch;
+import com.candido.server.exception.account.*;
 import com.candido.server.service.base.auth.provider.AuthProviderService;
 import com.candido.server.service.base.auth.token.TokenService;
 import com.candido.server.service.base.user.UserService;
@@ -19,6 +16,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import javax.security.auth.login.AccountException;
 import java.time.LocalDateTime;
 import java.util.Optional;
 
@@ -27,6 +25,9 @@ public class AccountServiceImpl implements AccountService {
 
     @Autowired
     private AccountRepository accountRepository;
+
+    @Autowired
+    private AccountRoleRepository accountRoleRepository;
 
     @Autowired
     private TokenService tokenService;
@@ -130,11 +131,14 @@ public class AccountServiceImpl implements AccountService {
         if (!request.password().equals(request.confirmPassword()))
             throw new ExceptionPasswordsDoNotMatch(EnumExceptionName.ERROR_VALIDATION_PASSWORDS_DO_NOT_MATCH.name());
 
+        AccountRole role = accountRoleRepository.findById(AccountRoleEnum.USER.getRoleId())
+                .orElseThrow(() -> new ExceptionAccountRoleNotFound(EnumExceptionName.ERROR_BUSINESS_ACCOUNT_ROLE_NOT_FOUND.name()));
+
         // Creazione dell'account
         var account = Account.builder()
                 .email(request.email())
                 .password(passwordEncoder.encode(request.password()))
-                .role(new AccountRole(AccountRoleEnum.USER.getRoleId()))
+                .role(role)
                 .createdAt(LocalDateTime.now())
                 .status(new AccountStatus(AccountStatusEnum.PENDING.getStatusId()))
                 .build();
