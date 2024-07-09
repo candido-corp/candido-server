@@ -6,10 +6,9 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.SQLRestriction;
 
 import java.time.LocalDateTime;
-import java.time.ZoneOffset;
-import java.util.Date;
 
 @Data
 @Builder
@@ -17,6 +16,7 @@ import java.util.Date;
 @NoArgsConstructor
 @Entity
 @Table(name = "token")
+@SQLRestriction("valid=1")
 public class Token {
 
     @Id
@@ -55,6 +55,9 @@ public class Token {
 
     @Column(name = "uuid_access_token")
     private String uuidAccessToken;
+
+    @Column(name = "valid")
+    private boolean valid;
 
     public boolean isAccessTokenExpired() {
         return getAccessTokenExpiration().isBefore(LocalDateTime.now());

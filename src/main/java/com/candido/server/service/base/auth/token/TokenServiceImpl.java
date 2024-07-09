@@ -5,8 +5,13 @@ import com.candido.server.domain.v1.token.*;
 import com.candido.server.exception.security.auth.ExceptionToken;
 import com.candido.server.exception.security.jwt.ExceptionInvalidJWTToken;
 import com.candido.server.security.config.JwtService;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.PersistenceContext;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Isolation;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Instant;
 import java.time.LocalDateTime;
@@ -15,9 +20,15 @@ import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.locks.ReentrantLock;
 
+@Slf4j
 @Service
+@Transactional(isolation = Isolation.SERIALIZABLE)
 public class TokenServiceImpl implements TokenService {
+
+    private final ConcurrentHashMap<Integer, ReentrantLock> userLocks = new ConcurrentHashMap<>();
 
     @Autowired
     JwtService jwtService;
@@ -27,6 +38,9 @@ public class TokenServiceImpl implements TokenService {
 
     @Autowired
     TemporaryCodeService temporaryCodeService;
+
+    @PersistenceContext
+    EntityManager entityManager;
 
     @Override
     public Optional<Token> findByAccessToken(String accessToken) {
@@ -58,6 +72,7 @@ public class TokenServiceImpl implements TokenService {
         return findByRefreshToken(refreshToken).orElseThrow(ExceptionToken::new);
     }
 
+    @Override
     public Token saveUserToken(
             Account account,
             String accessToken,
@@ -66,42 +81,55 @@ public class TokenServiceImpl implements TokenService {
             TokenTypeEnum tokenType,
             TokenScopeCategoryEnum tokenScopeCategoryEnum
     ) {
-        revokeAllAccountTokens(account);
+        ReentrantLock lock = userLocks.computeIfAbsent(account.getId(), k -> new ReentrantLock());
+        lock.lock();
+        try {
+            revokeAllAccountTokensByTokenScopeCategoryId(account, tokenScopeCategoryEnum.getTokenScopeCategoryId());
+            entityManager.flush();
 
-        Date accessTokenExpirationDate = jwtService.extractExpiration(accessToken);
-        LocalDateTime accessTokenExpiration = Instant.ofEpochMilli(accessTokenExpirationDate.getTime())
-                .atZone(ZoneId.systemDefault())
-                .toLocalDateTime();
-
-        String uuidAccessToken = UUID.randomUUID().toString().replaceAll("-", "");
-
-        var token = Token
-                .builder()
-                .account(account)
-                .accessToken(accessToken)
-                .tokenType(new TokenType(tokenType.getTokenTypeId()))
-                .accessTokenExpiration(accessTokenExpiration)
-                .tokenScopeCategory(new TokenScopeCategory(tokenScopeCategoryEnum.getTokenScopeCategoryId()))
-                .ipAddress(ipAddress)
-                .uuidAccessToken(uuidAccessToken)
-                .build();
-
-        if(refreshToken != null) {
-            Date refreshTokenExpirationDate = jwtService.extractExpiration(refreshToken);
-            LocalDateTime refreshTokenExpiration = Instant.ofEpochMilli(refreshTokenExpirationDate.getTime())
+            Date accessTokenExpirationDate = jwtService.extractExpiration(accessToken);
+            LocalDateTime accessTokenExpiration = Instant.ofEpochMilli(accessTokenExpirationDate.getTime())
                     .atZone(ZoneId.systemDefault())
                     .toLocalDateTime();
-            token.setRefreshToken(refreshToken);
-            token.setRefreshTokenExpiration(refreshTokenExpiration);
-        }
 
-        return tokenRepository.save(token);
+            String uuidAccessToken = UUID.randomUUID().toString().replaceAll("-", "");
+
+            var token = Token
+                    .builder()
+                    .account(account)
+                    .accessToken(accessToken)
+                    .tokenType(new TokenType(tokenType.getTokenTypeId()))
+                    .accessTokenExpiration(accessTokenExpiration)
+                    .tokenScopeCategory(new TokenScopeCategory(tokenScopeCategoryEnum.getTokenScopeCategoryId()))
+                    .ipAddress(ipAddress)
+                    .uuidAccessToken(uuidAccessToken)
+                    .valid(true)
+                    .build();
+
+            if (refreshToken != null) {
+                Date refreshTokenExpirationDate = jwtService.extractExpiration(refreshToken);
+                LocalDateTime refreshTokenExpiration = Instant.ofEpochMilli(refreshTokenExpirationDate.getTime())
+                        .atZone(ZoneId.systemDefault())
+                        .toLocalDateTime();
+                token.setRefreshToken(refreshToken);
+                token.setRefreshTokenExpiration(refreshTokenExpiration);
+            }
+
+            return tokenRepository.save(token);
+        } catch (Exception e) {
+//            log.error("Error saving token", e);
+            throw new ExceptionToken();
+        } finally {
+            lock.unlock();
+            userLocks.remove(account.getId(), lock);
+        }
     }
 
     @Override
     public void delete(Token token) {
         temporaryCodeService.deleteTemporaryCodeByTokenId(token.getId());
-        tokenRepository.delete(token);
+        token.setValid(false);
+        tokenRepository.save(token);
     }
 
     @Override
@@ -112,8 +140,19 @@ public class TokenServiceImpl implements TokenService {
     @Override
     public void revokeAllAccountTokens(Account account) {
         var validAccountTokens = findAllValidTokenByUser(account.getId());
-        if(validAccountTokens.isEmpty()) return;
+        if (validAccountTokens.isEmpty()) return;
         validAccountTokens.forEach(this::delete);
+        entityManager.flush();
+    }
+
+    @Override
+    public void revokeAllAccountTokensByTokenScopeCategoryId(Account account, int tokenScopeCategoryId) {
+        var validAccountTokens = findAllValidTokenByUser(account.getId());
+        if (validAccountTokens.isEmpty()) return;
+        validAccountTokens.stream()
+                .filter(token -> token.getTokenScopeCategory().getId() == tokenScopeCategoryId)
+                .forEach(this::delete);
+        entityManager.flush();
     }
 
     @Override

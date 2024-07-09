@@ -32,6 +32,7 @@ public interface TokenService {
     List<Token> findAllValidTokenByUser(Integer accountId);
 
     void revokeAllAccountTokens(Account account);
+    void revokeAllAccountTokensByTokenScopeCategoryId(Account account, int tokenScopeCategoryId);
 
 
     Token createRegistrationToken(Account account, String ipAddress);
