@@ -2,6 +2,7 @@ plugins {
 	java
 	id("org.springframework.boot") version "3.3.1"
 	id("io.spring.dependency-management") version "1.1.5"
+	id("org.sonarqube") version "5.0.0.4638"
 }
 
 group = "com.candido"
@@ -13,15 +14,20 @@ java {
 	}
 }
 
+repositories {
+	mavenCentral()
+}
+
 configurations {
 	compileOnly {
 		extendsFrom(configurations.annotationProcessor.get())
 	}
 }
 
-repositories {
-	mavenCentral()
-}
+val jsonwebtokenVersion = "0.12.6"
+val springdocOpenApiVersion = "2.3.0"
+val passayVersion = "1.6.4"
+val hibernateJpaModelGeneratorVersion = "6.5.2.Final"
 
 dependencies {
 	implementation("org.springframework.boot:spring-boot-starter-actuator")
@@ -31,28 +37,44 @@ dependencies {
 	implementation("org.springframework.boot:spring-boot-starter-thymeleaf")
 	implementation("org.springframework.boot:spring-boot-starter-validation")
 	implementation("org.springframework.boot:spring-boot-starter-web")
-
-	runtimeOnly("org.mariadb.jdbc:mariadb-java-client")
-
-	compileOnly("org.projectlombok:lombok")
-	annotationProcessor("org.projectlombok:lombok")
-
-	implementation("io.jsonwebtoken:jjwt-api:0.11.5")
-	runtimeOnly("io.jsonwebtoken:jjwt-impl:0.11.5")
-	runtimeOnly("io.jsonwebtoken:jjwt-jackson:0.11.5")
-
-	implementation("org.mapstruct:mapstruct:1.5.5.Final")
-	annotationProcessor("org.mapstruct:mapstruct-processor:1.5.5.Final")
-	implementation("org.passay:passay:1.6.4")
-
-	// https://mvnrepository.com/artifact/org.hibernate.orm/hibernate-jpamodelgen
-	annotationProcessor("org.hibernate.orm:hibernate-jpamodelgen:6.4.1.Final")
-
+	// https://mvnrepository.com/artifact/io.jsonwebtoken/jjwt-api
+	implementation("io.jsonwebtoken:jjwt-api:$jsonwebtokenVersion")
+	// https://mvnrepository.com/artifact/org.passay/passay
+	implementation("org.passay:passay:$passayVersion")
 	// https://mvnrepository.com/artifact/org.springdoc/springdoc-openapi-starter-webmvc-ui
-	implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:2.3.0")
+	implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:$springdocOpenApiVersion")
+
+
+	// https://mvnrepository.com/artifact/org.projectlombok/lombok
+	annotationProcessor("org.projectlombok:lombok")
+	// https://mvnrepository.com/artifact/org.hibernate.orm/hibernate-jpamodelgen
+	annotationProcessor("org.hibernate.orm:hibernate-jpamodelgen:$hibernateJpaModelGeneratorVersion")
+
+
+	// https://mvnrepository.com/artifact/org.projectlombok/lombok
+	compileOnly("org.projectlombok:lombok")
+
+
+	// https://mvnrepository.com/artifact/org.mariadb.jdbc/mariadb-java-client
+	runtimeOnly("org.mariadb.jdbc:mariadb-java-client")
+	// https://mvnrepository.com/artifact/io.jsonwebtoken/jjwt-impl
+	runtimeOnly("io.jsonwebtoken:jjwt-impl:$jsonwebtokenVersion")
+	// https://mvnrepository.com/artifact/io.jsonwebtoken/jjwt-jackson
+	runtimeOnly("io.jsonwebtoken:jjwt-jackson:$jsonwebtokenVersion")
+
 
 	testImplementation("org.springframework.boot:spring-boot-starter-test")
 }
+
+sonar {
+	properties {
+		property("sonar.projectKey", "candido-server")
+		property("sonar.projectName", "candido-server")
+		property("sonar.host.url", "http://localhost:9000")
+		property("sonar.token", System.getenv("SONAR_TOKEN"))
+	}
+}
+
 
 tasks.withType<Test> {
 	useJUnitPlatform()

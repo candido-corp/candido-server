@@ -4,7 +4,7 @@ import com.candido.server.domain.v1.account.Account;
 import com.candido.server.domain.v1.token.*;
 import com.candido.server.exception.security.auth.ExceptionToken;
 import com.candido.server.exception.security.jwt.ExceptionInvalidJWTToken;
-import com.candido.server.security.config.JwtService;
+import com.candido.server.security.JwtService;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import lombok.extern.slf4j.Slf4j;

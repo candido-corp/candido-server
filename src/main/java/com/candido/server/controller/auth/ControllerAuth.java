@@ -5,7 +5,7 @@ import com.candido.server.dto.v1.request.auth.RequestAuthentication;
 import com.candido.server.dto.v1.response.auth.ResponseAuthentication;
 import com.candido.server.dto.v1.response.auth.ResponseToken;
 import com.candido.server.service.base.auth.AuthenticationService;
-import com.candido.server.service.base.mapstruct.TokenMapper;
+import com.candido.server.service.base.mapper.TokenMapperService;
 import com.candido.server.util.UtilService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -26,7 +26,7 @@ public class ControllerAuth {
 
     private final UtilService utilService;
 
-    private final TokenMapper tokenMapper;
+    private final TokenMapperService tokenMapper;
 
     @PostMapping("/login")
     public ResponseEntity<ResponseAuthentication> login(

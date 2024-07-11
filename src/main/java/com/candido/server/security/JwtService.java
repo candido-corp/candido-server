@@ -1,4 +1,4 @@
-package com.candido.server.security.config;
+package com.candido.server.security;
 
 import com.candido.server.config.ConfigAppProperties;
 import com.candido.server.domain.v1.account.Account;
@@ -8,16 +8,23 @@ import com.candido.server.exception._common.resolver.DispatchMessageResolverExce
 import com.candido.server.exception.security.auth.ExceptionVerifyRegistrationToken;
 import com.candido.server.exception.security.jwt.ExceptionInvalidJWTToken;
 import com.candido.server.exception.security.jwt.ExceptionSecurityJwt;
-import io.jsonwebtoken.*;
-import io.jsonwebtoken.io.Decoders;
-import io.jsonwebtoken.security.Keys;
+
+import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.ExpiredJwtException;
+import io.jsonwebtoken.JwtException;
+import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.SignatureException;
+import io.jsonwebtoken.MalformedJwtException;
+import io.jsonwebtoken.UnsupportedJwtException;
+
+import io.jsonwebtoken.security.SignatureAlgorithm;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
-import javax.crypto.SecretKey;
+import java.security.PrivateKey;
+import java.security.PublicKey;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -38,6 +45,9 @@ public class JwtService {
 
     @Autowired
     private ConfigAppProperties configAppProperties;
+
+    @Autowired
+    private KeyLoader keyLoader;
 
     /**
      * Extracts the username from the provided JWT token.
@@ -138,6 +148,10 @@ public class JwtService {
 
     /**
      * Builds a token with specified claims, user details, and expiration.
+     * Generate a pair of keys with the following command:
+     * <pre>{@code openssl ecparam -genkey -name prime256v1 -noout -out private_key.pem}</pre>
+     * <pre>{@code openssl pkcs8 -topk8 -nocrypt -in private_key.pem -out private_key_pkcs8.pem}</pre>
+     * <pre>{@code openssl ec -in private_key.pem -pubout -out public_key.pem}</pre>
      *
      * @param extraClaims additional claims to include in the token.
      * @param userDetails the user details to include in the token.
@@ -145,15 +159,26 @@ public class JwtService {
      * @return a string representing the JWT token.
      */
     public String buildToken(Map<String, Object> extraClaims, UserDetails userDetails, long expirationTimeMillis) {
+        SignatureAlgorithm alg = Jwts.SIG.ES256;
+        PrivateKey privateKey;
+
+        try {
+            privateKey = keyLoader.loadPrivateKey();
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+
         return Jwts
                 .builder()
-                .setHeaderParam("typ", "JWT")
-                .setClaims(extraClaims)
-                .setSubject(userDetails.getUsername())
-                .setIssuedAt(new Date(System.currentTimeMillis()))
-                .setExpiration(new Date(System.currentTimeMillis() + expirationTimeMillis))
-                .setIssuer(configAppProperties.getSecurity().getJwt().getIssuer())
-                .signWith(getSignInKey(), SignatureAlgorithm.HS256)
+                .header().add("typ", "JWT")
+                .and()
+                .claims().empty().add(extraClaims)
+                .and()
+                .subject(userDetails.getUsername())
+                .issuedAt(new Date(System.currentTimeMillis()))
+                .expiration(new Date(System.currentTimeMillis() + expirationTimeMillis))
+                .issuer(configAppProperties.getSecurity().getJwt().getIssuer())
+                .signWith(privateKey, alg)
                 .compact();
     }
 
@@ -196,13 +221,19 @@ public class JwtService {
      * @return the claims contained within the token.
      */
     private Claims extractAllClaims(String token) {
+        PublicKey publicKey;
+        try {
+            publicKey = keyLoader.loadPublicKey();
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
         try {
             return Jwts
-                    .parserBuilder()
-                    .setSigningKey(getSignInKey())
+                    .parser()
+                    .verifyWith(publicKey)
                     .build()
-                    .parseClaimsJws(token)
-                    .getBody();
+                    .parseSignedClaims(token)
+                    .getPayload();
         } catch (JwtException ex) {
             handleJwtException(ex, token);
             return null;
@@ -254,15 +285,4 @@ public class JwtService {
         return EnumJwtExceptionState.UNKNOWN.name();
     }
 
-    /**
-     * Retrieves the signing key used to verify the JWT token.
-     *
-     * @see <a href="https://www.allkeysgenerator.com/">Generatore di chiave</a>
-     * @return the secret key used to sign the JWT token.
-     */
-    private SecretKey getSignInKey() {
-        String secretKey = configAppProperties.getSecurity().getJwt().getSecretKey();
-        byte[] keyBytes = Decoders.BASE64.decode(secretKey);
-        return Keys.hmacShaKeyFor(keyBytes);
-    }
 }

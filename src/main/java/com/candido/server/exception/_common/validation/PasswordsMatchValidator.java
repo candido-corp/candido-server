@@ -47,8 +47,8 @@ public class PasswordsMatchValidator implements ConstraintValidator<PasswordsMat
      */
     @Override
     public boolean isValid(Object value, ConstraintValidatorContext context) {
-        String password = null;
-        String confirmPassword = null;
+        String password;
+        String confirmPassword;
 
         try {
             password = getFieldValue(value, passwordField);

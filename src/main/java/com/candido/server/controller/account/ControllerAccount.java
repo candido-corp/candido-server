@@ -5,16 +5,12 @@ import com.candido.server.domain.v1.user.User;
 import com.candido.server.dto.v1.request.account.RequestUpdateUserDto;
 import com.candido.server.dto.v1.util.AccountDto;
 import com.candido.server.dto.v1.util.UserDto;
-import com.candido.server.exception._common.EnumExceptionName;
-import com.candido.server.exception.account.ExceptionAccountNotFound;
-import com.candido.server.exception.user.ExceptionUserNotFound;
 import com.candido.server.service.base.account.AccountService;
+import com.candido.server.service.base.mapper.AccountMapperService;
 import com.candido.server.service.base.mapper.UserMapperService;
-import com.candido.server.service.base.mapstruct.AccountMapper;
 import com.candido.server.service.base.user.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
@@ -27,7 +23,7 @@ public class ControllerAccount {
     private final AccountService accountService;
 
     @Autowired
-    AccountMapper accountMapper;
+    AccountMapperService accountMapper;
 
     @Autowired
     UserMapperService userMapper;

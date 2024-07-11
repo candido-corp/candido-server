@@ -2,7 +2,7 @@ package com.candido.server.controller.user;
 
 import com.candido.server.domain.v1.user.Gender;
 import com.candido.server.dto.v1.util.GenderDto;
-import com.candido.server.service.base.mapstruct.GenderMapper;
+import com.candido.server.service.base.mapper.GenderMapperService;
 import com.candido.server.service.base.user.GenderService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -20,7 +20,7 @@ public class ControllerGender {
     GenderService genderService;
 
     @Autowired
-    GenderMapper genderMapper;
+    GenderMapperService genderMapper;
 
     @GetMapping
     public ResponseEntity<List<GenderDto>> getGenders() {

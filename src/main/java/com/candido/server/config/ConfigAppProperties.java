@@ -30,6 +30,7 @@ public class ConfigAppProperties {
             private RefreshToken refreshToken = new RefreshToken();
             private RegistrationToken registrationToken = new RegistrationToken();
             private ResetToken resetToken = new ResetToken();
+            private Keys keys = new Keys();
 
             @Data
             public static class RefreshToken {
@@ -44,6 +45,12 @@ public class ConfigAppProperties {
             @Data
             public static class ResetToken {
                 private int expiration;
+            }
+
+            @Data
+            public static class Keys {
+                private String keyPrivate;
+                private String keyPublic;
             }
 
         }

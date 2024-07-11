@@ -17,7 +17,7 @@ import com.candido.server.exception.account.ExceptionAccountNotFound;
 import com.candido.server.exception.security.auth.ExceptionAuth;
 import com.candido.server.exception.security.auth.ExceptionInvalidToken;
 import com.candido.server.exception.security.jwt.ExceptionInvalidJWTToken;
-import com.candido.server.security.config.JwtService;
+import com.candido.server.security.JwtService;
 import com.candido.server.service.base.account.AccountService;
 import com.candido.server.service.base.auth.token.TemporaryCodeService;
 import com.candido.server.service.base.auth.token.TokenService;

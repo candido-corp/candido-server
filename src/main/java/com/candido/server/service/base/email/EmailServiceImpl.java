@@ -33,7 +33,7 @@ public class EmailServiceImpl implements EmailService {
     public void sendSimpleMessage(String from, String fromPersonal, String to, String subject, String text) {
         if(smtpCanSend) {
             MimeMessage message = emailSender.createMimeMessage();
-            MimeMessageHelper helper = null;
+            MimeMessageHelper helper;
             try {
                 helper = new MimeMessageHelper(message, true);
                 message.setContent(text, "text/html; charset=utf-8");

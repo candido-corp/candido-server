@@ -71,8 +71,8 @@ public class TemporaryCodeServiceImpl implements TemporaryCodeService {
     @Override
     public TemporaryCode generateCode(Long tokenId) {
         SecureRandom random = new SecureRandom();
-        int randomNumber = 0;
-        String formattedNumber = "";
+        int randomNumber;
+        String formattedNumber;
         int digits = utilService.countDigits(MAX_TEMPORARY_CODE_SIZE - 1);
 
         do {

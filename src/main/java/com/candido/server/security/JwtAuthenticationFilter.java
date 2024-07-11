@@ -1,4 +1,4 @@
-package com.candido.server.security.config;
+package com.candido.server.security;
 
 import com.candido.server.domain.v1.token.Token;
 import com.candido.server.service.base.auth.token.TokenService;
@@ -39,26 +39,17 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             @NonNull HttpServletResponse response,
             @NonNull FilterChain filterChain
     ) throws ServletException, IOException {
-
-        // Recupero il token dal header della richiesta
         final String authHeader = request.getHeader(HttpHeaders.AUTHORIZATION);
-
-        // Variabile per il token JWT
         final String jwt;
-
-        // Variabile per la email (username) all'interno del token
         final String userEmail;
 
-        // Se header recuperato è null o non inizia con la parola chiave "Bearer ", chiudo la richiesta
-        if(authHeader == null || !authHeader.startsWith("Bearer ")) {
+        String authHeaderToSearch = "Bearer ";
+        if(authHeader == null || !authHeader.startsWith(authHeaderToSearch)) {
             filterChain.doFilter(request, response);
             return;
         }
 
-        // Recupero il token JWT alla settima posizione che è la lunghezza della parola chiave "Bearer "
-        jwt = authHeader.substring(7);
-
-        // Tramite una classe di supporto estraggo lo username dal token
+        jwt = authHeader.substring(authHeaderToSearch.length());
         try {
             userEmail = jwtService.extractUsername(jwt);
         } catch (Exception e) {
@@ -66,11 +57,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             return;
         }
 
-        // Controllo che lo username non sia null e controllo nel contesto di sicurezza di spring che
-        // l'utente non sia già autenticato
         if(userEmail != null && SecurityContextHolder.getContext().getAuthentication() == null) {
-
-            // Recupero l'utente dal database in base allo username
             UserDetails userDetails;
             try {
                 userDetails = this.userDetailsService.loadUserByUsername(userEmail);
@@ -79,40 +66,28 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                 return;
             }
 
-            // Recupero il token
             Optional<Token> accessToken = tokenService.findByAccessToken(jwt);
-
-            // Controllo che il token sia presente
             if(accessToken.isEmpty()) {
                 filterChain.doFilter(request, response);
                 return;
             }
 
-            // Controllo che il token non sia scaduto
             var isValidToken = accessToken
-                    .map(t -> !t.isAccessTokenExpired())
+                    .map(t -> !t.isAccessTokenExpired() || !t.isValid())
                     .orElse(false);
 
-            // Controllo che il token inviato sia valido
             if(jwtService.isValidToken(jwt, userDetails) && isValidToken) {
-
-                // Creo l'oggetto per il token dell'autenticazione di spring
                 UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(
                         userDetails,
                         null,
                         userDetails.getAuthorities()
                 );
-
-                // Aggiungo dettagli al token
                 authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
-
-                // Faccio un update del SecurityContextHolder
                 SecurityContextHolder.getContext().setAuthentication(authToken);
             }
 
         }
 
-        // Viene elaborata la richiesta una volta processata
         filterChain.doFilter(request, response);
     }
 

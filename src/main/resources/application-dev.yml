@@ -8,7 +8,6 @@ application:
     security:
         jwt:
             issuer: Candido
-            secret-key: 6150645367566B58703273357638792F423F4528482B4D6251655468576D5A71
             expiration: 86400000 # 1 day in ms
             refresh-token:
                 expiration: 604800000 # 7 days in ms
@@ -16,6 +15,9 @@ application:
                 expiration: 864000000 # 10 days in ms
             reset-token:
                 expiration: 864000000 # 10 days in ms
+            keys:
+                key-private: ${JWT_PRIVATE_KEY}
+                key-public: ${JWT_PUBLIC_KEY}
     email:
         host: ${SMTP_HOST}
         port: 587

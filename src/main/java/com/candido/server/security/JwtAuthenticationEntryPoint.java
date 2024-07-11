@@ -1,4 +1,4 @@
-package com.candido.server.security.config;
+package com.candido.server.security;
 
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -18,7 +18,7 @@ public class JwtAuthenticationEntryPoint implements AuthenticationEntryPoint {
             HttpServletResponse response,
             AuthenticationException authException
     ) throws IOException, ServletException {
-        // TODO: Potenzialmente, invia una email
+        // TODO: Should we send an email to the user?
         response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
     }
 

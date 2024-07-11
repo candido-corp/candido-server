@@ -1,4 +1,4 @@
-package com.candido.server.security.config;
+package com.candido.server.security;
 
 import com.candido.server.domain.v1.token.TokenRepository;
 import jakarta.servlet.http.HttpServletRequest;
