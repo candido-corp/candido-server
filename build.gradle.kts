@@ -68,9 +68,14 @@ dependencies {
 
 sonar {
 	properties {
+		property("sonar.verbose", "true")
+		property("sonar.log.level", "DEBUG")
+		property("org.gradle.debug", "true")
+		property("sonar.java.debug", "true")
+		property("sonar.java.binaries", "build/classes")
 		property("sonar.projectKey", "candido-server")
 		property("sonar.projectName", "candido-server")
-		property("sonar.host.url", "http://localhost:9000")
+		property("sonar.host.url", System.getenv("SONAR_URL"))
 		property("sonar.token", System.getenv("SONAR_TOKEN"))
 	}
 }
