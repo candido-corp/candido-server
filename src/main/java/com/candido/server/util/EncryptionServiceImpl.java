@@ -15,16 +15,15 @@ import java.util.Base64;
 @Service
 public class EncryptionServiceImpl implements EncryptionService {
 
-    private static final String secret = "7G12bJ3gF6H8K9L0P2Q5R8S1U4V7W0Z3";
-    private final SecretKey secretKey = new SecretKeySpec(Base64.getDecoder().decode(secret), "AES");
-
+    private static final String SECRET = "7G12bJ3gF6H8K9L0P2Q5R8S1U4V7W0Z3";
+    private final SecretKey secretKey = new SecretKeySpec(Base64.getDecoder().decode(SECRET), "AES");
     private final ExceptionResolver exceptionResolver;
 
     @Override
     public String encrypt(String data) {
         Cipher cipher;
         try {
-            cipher = Cipher.getInstance("AES");
+            cipher = Cipher.getInstance("AES/GCM/NoPadding");
             cipher.init(Cipher.ENCRYPT_MODE, secretKey);
             byte[] encryptedData = cipher.doFinal(data.getBytes());
             return Base64.getUrlEncoder().withoutPadding().encodeToString(encryptedData);
@@ -38,7 +37,7 @@ public class EncryptionServiceImpl implements EncryptionService {
     public String decrypt(String encryptedData) {
         Cipher cipher;
         try {
-            cipher = Cipher.getInstance("AES");
+            cipher = Cipher.getInstance("AES/GCM/NoPadding");
             cipher.init(Cipher.DECRYPT_MODE, secretKey);
             byte[] decodedData = Base64.getUrlDecoder().decode(encryptedData);
             byte[] decryptedData = cipher.doFinal(decodedData);
