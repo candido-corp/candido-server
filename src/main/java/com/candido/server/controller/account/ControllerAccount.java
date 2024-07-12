@@ -9,7 +9,6 @@ import com.candido.server.service.base.account.AccountService;
 import com.candido.server.service.base.mapper.AccountMapperService;
 import com.candido.server.service.base.mapper.UserMapperService;
 import com.candido.server.service.base.user.UserService;
-import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
@@ -17,19 +16,25 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/v1/me")
-@RequiredArgsConstructor
 public class ControllerAccount {
 
     private final AccountService accountService;
+    private final AccountMapperService accountMapper;
+    private final UserMapperService userMapper;
+    private final UserService userService;
 
     @Autowired
-    AccountMapperService accountMapper;
-
-    @Autowired
-    UserMapperService userMapper;
-
-    @Autowired
-    UserService userService;
+    public ControllerAccount(
+            AccountService accountService,
+            AccountMapperService accountMapper,
+            UserMapperService userMapper,
+            UserService userService
+    ) {
+        this.accountService = accountService;
+        this.accountMapper = accountMapper;
+        this.userMapper = userMapper;
+        this.userService = userService;
+    }
 
     @GetMapping
     public ResponseEntity<AccountDto> getAccountInfo(Authentication authentication) {
@@ -50,7 +55,6 @@ public class ControllerAccount {
             Authentication authentication,
             @RequestBody RequestUpdateUserDto requestUpdateUserDto
     ) {
-        // TODO: Modifica nome e cognome ogni X giorni. La prima volta è possibile cambiarlo subito.
         // TODO: Se c'è una candidatura aperta non può modificare il nome e cognome.
 
         Account account = accountService.findAccountByEmailOrThrow(authentication.getName());

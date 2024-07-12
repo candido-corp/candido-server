@@ -16,11 +16,17 @@ import java.util.List;
 @RequestMapping("/api/v1/genders")
 public class ControllerGender {
 
-    @Autowired
-    GenderService genderService;
+    private final GenderService genderService;
+    private final GenderMapperService genderMapper;
 
     @Autowired
-    GenderMapperService genderMapper;
+    public ControllerGender(
+            GenderService genderService,
+            GenderMapperService genderMapper
+    ) {
+        this.genderService = genderService;
+        this.genderMapper = genderMapper;
+    }
 
     @GetMapping
     public ResponseEntity<List<GenderDto>> getGenders() {
