@@ -13,7 +13,7 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 public class UserDto {
 
-    private final static int NAME_CHANGE_TIME_THRESHOLD = 30;
+    private static final int NAME_CHANGE_TIME_THRESHOLD = 30;
 
     @JsonProperty("first_name")
     String firstName;
