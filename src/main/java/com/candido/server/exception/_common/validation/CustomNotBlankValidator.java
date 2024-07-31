@@ -1,7 +1,12 @@
 package com.candido.server.exception._common.validation;
 
+import com.candido.server.exception._common.EnumExceptionName;
+import com.candido.server.exception.util.ExceptionValidation;
 import jakarta.validation.ConstraintValidator;
 import jakarta.validation.ConstraintValidatorContext;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * CustomNotBlankValidator is a class that implements the ConstraintValidator interface.
@@ -20,6 +25,11 @@ public class CustomNotBlankValidator implements ConstraintValidator<CustomNotBla
     private String exceptionMessage;
 
     /**
+     * The fields to validate.
+     */
+    private List<String> fields;
+
+    /**
      * Initializes the validator with the annotation details.
      *
      * @param constraintAnnotation The annotation instance with its defined values.
@@ -28,6 +38,7 @@ public class CustomNotBlankValidator implements ConstraintValidator<CustomNotBla
     public void initialize(CustomNotBlank constraintAnnotation) {
         this.exceptionClass = constraintAnnotation.exception();
         this.exceptionMessage = constraintAnnotation.exceptionName().name();
+        fields = new ArrayList<>();
     }
 
     /**
@@ -51,10 +62,10 @@ public class CustomNotBlankValidator implements ConstraintValidator<CustomNotBla
     private void throwException() {
         try {
             throw exceptionClass
-                    .getConstructor(String.class)
-                    .newInstance(exceptionMessage);
+                    .getConstructor(String.class, List.class)
+                    .newInstance(exceptionMessage, fields);
         } catch (Exception e) {
-            throw new RuntimeException("Invalid exception configuration", e);
+            throw new ExceptionValidation(EnumExceptionName.ERROR_VALIDATION_INVALID_EXCEPTION_CONFIGURATION.name(), e.getMessage());
         }
     }
 }
