@@ -4,7 +4,7 @@ import com.candido.server.config.ConfigAppProperties;
 import com.candido.server.domain.v1.account.Account;
 import com.candido.server.domain.v1.token.EnumJwtExceptionState;
 import com.candido.server.exception._common.CustomExceptionResolver;
-import com.candido.server.exception._common.resolver.DispatchMessageResolverException;
+import com.candido.server.exception._common.resolver.DispatchMessageResolver;
 import com.candido.server.exception.security.auth.ExceptionVerifyRegistrationToken;
 import com.candido.server.exception.security.jwt.ExceptionInvalidJWTToken;
 import com.candido.server.exception.security.jwt.ExceptionSecurityJwt;
@@ -34,7 +34,7 @@ public class JwtService {
     private CustomExceptionResolver customExceptionResolver;
 
     @Autowired
-    private DispatchMessageResolverException dispatchMessageResolverException;
+    private DispatchMessageResolver dispatchMessageResolver;
 
     @Autowired
     private ConfigAppProperties configAppProperties;

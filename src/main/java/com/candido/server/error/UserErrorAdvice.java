@@ -3,10 +3,9 @@ package com.candido.server.error;
 import com.candido.server.exception._common.CustomExceptionResolver;
 import com.candido.server.exception._common.CustomRuntimeException;
 import com.candido.server.exception._common.ApiErrorResponse;
-import com.candido.server.exception._common.resolver.EnumMessageResolverExceptionType;
+import com.candido.server.exception._common.resolver.EnumMessageResolverType;
 import com.candido.server.exception.user.ExceptionUserNotFound;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ControllerAdvice;
@@ -28,7 +27,7 @@ public class UserErrorAdvice {
                 ex,
                 locale,
                 HttpStatus.NOT_FOUND,
-                EnumMessageResolverExceptionType.BUSINESS
+                EnumMessageResolverType.BUSINESS
         );
     }
 

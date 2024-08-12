@@ -1,7 +1,7 @@
 package com.candido.server.exception._common;
 
-import com.candido.server.exception._common.resolver.DispatchMessageResolverException;
-import com.candido.server.exception._common.resolver.EnumMessageResolverExceptionType;
+import com.candido.server.exception._common.resolver.DispatchMessageResolver;
+import com.candido.server.exception._common.resolver.EnumMessageResolverType;
 import com.candido.server.exception.account.ExceptionInvalidPasswordAccountList;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -17,7 +17,7 @@ import java.util.*;
 @RequiredArgsConstructor
 public class CustomExceptionResolver implements ExceptionResolver {
 
-    private final DispatchMessageResolverException dispatchMessageResolverException;
+    private final DispatchMessageResolver dispatchMessageResolver;
 
     /**
      * Logs the exception to the console.
@@ -59,11 +59,12 @@ public class CustomExceptionResolver implements ExceptionResolver {
     public ApiError createApiErrorResponse(
             CustomRuntimeException ex,
             Locale locale,
-            EnumMessageResolverExceptionType type
+            EnumMessageResolverType type
     ) {
-        String errorMessage = dispatchMessageResolverException.resolveMessage(ex, locale, type);
+        String errorMessage = dispatchMessageResolver.resolveMessage(ex, locale, type);
         return ApiError
                 .builder()
+                .fields(ex.getFields())
                 .code(ex.getMessage())
                 .data(ex.getDetails())
                 .message(errorMessage)
@@ -85,7 +86,7 @@ public class CustomExceptionResolver implements ExceptionResolver {
             CustomRuntimeException ex,
             Locale locale,
             HttpStatus httpStatus,
-            EnumMessageResolverExceptionType type
+            EnumMessageResolverType type
     ) {
         printException(ex);
         var apiError = createApiErrorResponse(ex, locale, type);
@@ -107,7 +108,7 @@ public class CustomExceptionResolver implements ExceptionResolver {
             ExceptionInvalidPasswordAccountList ex,
             Locale locale,
             HttpStatus httpStatus,
-            EnumMessageResolverExceptionType type
+            EnumMessageResolverType type
     ) {
         ex.getExceptions().forEach(this::printException);
         List<CustomRuntimeException> customRuntimeExceptions = new ArrayList<>(ex.getExceptions());

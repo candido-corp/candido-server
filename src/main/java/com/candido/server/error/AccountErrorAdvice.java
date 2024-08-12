@@ -3,7 +3,7 @@ package com.candido.server.error;
 import com.candido.server.exception._common.ApiErrorResponse;
 import com.candido.server.exception._common.CustomExceptionResolver;
 import com.candido.server.exception._common.CustomRuntimeException;
-import com.candido.server.exception._common.resolver.EnumMessageResolverExceptionType;
+import com.candido.server.exception._common.resolver.EnumMessageResolverType;
 import com.candido.server.exception.account.*;
 import com.candido.server.exception.security.auth.ExceptionTemporaryCode;
 import lombok.RequiredArgsConstructor;
@@ -30,7 +30,7 @@ public class AccountErrorAdvice {
                 ex,
                 locale,
                 HttpStatus.CONFLICT,
-                EnumMessageResolverExceptionType.BUSINESS
+                EnumMessageResolverType.BUSINESS
         );
     }
 
@@ -44,7 +44,7 @@ public class AccountErrorAdvice {
                 ex,
                 locale,
                 HttpStatus.NOT_FOUND,
-                EnumMessageResolverExceptionType.BUSINESS
+                EnumMessageResolverType.BUSINESS
         );
     }
 
@@ -63,7 +63,7 @@ public class AccountErrorAdvice {
                 ex,
                 locale,
                 HttpStatus.BAD_REQUEST,
-                EnumMessageResolverExceptionType.VALIDATION
+                EnumMessageResolverType.VALIDATION
         );
     }
 
@@ -74,7 +74,7 @@ public class AccountErrorAdvice {
                 ex,
                 locale,
                 HttpStatus.BAD_REQUEST,
-                EnumMessageResolverExceptionType.VALIDATION
+                EnumMessageResolverType.VALIDATION
         );
     }
 

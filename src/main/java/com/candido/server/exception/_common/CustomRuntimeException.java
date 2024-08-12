@@ -45,6 +45,11 @@ public class CustomRuntimeException extends RuntimeException {
     private LocalDateTime timestamp;
 
     /**
+     * The list of fields associated with the exception.
+     */
+    private List<String> fields;
+
+    /**
      * Constructs a new CustomRuntimeException with no detail message.
      */
     public CustomRuntimeException() {
@@ -69,6 +74,18 @@ public class CustomRuntimeException extends RuntimeException {
     public CustomRuntimeException(String message, String ...messages) {
         this.message = message;
         this.extraMessages = messages;
+        this.timestamp = LocalDateTime.now();
+    }
+
+    /**
+     * Constructs a new CustomRuntimeException with the specified detail message and fields.
+     *
+     * @param message The detail message.
+     * @param fields The list of fields associated with the exception.
+     */
+    public CustomRuntimeException(String message, List<String> fields) {
+        this.message = message;
+        this.fields = fields;
         this.timestamp = LocalDateTime.now();
     }
 

@@ -10,25 +10,25 @@ import java.util.Locale;
 import java.util.Optional;
 
 /**
- * Service for resolving messages related to business exceptions.
+ * Service for resolving messages related to authentication exceptions.
  */
 @Service
-public class MessageResolverBusinessException extends MessageResolverException {
+public class MessageResolverAuthentication extends MessageResolver {
 
     private final MessageSource messageSource;
 
     /**
-     * Constructs a new instance of MessageResolverBusinessException.
+     * Constructs a new instance of MessageResolverAuthenticationException.
      *
      * @param messageSource the message source to use for resolving messages
      */
     @Autowired
-    public MessageResolverBusinessException(@Qualifier("businessMessageSource") MessageSource messageSource) {
+    public MessageResolverAuthentication(@Qualifier("authenticationMessageSource") MessageSource messageSource) {
         this.messageSource = messageSource;
     }
 
     /**
-     * Resolves the message for the given business exception based on the provided locale.
+     * Resolves the message for the given authentication exception based on the provided locale.
      *
      * @param ex the exception to resolve the message for
      * @param locale the locale to use for message resolution

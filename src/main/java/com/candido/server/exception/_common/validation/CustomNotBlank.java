@@ -5,6 +5,7 @@ import jakarta.validation.Constraint;
 import jakarta.validation.Payload;
 
 import java.lang.annotation.*;
+import java.util.List;
 
 @Documented
 @Constraint(validatedBy = CustomNotBlankValidator.class)
@@ -23,4 +24,5 @@ public @interface CustomNotBlank {
     Class<? extends Payload>[] payload() default {};
     Class<? extends RuntimeException> exception();
     EnumExceptionName exceptionName();
+    String[] exceptionFields();
 }

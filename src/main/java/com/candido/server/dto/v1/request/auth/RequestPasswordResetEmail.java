@@ -6,10 +6,13 @@ import com.candido.server.exception.account.ExceptionInvalidEmailAccount;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 public record RequestPasswordResetEmail (
-        @JsonProperty("email")
+        @JsonProperty(JSON_PROPERTY_EMAIL)
         @CustomNotBlank(
                 exception = ExceptionInvalidEmailAccount.class,
-                exceptionName = EnumExceptionName.ERROR_VALIDATION_EMAIL_CAN_NOT_BE_EMPTY
+                exceptionName = EnumExceptionName.ERROR_VALIDATION_EMAIL_CAN_NOT_BE_EMPTY,
+                exceptionFields = {JSON_PROPERTY_EMAIL}
         )
         String email
-) {}
+) {
+    public static final String JSON_PROPERTY_EMAIL = "email";
+}
