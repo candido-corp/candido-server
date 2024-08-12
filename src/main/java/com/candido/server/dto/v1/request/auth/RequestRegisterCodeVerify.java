@@ -7,24 +7,31 @@ import com.candido.server.exception.security.auth.ExceptionValidationAuth;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 public record RequestRegisterCodeVerify(
-        @JsonProperty("t")
+        @JsonProperty(JSON_PROPERTY_UUID_ACCESS)
         @CustomNotBlank(
                 exception = ExceptionValidationAuth.class,
-                exceptionName = EnumExceptionName.ERROR_VALIDATION_TOKEN_CAN_NOT_BE_EMPTY
+                exceptionName = EnumExceptionName.ERROR_VALIDATION_TOKEN_CAN_NOT_BE_EMPTY,
+                exceptionFields = {JSON_PROPERTY_UUID_ACCESS}
         )
         String uuidAccessToken,
 
-        @JsonProperty("e")
+        @JsonProperty(JSON_PROPERTY_ENCRYPTED_EMAIL)
         @CustomNotBlank(
                 exception = ExceptionValidationAuth.class,
-                exceptionName = EnumExceptionName.ERROR_VALIDATION_EMAIL_CAN_NOT_BE_EMPTY
+                exceptionName = EnumExceptionName.ERROR_VALIDATION_EMAIL_CAN_NOT_BE_EMPTY,
+                exceptionFields = {JSON_PROPERTY_ENCRYPTED_EMAIL}
         )
         String encryptedEmail,
 
-        @JsonProperty("c")
+        @JsonProperty(JSON_PROPERTY_TEMPORARY_CODE)
         @CustomNotBlank(
                 exception = ExceptionTemporaryCode.class,
-                exceptionName = EnumExceptionName.ERROR_VALIDATION_TEMPORARY_CODE_CAN_NOT_BE_EMPTY
+                exceptionName = EnumExceptionName.ERROR_VALIDATION_TEMPORARY_CODE_CAN_NOT_BE_EMPTY,
+                exceptionFields = {JSON_PROPERTY_TEMPORARY_CODE}
         )
         String temporaryCode
-) {}
+) {
+    public static final String JSON_PROPERTY_UUID_ACCESS = "t";
+    public static final String JSON_PROPERTY_ENCRYPTED_EMAIL = "e";
+    public static final String JSON_PROPERTY_TEMPORARY_CODE = "c";
+}

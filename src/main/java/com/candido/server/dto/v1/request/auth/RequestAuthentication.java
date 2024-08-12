@@ -8,20 +8,25 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 
 
 public record RequestAuthentication (
-        @JsonProperty("email")
+        @JsonProperty(JSON_PROPERTY_EMAIL)
         @CustomNotBlank(
                 exception = ExceptionValidationAuth.class,
-                exceptionName = EnumExceptionName.ERROR_VALIDATION_EMAIL_CAN_NOT_BE_EMPTY
+                exceptionName = EnumExceptionName.ERROR_VALIDATION_EMAIL_CAN_NOT_BE_EMPTY,
+                exceptionFields = {JSON_PROPERTY_EMAIL}
         )
         String email,
 
-        @JsonProperty("password")
+        @JsonProperty(JSON_PROPERTY_PASSWORD)
         @CustomNotBlank(
                 exception = ExceptionValidationAuth.class,
-                exceptionName = EnumExceptionName.ERROR_VALIDATION_PASSWORD_CAN_NOT_BE_EMPTY
+                exceptionName = EnumExceptionName.ERROR_VALIDATION_PASSWORD_CAN_NOT_BE_EMPTY,
+                exceptionFields = {JSON_PROPERTY_PASSWORD}
         )
         String password
 ) {
+
+    public static final String JSON_PROPERTY_EMAIL = "email";
+    public static final String JSON_PROPERTY_PASSWORD = "password";
 
     /**
      * Convert the request to a UsernamePasswordAuthenticationToken.

@@ -6,7 +6,6 @@ import com.candido.server.exception._common.validation.PasswordsMatch;
 import com.candido.server.exception._common.validation.ValidPassword;
 import com.candido.server.exception.account.ExceptionInvalidPasswordAccount;
 import com.candido.server.exception.account.ExceptionPasswordsDoNotMatch;
-import com.candido.server.exception.security.auth.ExceptionAuth;
 import com.candido.server.exception.security.auth.ExceptionValidationAuth;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
@@ -17,32 +16,43 @@ import com.fasterxml.jackson.annotation.JsonProperty;
         exceptionName = EnumExceptionName.ERROR_VALIDATION_PASSWORDS_DO_NOT_MATCH
 )
 public record RequestPasswordReset (
-        @JsonProperty("t")
+        @JsonProperty(JSON_PROPERTY_UUID_ACCESS)
         @CustomNotBlank(
                 exception = ExceptionValidationAuth.class,
-                exceptionName = EnumExceptionName.ERROR_VALIDATION_TOKEN_CAN_NOT_BE_EMPTY
+                exceptionName = EnumExceptionName.ERROR_VALIDATION_TOKEN_CAN_NOT_BE_EMPTY,
+                exceptionFields = {JSON_PROPERTY_UUID_ACCESS}
         )
         String uuidAccessToken,
 
-        @JsonProperty("e")
+        @JsonProperty(JSON_PROPERTY_ENCRYPTED_EMAIL)
         @CustomNotBlank(
                 exception = ExceptionValidationAuth.class,
-                exceptionName = EnumExceptionName.ERROR_VALIDATION_EMAIL_CAN_NOT_BE_EMPTY
+                exceptionName = EnumExceptionName.ERROR_VALIDATION_EMAIL_CAN_NOT_BE_EMPTY,
+                exceptionFields = {JSON_PROPERTY_ENCRYPTED_EMAIL}
         )
         String encryptedEmail,
 
-        @JsonProperty("password")
+        @JsonProperty(JSON_PROPERTY_PASSWORD)
         @CustomNotBlank(
                 exception = ExceptionInvalidPasswordAccount.class,
-                exceptionName = EnumExceptionName.ERROR_VALIDATION_PASSWORD_CAN_NOT_BE_EMPTY
+                exceptionName = EnumExceptionName.ERROR_VALIDATION_PASSWORD_CAN_NOT_BE_EMPTY,
+                exceptionFields = {JSON_PROPERTY_PASSWORD}
         )
         @ValidPassword
         String password,
 
-        @JsonProperty("confirm_password")
+        @JsonProperty(JSON_PROPERTY_CONFIRM_PASSWORD)
         @CustomNotBlank(
                 exception = ExceptionInvalidPasswordAccount.class,
-                exceptionName = EnumExceptionName.ERROR_VALIDATION_CONFIRM_PASSWORD_CAN_NOT_BE_EMPTY
+                exceptionName = EnumExceptionName.ERROR_VALIDATION_CONFIRM_PASSWORD_CAN_NOT_BE_EMPTY,
+                exceptionFields = {JSON_PROPERTY_CONFIRM_PASSWORD}
         )
         String confirmPassword
-) {}
+) {
+
+    public static final String JSON_PROPERTY_UUID_ACCESS = "t";
+    public static final String JSON_PROPERTY_ENCRYPTED_EMAIL = "e";
+    public static final String JSON_PROPERTY_PASSWORD = "password";
+    public static final String JSON_PROPERTY_CONFIRM_PASSWORD = "confirm_password";
+
+}
