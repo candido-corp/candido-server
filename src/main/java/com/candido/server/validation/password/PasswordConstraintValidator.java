@@ -1,5 +1,6 @@
 package com.candido.server.validation.password;
 
+import com.candido.server.dto.v1.request.auth.RequestRegister;
 import com.candido.server.exception.account.ExceptionInvalidPasswordAccount;
 import com.candido.server.exception.account.ExceptionInvalidPasswordAccountList;
 import org.passay.*;
@@ -44,7 +45,7 @@ public class PasswordConstraintValidator {
                             "ERROR_VALIDATION_PASSWORD_" + ruleResultDetail.getErrorCode(),
                             ruleResultDetail.getValues(),
                             ruleResultDetail.getParameters(),
-                            List.of("password")
+                            List.of(RequestRegister.JSON_PROPERTY_PASSWORD)
                     )
             );
         });
