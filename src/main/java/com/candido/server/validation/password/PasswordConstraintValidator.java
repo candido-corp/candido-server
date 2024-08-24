@@ -43,7 +43,8 @@ public class PasswordConstraintValidator {
                     new ExceptionInvalidPasswordAccount(
                             "ERROR_VALIDATION_PASSWORD_" + ruleResultDetail.getErrorCode(),
                             ruleResultDetail.getValues(),
-                            ruleResultDetail.getParameters()
+                            ruleResultDetail.getParameters(),
+                            List.of("password")
                     )
             );
         });

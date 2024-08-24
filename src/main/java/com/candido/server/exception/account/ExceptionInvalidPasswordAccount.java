@@ -16,4 +16,7 @@ public class ExceptionInvalidPasswordAccount extends CustomRuntimeException {
     public ExceptionInvalidPasswordAccount(String message, Object[] args, Map<String, Object> details) {
         super(message, args, details);
     }
+    public ExceptionInvalidPasswordAccount(String message, Object[] args, Map<String, Object> details, List<String> fields) {
+        super(message, args, details, fields);
+    }
 }

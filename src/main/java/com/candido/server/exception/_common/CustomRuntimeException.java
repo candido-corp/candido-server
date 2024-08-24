@@ -108,6 +108,21 @@ public class CustomRuntimeException extends RuntimeException {
      * @param args    Arguments associated with the detail message.
      * @param details Details associated with the exception.
      */
+    public CustomRuntimeException(String message, Object[] args, Map<String, Object> details, List<String> fields) {
+        super();
+        this.message = message;
+        this.args = args;
+        this.details = details;
+        this.fields = fields;
+    }
+
+    /**
+     * Constructs a new CustomRuntimeException with the specified detail message, arguments, and details.
+     *
+     * @param message The detail message.
+     * @param args    Arguments associated with the detail message.
+     * @param details Details associated with the exception.
+     */
     public CustomRuntimeException(String message, Object[] args, Map<String, Object> details) {
         super();
         this.message = message;
