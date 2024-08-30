@@ -2,6 +2,7 @@ package com.candido.server.service.base.account;
 
 import com.candido.server.domain.v1.account.Account;
 import com.candido.server.dto.v1.request.auth.RequestRegister;
+import com.candido.server.dto.v1.util.AccountUserPair;
 
 import java.util.Optional;
 
@@ -16,5 +17,5 @@ public interface AccountService {
     void activateAccount(Account account);
 
 
-    Account createAccount(RequestRegister request);
+    AccountUserPair createAccount(RequestRegister request);
 }

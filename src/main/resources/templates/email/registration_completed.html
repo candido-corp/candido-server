@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" xmlns:th="http://www.w3.org/1999/xhtml">
 <head>
     <meta charset="UTF-8">
     <title>Welcome to Candido</title>
@@ -24,15 +24,15 @@
                                         <tbody>
                                         <tr>
                                             <td align="left"
-                                                style="font-size:0px;padding:10px 25px;padding-left:0;word-break:break-word">
+                                                style="font-size:0px;padding:10px 0 0 0;padding-left:0;word-break:break-word">
                                                 <table border="0" cellpadding="0" cellspacing="0" role="presentation"
                                                        style="border-collapse:collapse;border-spacing:0px">
                                                     <tbody>
                                                     <tr>
-                                                        <td style="width:140px">
+                                                        <td style="width:130px">
 
                                                             <img alt=""
-                                                                 src="https://mmarcoo.altervista.org/cand/uploads/candido_nw_logo_29082024_4.png"
+                                                                 src="https://mmarcoo.altervista.org/cand/uploads/candido_nw_logo_30082024_1.png"
                                                                  style="border:0;display:block;outline:none;text-decoration:none;height:auto;width:100%;font-size:13px"
                                                                  width="200" height="auto">
 
@@ -70,7 +70,7 @@
                                                 style="font-size:0px;padding:10px 25px;padding-top:24px;padding-right:0px;padding-bottom:8px;padding-left:0px;word-break:break-word">
                                                 <div style="font-family:Titillium Web,system-ui,sans-serif;font-size:13px;font-weight:bold;line-height:1;text-align:left;color:#17324d">
                                                     <h1 style="font-size:32px;line-height:36px;margin:0">
-                                                        Welcome to Candido
+                                                        Welcome to Candido!
                                                     </h1>
                                                 </div>
                                             </td>
@@ -81,7 +81,7 @@
                                                 style="font-size:0px;padding:10px 25px;padding-top:0px;padding-right:0px;padding-bottom:0px;padding-left:0px;word-break:break-word">
                                                 <div style="font-family:Titillium Web,system-ui,sans-serif;font-size:16px;font-weight:regular;line-height:24px;text-align:left;color:#17324d">
                                                     <p>
-                                                        Hey Marco, <br>
+                                                        Hey <span th:text="${FIRST_NAME}">John</span>, <br>
                                                         your registration is now complete.<br>
                                                         We're excited to have you on board and can't wait to see all
                                                         that you'll accomplish with Candido by your side!
@@ -142,7 +142,8 @@
                                         <tr>
                                             <td align="left" style="font-size:0px;padding:0;word-break:break-word">
                                                 <div style="font-family:Titillium Web,system-ui,sans-serif;font-size:14px;font-weight:regular;line-height:20px;text-align:left;color:#17324d">
-                                                    Marco Tasca
+                                                    <span th:text="${FIRST_NAME}">John</span>
+                                                    <span th:text="${LAST_NAME}">Doe</span>
                                                 </div>
                                             </td>
                                         </tr>
@@ -161,8 +162,8 @@
                                         </tr>
                                         <tr>
                                             <td align="left" style="font-size:0px;padding:0;word-break:break-word">
-                                                <div style="font-family:Titillium Web,system-ui,sans-serif;font-size:14px;font-weight:regular;line-height:20px;text-align:left;color:#17324d">
-                                                    tascamarcoo@gmail.com
+                                                <div th:text="${USERNAME}" style="font-family:Titillium Web,system-ui,sans-serif;font-size:14px;font-weight:regular;line-height:20px;text-align:left;color:#17324d">
+                                                    john.doe@candido.com
                                                 </div>
                                             </td>
                                         </tr>
@@ -181,8 +182,8 @@
                                         </tr>
                                         <tr>
                                             <td align="left" style="font-size:0px;padding:0;word-break:break-word">
-                                                <div style="font-family:Titillium Web,system-ui,sans-serif;font-size:14px;font-weight:regular;line-height:20px;text-align:left;color:#17324d">
-                                                    151.46.59.79
+                                                <div th:text="${IP}" style="font-family:Titillium Web,system-ui,sans-serif;font-size:14px;font-weight:regular;line-height:20px;text-align:left;color:#17324d">
+                                                    192.168.0.1
                                                 </div>
                                             </td>
                                         </tr>
@@ -269,16 +270,12 @@
                                             <td align="left" style="font-size:0px;padding:0px;word-break:break-word">
                                                 <div style="font-family:Titillium Web,system-ui,sans-serif;font-size:14px;font-weight:regular;line-height:20px;text-align:left;color:#5c6f82">
                                                     <p>
-                                                        Receive this communication to verify that the registration on
-                                                        Candido was performed by you.
+                                                        You are receiving this email because you have successfully completed a registration on Candido.
                                                     </p>
                                                     <p>
                                                         <strong>
-                                                            Do not reply to this email address:
-                                                            it is used only for sending
-                                                            of this communication and, not being
-                                                            monitored, you would not receive
-                                                            answer.
+                                                            Please note that this email address is not monitored.
+                                                            If you need assistance, do not reply to this email as you will not receive a response.
                                                         </strong>
                                                     </p>
                                                 </div>
