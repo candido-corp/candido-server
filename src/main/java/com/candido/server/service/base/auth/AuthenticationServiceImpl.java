@@ -6,6 +6,7 @@ import com.candido.server.domain.v1.account.AccountStatus;
 import com.candido.server.domain.v1.account.AccountStatusEnum;
 import com.candido.server.domain.v1.token.Token;
 import com.candido.server.domain.v1.token.TokenScopeCategoryEnum;
+import com.candido.server.domain.v1.user.User;
 import com.candido.server.dto.v1.request.auth.RequestAuthentication;
 import com.candido.server.dto.v1.request.auth.RequestPasswordReset;
 import com.candido.server.dto.v1.request.auth.RequestRegister;
@@ -61,30 +62,32 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     @Transactional
     @Override
     public ResponseAuthentication registerByEmail(RequestRegister request, String ipAddress, String appUrl) {
-        var account = accountService.createAccount(request);
-        var token = tokenService.createRegistrationToken(account, ipAddress);
+        var accountUserPair = accountService.createAccount(request);
+        var token = tokenService.createRegistrationToken(accountUserPair.getAccount(), ipAddress);
 
         var event = new OnEmailRegistrationEvent(
                 this,
-                account,
+                accountUserPair.getAccount(),
+                accountUserPair.getUser(),
                 token.getUuidAccessToken(),
                 appUrl
         );
         eventPublisher.publishEvent(event);
 
-        return createAuthentication(account, ipAddress);
+        return createAuthentication(accountUserPair.getAccount(), ipAddress);
     }
 
     @Transactional
     @Override
     public ResponseRegistration registerByCode(RequestRegister request, String ipAddress, String appUrl) {
-        var account = accountService.createAccount(request);
-        var token = tokenService.createRegistrationToken(account, ipAddress);
+        var accountUserPair = accountService.createAccount(request);
+        var token = tokenService.createRegistrationToken(accountUserPair.getAccount(), ipAddress);
         var temporaryCode = temporaryCodeService.assignCode(token.getId());
 
         var event = new OnCodeRegistrationEvent(
                 this,
-                account,
+                accountUserPair.getAccount(),
+                accountUserPair.getUser(),
                 token.getUuidAccessToken(),
                 temporaryCode.getCode(),
                 appUrl
@@ -110,7 +113,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
         tokenService.validateTokenAndDelete(token.getAccessToken(), tokenScopeCategoryId, account.get());
         accountService.activateAccount(account.get());
         var user = userService.findUserByAccountIdOrThrow(account.get().getId());
-        var event = new OnRegistrationCompletedEvent(this, account.get(), user);
+        var event = new OnRegistrationCompletedEvent(this, account.get(), user, token.getIpAddress());
         eventPublisher.publishEvent(event);
     }
 
@@ -128,7 +131,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
         tokenService.validateTokenAndDelete(token.getAccessToken(), tokenScopeCategoryId, account.get());
         accountService.activateAccount(account.get());
         var user = userService.findUserByAccountIdOrThrow(account.get().getId());
-        var event = new OnRegistrationCompletedEvent(this, account.get(), user);
+        var event = new OnRegistrationCompletedEvent(this, account.get(), user, ipAddress);
         eventPublisher.publishEvent(event);
 
         return createAuthentication(account.get(), ipAddress);
@@ -178,7 +181,9 @@ public class AuthenticationServiceImpl implements AuthenticationService {
         // allowing it to be activated even if registration isn't complete.
         if(account.isPresent() && account.get().isEnabled()) {
             Token token = tokenService.createResetToken(account.get(), ipAddress);
-            var event = new OnResetAccountEvent(this, account.get(), token.getUuidAccessToken(), appUrl);
+            Optional<User> user = userService.findUserByAccountId(account.get().getId());
+            if(user.isEmpty()) return;
+            var event = new OnResetAccountEvent(this, account.get(), user.get(), token.getUuidAccessToken(), appUrl);
             eventPublisher.publishEvent(event);
         }
     }
@@ -200,7 +205,9 @@ public class AuthenticationServiceImpl implements AuthenticationService {
         }
         accountService.save(account.get());
 
-        var event = new OnResetAccountCompletedEvent(this, account.get());
+        User user = userService.findUserByAccountIdOrThrow(account.get().getId());
+
+        var event = new OnResetAccountCompletedEvent(this, account.get(), user);
         eventPublisher.publishEvent(event);
 
         Token token = tokenService.createLoginToken(account.get(), ipAddress);
@@ -242,9 +249,11 @@ public class AuthenticationServiceImpl implements AuthenticationService {
         var account = accountService.findAccountByIdOrThrow(token.getAccount().getId());
         temporaryCodeService.deleteTemporaryCodeByTokenId(token.getId());
         var temporaryCode = temporaryCodeService.assignCode(token.getId());
+        var user = userService.findUserByAccountIdOrThrow(account.getId());
         var event = new OnCodeRegistrationEvent(
                 this,
                 account,
+                user,
                 token.getUuidAccessToken(),
                 temporaryCode.getCode(),
                 appUrl
