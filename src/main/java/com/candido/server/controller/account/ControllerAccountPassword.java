@@ -4,6 +4,7 @@ import com.candido.server.dto.v1.request.account.RequestEditAccountPassword;
 import com.candido.server.service.base.account.AccountService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.validation.annotation.Validated;
@@ -15,10 +16,16 @@ import org.springframework.web.bind.annotation.RestController;
 @Validated
 @RestController
 @RequestMapping("/api/v1/me/password")
-@RequiredArgsConstructor
 public class ControllerAccountPassword {
 
     private final AccountService accountService;
+
+    @Autowired
+    public ControllerAccountPassword(
+            AccountService accountService
+    ) {
+        this.accountService = accountService;
+    }
 
     @PutMapping
     public ResponseEntity<Void> editAccountPassword(
