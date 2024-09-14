@@ -14,6 +14,9 @@ import org.springframework.stereotype.Component;
 @Component
 public class AuthListenerImpl implements AuthListenerService {
 
+    private final EmailService emailService;
+    private final UtilService utilService;
+
     @Value("${application.name}")
     private String applicationName;
 
@@ -23,12 +26,8 @@ public class AuthListenerImpl implements AuthListenerService {
     @Value("${application.client.domain}")
     private String clientDomain;
 
-    private final EmailService emailService;
-
-    private final UtilService utilService;
-
     @Autowired
-    public AuthListenerImpl(EmailService emailService, UtilService utilService) {
+    AuthListenerImpl(EmailService emailService, UtilService utilService) {
         this.emailService = emailService;
         this.utilService = utilService;
     }
@@ -41,7 +40,7 @@ public class AuthListenerImpl implements AuthListenerService {
 
         String email = event.getAccount().getEmail();
         String linkToVerify = utilService.buildEmailVerificationLink(event.getRegistrationToken(), email);
-        String content = emailService.buildRegistrationEmailContent(event.getAccount(), linkToVerify);
+        String content = emailService.buildRegistrationEmailContent(event.getAccount(), event.getUser(), linkToVerify);
 
         emailService.sendSimpleMessage(
                 noReply,
@@ -60,7 +59,7 @@ public class AuthListenerImpl implements AuthListenerService {
 
         String email = event.getAccount().getEmail();
         String linkToVerify = utilService.buildCodeVerificationLink(event.getRegistrationToken(), email);
-        String content = emailService.buildCodeVerificationEmailContent(event.getAccount(), event.getTemporaryCode(), linkToVerify);
+        String content = emailService.buildCodeVerificationEmailContent(event.getAccount(), event.getUser(), event.getTemporaryCode(), linkToVerify);
 
         emailService.sendSimpleMessage(
                 noReply,
@@ -78,7 +77,7 @@ public class AuthListenerImpl implements AuthListenerService {
         log.info("[Event::RegistrationCompleted] Account -> {}", event.getAccount());
 
         String content = emailService.buildRegistrationCompletedEmailContent(
-                event.getAccount(), event.getUser()
+                event.getAccount(), event.getUser(), event.getIpAddress()
         );
 
         emailService.sendSimpleMessage(
@@ -99,7 +98,7 @@ public class AuthListenerImpl implements AuthListenerService {
         String email = event.getAccount().getEmail();
         String linkToVerify = utilService.buildResetPasswordLink(event.getResetToken(), email);
         String content = emailService.buildResetPasswordEmailContent(
-                event.getAccount(), linkToVerify
+                event.getAccount(), event.getUser(), linkToVerify
         );
 
         emailService.sendSimpleMessage(
@@ -118,7 +117,7 @@ public class AuthListenerImpl implements AuthListenerService {
         log.info("[Event::ResetPasswordCompleted] Account -> {}", event.getAccount());
 
         String content = emailService.buildResetPasswordCompletedEmailContent(
-                event.getAccount()
+                event.getAccount(), event.getUser()
         );
 
         emailService.sendSimpleMessage(

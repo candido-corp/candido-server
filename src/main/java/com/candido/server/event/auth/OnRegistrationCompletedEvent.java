@@ -13,23 +13,28 @@ import org.springframework.context.ApplicationEvent;
 @Getter
 public class OnRegistrationCompletedEvent extends ApplicationEvent {
 
-    // The account associated with the registration
     private final Account account;
-
-    // The user associated with the registration
-    private final User user;
+    private final transient User user;
+    private final String ipAddress;
 
     /**
      * Constructor for the OnRegistrationCompletedEvent.
      *
-     * @param source  the object on which the event initially occurred
-     * @param account the account associated with the registration
-     * @param user    the user associated with the registration
+     * @param source    the object on which the event initially occurred
+     * @param account   the account associated with the registration
+     * @param user      the user associated with the registration
+     * @param ipAddress the IP address of the client
      */
-    public OnRegistrationCompletedEvent(Object source, final Account account, final User user) {
+    public OnRegistrationCompletedEvent(
+            Object source,
+            final Account account,
+            final User user,
+            final String ipAddress
+    ) {
         super(source);
         this.account = account;
         this.user = user;
+        this.ipAddress = ipAddress;
     }
 
 }

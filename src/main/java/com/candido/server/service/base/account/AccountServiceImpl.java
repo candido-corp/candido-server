@@ -4,6 +4,7 @@ import com.candido.server.domain.v1.account.*;
 import com.candido.server.domain.v1.provider.AuthProviderEnum;
 import com.candido.server.domain.v1.user.User;
 import com.candido.server.dto.v1.request.auth.RequestRegister;
+import com.candido.server.dto.v1.util.AccountUserPair;
 import com.candido.server.exception._common.EnumExceptionName;
 import com.candido.server.exception.account.*;
 import com.candido.server.service.base.auth.provider.AuthProviderService;
@@ -116,7 +117,7 @@ public class AccountServiceImpl implements AccountService {
 
     @Transactional
     @Override
-    public Account createAccount(RequestRegister request) {
+    public AccountUserPair createAccount(RequestRegister request) {
         // Verifica l'esistenza di un account duplicato
         var duplicateAccount = findByEmail(request.email());
         if (duplicateAccount.isPresent())
@@ -159,7 +160,7 @@ public class AccountServiceImpl implements AccountService {
         // Aggiunta del provider di autenticazione
         authProviderService.addProviderToAccount(AuthProviderEnum.LOCAL.getProviderId(), savedAccount.getId());
 
-        return savedAccount;
+        return new AccountUserPair(savedAccount, user);
     }
 
 

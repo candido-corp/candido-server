@@ -13,7 +13,7 @@ import java.util.Optional;
  * Service for resolving messages related to validation exceptions.
  */
 @Service
-public class MessageResolverValidationException extends MessageResolverException {
+public class MessageResolverValidation extends MessageResolver {
 
     private final MessageSource messageSource;
 
@@ -23,7 +23,7 @@ public class MessageResolverValidationException extends MessageResolverException
      * @param messageSource the message source to use for resolving messages
      */
     @Autowired
-    public MessageResolverValidationException(@Qualifier("validationMessageSource") MessageSource messageSource) {
+    public MessageResolverValidation(@Qualifier("validationMessageSource") MessageSource messageSource) {
         this.messageSource = messageSource;
     }
 

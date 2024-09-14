@@ -6,7 +6,7 @@ import lombok.Getter;
  * Enum for the different types of exceptions that can be resolved.
  */
 @Getter
-public enum EnumMessageResolverExceptionType {
+public enum EnumMessageResolverType {
     AUTHENTICATION,
     BUSINESS,
     VALIDATION;

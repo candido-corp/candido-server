@@ -14,26 +14,33 @@ import com.fasterxml.jackson.annotation.JsonProperty;
         exception = ExceptionPasswordsDoNotMatch.class,
         exceptionName = EnumExceptionName.ERROR_VALIDATION_PASSWORDS_DO_NOT_MATCH
 )
-public record RequestEditAccountPassword (
-        @JsonProperty("current_password")
+public record RequestEditAccountPassword(
+        @JsonProperty(JSON_PROPERTY_CURRENT_PASSWORD)
         @CustomNotBlank(
                 exception = ExceptionValidationAuth.class,
-                exceptionName = EnumExceptionName.ERROR_VALIDATION_PASSWORD_CAN_NOT_BE_EMPTY
+                exceptionName = EnumExceptionName.ERROR_VALIDATION_PASSWORD_CAN_NOT_BE_EMPTY,
+                exceptionFields = {JSON_PROPERTY_CURRENT_PASSWORD}
         )
         String currentPassword,
 
-        @JsonProperty("password")
+        @JsonProperty(JSON_PROPERTY_PASSWORD)
         @CustomNotBlank(
                 exception = ExceptionValidationAuth.class,
-                exceptionName = EnumExceptionName.ERROR_VALIDATION_PASSWORD_CAN_NOT_BE_EMPTY
+                exceptionName = EnumExceptionName.ERROR_VALIDATION_PASSWORD_CAN_NOT_BE_EMPTY,
+                exceptionFields = {JSON_PROPERTY_PASSWORD}
         )
         @ValidPassword
         String password,
 
-        @JsonProperty("confirm_password")
+        @JsonProperty(JSON_PROPERTY_CONFIRM_PASSWORD)
         @CustomNotBlank(
                 exception = ExceptionValidationAuth.class,
-                exceptionName = EnumExceptionName.ERROR_VALIDATION_PASSWORD_CAN_NOT_BE_EMPTY
+                exceptionName = EnumExceptionName.ERROR_VALIDATION_PASSWORD_CAN_NOT_BE_EMPTY,
+                exceptionFields = {JSON_PROPERTY_CONFIRM_PASSWORD}
         )
         String confirmPassword
-) {}
+) {
+    public static final String JSON_PROPERTY_CURRENT_PASSWORD = "current_password";
+    public static final String JSON_PROPERTY_PASSWORD = "password";
+    public static final String JSON_PROPERTY_CONFIRM_PASSWORD = "confirm_password";
+}

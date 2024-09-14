@@ -4,21 +4,19 @@ import com.candido.server.exception._common.CustomRuntimeException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
-import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
-import java.util.stream.Collectors;
 
 /**
  * Service for resolving messages for different types of exceptions.
  */
 @Service
 @RequiredArgsConstructor
-public class DispatchMessageResolverException extends MessageResolverException {
+public class DispatchMessageResolver extends MessageResolver {
 
-    private final MessageResolverAuthenticationException messageResolverAuthenticationException;
-    private final MessageResolverBusinessException messageResolverBusinessException;
-    private final MessageResolverValidationException messageResolverValidationException;
+    private final MessageResolverAuthentication messageResolverAuthentication;
+    private final MessageResolverBusiness messageResolverBusiness;
+    private final MessageResolverValidation messageResolverValidation;
 
     /**
      * Resolves the message for the given exception based on the provided locale and type of exception.
@@ -28,11 +26,11 @@ public class DispatchMessageResolverException extends MessageResolverException {
      * @return the resolved message as a string
      */
     @Override
-    public String resolveMessage(CustomRuntimeException ex, Locale locale, EnumMessageResolverExceptionType type) {
+    public String resolveMessage(CustomRuntimeException ex, Locale locale, EnumMessageResolverType type) {
         return switch (type) {
-            case AUTHENTICATION -> messageResolverAuthenticationException.resolveMessage(ex, locale);
-            case BUSINESS -> messageResolverBusinessException.resolveMessage(ex, locale);
-            case VALIDATION -> messageResolverValidationException.resolveMessage(ex, locale);
+            case AUTHENTICATION -> messageResolverAuthentication.resolveMessage(ex, locale);
+            case BUSINESS -> messageResolverBusiness.resolveMessage(ex, locale);
+            case VALIDATION -> messageResolverValidation.resolveMessage(ex, locale);
         };
     }
 
@@ -44,11 +42,12 @@ public class DispatchMessageResolverException extends MessageResolverException {
      * @param type the type of exception to resolve the message for
      * @return the resolved message as a string
      */
-    public List<String> resolveMessage(List<CustomRuntimeException> exs, Locale locale, EnumMessageResolverExceptionType type) {
+    @Override
+    public List<String> resolveMessage(List<CustomRuntimeException> exs, Locale locale, EnumMessageResolverType type) {
         return exs
                 .stream()
                 .map(exception -> resolveMessage(exception, locale, type))
-                .collect(Collectors.toList());
+                .toList();
     }
 
 }

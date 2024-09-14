@@ -1,7 +1,15 @@
 package com.candido.server.exception._common.validation;
 
+import com.candido.server.exception._common.EnumExceptionName;
+import com.candido.server.exception.util.ExceptionValidation;
 import jakarta.validation.ConstraintValidator;
 import jakarta.validation.ConstraintValidatorContext;
+import org.hibernate.validator.messageinterpolation.HibernateMessageInterpolatorContext;
+
+import java.lang.reflect.InvocationTargetException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 /**
  * CustomNotBlankValidator is a class that implements the ConstraintValidator interface.
@@ -20,6 +28,11 @@ public class CustomNotBlankValidator implements ConstraintValidator<CustomNotBla
     private String exceptionMessage;
 
     /**
+     * The fields to include in the exception message.
+     */
+    private String[] exceptionFields;
+
+    /**
      * Initializes the validator with the annotation details.
      *
      * @param constraintAnnotation The annotation instance with its defined values.
@@ -28,6 +41,7 @@ public class CustomNotBlankValidator implements ConstraintValidator<CustomNotBla
     public void initialize(CustomNotBlank constraintAnnotation) {
         this.exceptionClass = constraintAnnotation.exception();
         this.exceptionMessage = constraintAnnotation.exceptionName().name();
+        this.exceptionFields = constraintAnnotation.exceptionFields();
     }
 
     /**
@@ -51,10 +65,10 @@ public class CustomNotBlankValidator implements ConstraintValidator<CustomNotBla
     private void throwException() {
         try {
             throw exceptionClass
-                    .getConstructor(String.class)
-                    .newInstance(exceptionMessage);
-        } catch (Exception e) {
-            throw new RuntimeException("Invalid exception configuration", e);
+                    .getConstructor(String.class, List.class)
+                    .newInstance(exceptionMessage, Arrays.asList(exceptionFields));
+        } catch (NoSuchMethodException | InstantiationException | IllegalAccessException | InvocationTargetException e) {
+            throw new ExceptionValidation(EnumExceptionName.ERROR_VALIDATION_INVALID_EXCEPTION_CONFIGURATION.name(), e.getMessage());
         }
     }
 }

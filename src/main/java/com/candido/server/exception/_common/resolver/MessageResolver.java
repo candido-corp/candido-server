@@ -1,6 +1,7 @@
 package com.candido.server.exception._common.resolver;
 
 import com.candido.server.exception._common.CustomRuntimeException;
+import java.util.Collections;
 
 import java.util.List;
 import java.util.Locale;
@@ -8,7 +9,7 @@ import java.util.Locale;
 /**
  * Interface for resolving messages for custom runtime exceptions.
  */
-public abstract class MessageResolverException {
+public abstract class MessageResolver {
     /**
      * Resolves the message for the given exception based on the provided locale.
      *
@@ -28,7 +29,7 @@ public abstract class MessageResolverException {
      * @param type the type of exception to resolve the message for
      * @return the resolved message as a string
      */
-    public String resolveMessage(CustomRuntimeException ex, Locale locale, EnumMessageResolverExceptionType type) {
+    public String resolveMessage(CustomRuntimeException ex, Locale locale, EnumMessageResolverType type) {
         return null;
     }
 
@@ -40,7 +41,7 @@ public abstract class MessageResolverException {
      * @param type the type of exception to resolve the message for
      * @return the resolved message as a string
      */
-    public List<String> resolveMessage(List<CustomRuntimeException> exs, Locale locale, EnumMessageResolverExceptionType type) {
-        return null;
+    public List<String> resolveMessage(List<CustomRuntimeException> exs, Locale locale, EnumMessageResolverType type) {
+        return Collections.emptyList();
     }
 }

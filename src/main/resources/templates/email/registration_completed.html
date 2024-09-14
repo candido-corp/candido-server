@@ -1,76 +1,298 @@
 <!DOCTYPE html>
-<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<html lang="en" xmlns:th="http://www.w3.org/1999/xhtml">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Welcome to Candido!</title>
-    <style>
-        body {
-            background-color: #ffffff;
-            color: #000000;
-            font-family: 'Montserrat', sans-serif;
-            margin: 0;
-            padding: 0;
-        }
-        .container {
-            max-width: 600px;
-            margin: 20px auto;
-            padding: 0;
-        }
-        .header img {
-            height: 50px;
-            margin-top: 10px;
-        }
-        .main-content {
-            background-color: #D3EFFF;
-            border-radius: 8px;
-            margin: 20px 0;
-            padding: 24px;
-            text-align: center;
-        }
-        .info-box {
-            background-color: #ffffff;
-            padding: 15px 20px;
-            border-radius: 0.5em;
-            text-align: left;
-            margin: 20px auto;
-            width: 550px;
-            font-size: 16px;
-            line-height: 140%;
-            color: #8e8e8e;
-        }
-        .footer {
-            font-size: 10px;
-            text-align: center;
-            color: #6a737d;
-            margin-top: 20px;
-        }
-    </style>
+    <title>Welcome to Candido</title>
 </head>
 <body>
-<div class="container">
-    <div class="header">
-        <img src="https://i.postimg.cc/sXVJZkKF/temp-Imageq-IMotl.jpg" alt="Logo Candido">
-    </div>
-    <div class="main-content">
-        <h1>Welcome to Candido!</h1>
-        <p>Congratulations, <strong th:text="${username}">{{registration.username}}</strong>! Your registration is now complete.</p>
-        <p>We're excited to have you on board and can't wait to see all that you'll accomplish with Candido by your side!</p>
-        <div class="info-box">
-            <p><span>First name:</span> <strong th:text="${first_name}">{{registration.first_name}}</strong></p>
-            <p><span>Last name:</span> <strong th:text="${last_name}">{{registration.last_name}}</strong></p>
-            <p><span>E-mail:</span> <strong th:text="${username}">{{registration.username}}</strong></p>
-        </div>
-        <p>To start enjoying the services of Candido, simply log in to your account using your credentials. Feel free to explore our platform.</p>
-        <p>Thank you for choosing Candido. Opportunities are just waiting for you!</p>
-    </div>
-    <div class="footer">
-        This email was sent to <strong th:text="${username}">{{registration.username}}</strong>, which is associated with a registered Candido account.
-        <br>
-        © 2023 Candido - All Rights Reserved
-        <br>
-        <a href="" target="_blank">Camponogara, Venice - Italy</a>
-    </div>
+<div style="margin:0px auto;max-width:600px">
+
+    <table align="center" border="0" cellpadding="0" cellspacing="0" role="presentation" style="width:100%">
+        <tbody>
+        <tr>
+            <td style="direction:ltr; font-size:0px; padding:20px 0; padding-left:20px; padding-right:20px; text-align:center">
+                <div style="margin:0px auto; max-width:560px">
+
+                    <table align="center" border="0" cellpadding="0" cellspacing="0" role="presentation"
+                           style="width:100%">
+                        <tbody>
+                        <tr>
+                            <td style="direction:ltr;font-size:0px;padding:20px 0;padding-bottom:0px;padding-top:0px;text-align:center">
+                                <div style="font-size:0px;text-align:left;direction:ltr;display:inline-block;vertical-align:top;width:100%">
+                                    <table border="0" cellpadding="0" cellspacing="0" role="presentation"
+                                           style="vertical-align:top" width="100%">
+                                        <tbody>
+                                        <tr>
+                                            <td align="left"
+                                                style="font-size:0px;padding:10px 0 0 0;padding-left:0;word-break:break-word">
+                                                <table border="0" cellpadding="0" cellspacing="0" role="presentation"
+                                                       style="border-collapse:collapse;border-spacing:0px">
+                                                    <tbody>
+                                                    <tr>
+                                                        <td style="width:130px">
+
+                                                            <img alt=""
+                                                                 src="https://mmarcoo.altervista.org/cand/uploads/candido_nw_logo_30082024_1.png"
+                                                                 style="border:0;display:block;outline:none;text-decoration:none;height:auto;width:100%;font-size:13px"
+                                                                 width="200" height="auto">
+
+                                                        </td>
+                                                    </tr>
+                                                    </tbody>
+                                                </table>
+
+                                            </td>
+                                        </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </td>
+                        </tr>
+                        </tbody>
+                    </table>
+
+                </div>
+
+
+                <div style="margin:0px auto;max-width:560px">
+
+                    <table align="center" border="0" cellpadding="0" cellspacing="0" role="presentation"
+                           style="width:100%">
+                        <tbody>
+                        <tr>
+                            <td style="direction:ltr;font-size:0px;padding:0px;padding-bottom:8px;text-align:center">
+                                <div style="font-size:0px;text-align:left;direction:ltr;display:inline-block;vertical-align:top;width:100%">
+                                    <table border="0" cellpadding="0" cellspacing="0" role="presentation"
+                                           style="vertical-align:top" width="100%">
+                                        <tbody>
+                                        <tr>
+                                            <td align="left"
+                                                style="font-size:0px;padding:10px 25px;padding-top:24px;padding-right:0px;padding-bottom:8px;padding-left:0px;word-break:break-word">
+                                                <div style="font-family:Titillium Web,system-ui,sans-serif;font-size:13px;font-weight:bold;line-height:1;text-align:left;color:#17324d">
+                                                    <h1 style="font-size:32px;line-height:36px;margin:0">
+                                                        Welcome to Candido!
+                                                    </h1>
+                                                </div>
+                                            </td>
+                                        </tr>
+
+                                        <tr>
+                                            <td align="left"
+                                                style="font-size:0px;padding:10px 25px;padding-top:0px;padding-right:0px;padding-bottom:0px;padding-left:0px;word-break:break-word">
+                                                <div style="font-family:Titillium Web,system-ui,sans-serif;font-size:16px;font-weight:regular;line-height:22px;text-align:left;color:#17324d">
+                                                    <p>
+                                                        Hey <span th:text="${FIRST_NAME}">John</span>, <br>
+                                                        your registration is now complete.<br>
+                                                        We're excited to have you on board and can't wait to see all
+                                                        that you'll accomplish with Candido by your side!
+                                                    </p>
+                                                    <br>
+                                                    <p>Registration data:</p>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </td>
+                        </tr>
+                        </tbody>
+                    </table>
+
+                </div>
+
+
+                <div style="margin:0px auto; border-radius:8px; max-width:560px; background: #fafafa;">
+                    <table align="center" border="0" cellpadding="0" cellspacing="0" role="presentation"
+                           style="width:100%;border-radius:8px">
+                        <tbody>
+                        <tr>
+                            <td style="direction:ltr;font-size:0px;padding:24px;text-align:left">
+                                <div style="font-size:0px;text-align:left;direction:ltr;display:inline-block;vertical-align:top;width:100%">
+                                    <table border="0" cellpadding="0" cellspacing="0" role="presentation"
+                                           style="vertical-align:top" width="100%">
+                                        <tbody>
+                                        <tr>
+                                            <td align="left" style="font-size:0px;padding:0;word-break:break-word">
+                                                <div style="font-family:Titillium Web,system-ui,sans-serif;font-size:14px;font-weight:bold;line-height:20px;text-align:left;color:#17324d">
+                                                    Identity Provider
+                                                </div>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td align="left" style="font-size:0px;padding:0;word-break:break-word">
+                                                <div style="font-family:Titillium Web,system-ui,sans-serif;font-size:14px;font-weight:regular;line-height:20px;text-align:left;color:#17324d">
+                                                    Candido ID
+                                                </div>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td align="center"
+                                                style="font-size:0px;padding:10px 25px;padding-top:16px;padding-right:0px;padding-bottom:16px;padding-left:0px;word-break:break-word">
+                                                <p style="border-top:solid 1px #e3e7eb;font-size:1px;margin:0px auto;width:100%"></p>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td align="left" style="font-size:0px;padding:0;word-break:break-word">
+                                                <div style="font-family:Titillium Web,system-ui,sans-serif;font-size:14px;font-weight:bold;line-height:20px;text-align:left;color:#17324d">
+                                                    Full Name
+                                                </div>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td align="left" style="font-size:0px;padding:0;word-break:break-word">
+                                                <div style="font-family:Titillium Web,system-ui,sans-serif;font-size:14px;font-weight:regular;line-height:20px;text-align:left;color:#17324d">
+                                                    <span th:text="${FIRST_NAME}">John</span>
+                                                    <span th:text="${LAST_NAME}">Doe</span>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td align="center"
+                                                style="font-size:0px;padding:10px 25px;padding-top:16px;padding-right:0px;padding-bottom:16px;padding-left:0px;word-break:break-word">
+                                                <p style="border-top:solid 1px #e3e7eb;font-size:1px;margin:0px auto;width:100%"></p>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td align="left" style="font-size:0px;padding:0;word-break:break-word">
+                                                <div style="font-family:Titillium Web,system-ui,sans-serif;font-size:14px;font-weight:bold;line-height:20px;text-align:left;color:#17324d">
+                                                    E-mail
+                                                </div>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td align="left" style="font-size:0px;padding:0;word-break:break-word">
+                                                <div th:text="${USERNAME}" style="font-family:Titillium Web,system-ui,sans-serif;font-size:14px;font-weight:regular;line-height:20px;text-align:left;color:#17324d">
+                                                    john.doe@candido.com
+                                                </div>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td align="center"
+                                                style="font-size:0px;padding:10px 25px;padding-top:16px;padding-right:0px;padding-bottom:16px;padding-left:0px;word-break:break-word">
+                                                <p style="border-top:solid 1px #e3e7eb;font-size:1px;margin:0px auto;width:100%"></p>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td align="left" style="font-size:0px;padding:0;word-break:break-word">
+                                                <div style="font-family:Titillium Web,system-ui,sans-serif;font-size:14px;font-weight:bold;line-height:20px;text-align:left;color:#17324d">
+                                                    Indirizzo IP
+                                                </div>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td align="left" style="font-size:0px;padding:0;word-break:break-word">
+                                                <div th:text="${IP}" style="font-family:Titillium Web,system-ui,sans-serif;font-size:14px;font-weight:regular;line-height:20px;text-align:left;color:#17324d">
+                                                    192.168.0.1
+                                                </div>
+                                            </td>
+                                        </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+
+                <div style="margin:0px auto;max-width:560px">
+
+                    <table align="center" border="0" cellpadding="0" cellspacing="0" role="presentation"
+                           style="width:100%">
+                        <tbody>
+                        <tr>
+                            <td style="direction:ltr;font-size:0px;padding:0px;text-align:center">
+                                <div style="font-size:0px;text-align:left;direction:ltr;display:inline-block;vertical-align:top;width:100%">
+                                    <table border="0" cellpadding="0" cellspacing="0" role="presentation"
+                                           style="vertical-align:top" width="100%">
+                                        <tbody>
+                                        <tr>
+                                            <td align="left"
+                                                style="font-size:0px;padding:10px 25px;padding-top:0px;padding-right:0px;padding-bottom:0px;padding-left:0px;word-break:break-word">
+                                                <div style="font-family:Titillium Web,system-ui,sans-serif;font-size:16px;font-weight:regular;line-height:22px;text-align:left;color:#17324d">
+                                                    <p style="margin-top:0px">
+                                                        <br>
+                                                        See you soon,
+                                                        <br aria-hidden="true">
+                                                        the Candido team.
+                                                    </p>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <div style="margin:0px auto;max-width:560px">
+                    <table align="center" border="0" cellpadding="0" cellspacing="0" role="presentation"
+                           style="width:100%">
+                        <tbody>
+                        <tr>
+                            <td style="direction:ltr;font-size:0px;padding:20px 0;padding-bottom:0px;padding-top:0px;text-align:center">
+                                <div style="font-size:0px;text-align:left;direction:ltr;display:inline-block;vertical-align:top;width:100%">
+                                    <table border="0" cellpadding="0" cellspacing="0" role="presentation"
+                                           style="vertical-align:top" width="100%">
+                                        <tbody>
+                                        <tr>
+                                            <td align="center"
+                                                style="font-size:0px;padding:0px;padding-top:16px;padding-bottom:16px;word-break:break-word">
+                                                <p style="border-top:solid 1px #e3e7eb;font-size:1px;margin:0px auto;width:100%"></p>
+                                            </td>
+                                        </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+
+                <div style="margin:0px auto;max-width:560px">
+                    <table align="center" border="0" cellpadding="0" cellspacing="0" role="presentation"
+                           style="width:100%">
+                        <tbody>
+                        <tr>
+                            <td style="direction:ltr;font-size:0px;padding:20px 0;padding-top:0px;text-align:center">
+                                <div style="font-size:0px;text-align:left;direction:ltr;display:inline-block;vertical-align:top;width:100%">
+                                    <table border="0" cellpadding="0" cellspacing="0" role="presentation"
+                                           style="vertical-align:top" width="100%">
+                                        <tbody>
+                                        <tr>
+                                            <td align="left" style="font-size:0px;padding:0px;word-break:break-word">
+                                                <div style="font-family:Titillium Web,system-ui,sans-serif;font-size:14px;font-weight:regular;line-height:18px;text-align:left;color:#5c6f82">
+                                                    <p>
+                                                        You are receiving this email because you have successfully completed a registration on Candido.
+                                                    </p>
+                                                    <p>
+                                                        <strong>
+                                                            Please note that this email address is not monitored.
+                                                            If you need assistance, do not reply to this email as you will not receive a response.
+                                                        </strong>
+                                                    </p>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </td>
+        </tr>
+        </tbody>
+    </table>
 </div>
 </body>
 </html>
