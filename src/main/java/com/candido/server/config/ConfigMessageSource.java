@@ -15,6 +15,8 @@ import java.util.Locale;
 @Component
 public class ConfigMessageSource implements WebMvcConfigurer {
 
+    private static final String DEFAULT_ENCODING = "utf-8";
+
     @Bean
     public LocaleResolver localeResolver() {
         SessionLocaleResolver slr = new SessionLocaleResolver();
@@ -42,7 +44,7 @@ public class ConfigMessageSource implements WebMvcConfigurer {
         messageSource.setBasename(
                 "classpath:/messages/auth/message"
         );
-        messageSource.setDefaultEncoding("utf-8");
+        messageSource.setDefaultEncoding(DEFAULT_ENCODING);
         return messageSource;
     }
 
@@ -52,7 +54,7 @@ public class ConfigMessageSource implements WebMvcConfigurer {
         messageSource.setBasenames(
                 "classpath:/messages/business/message"
         );
-        messageSource.setDefaultEncoding("utf-8");
+        messageSource.setDefaultEncoding(DEFAULT_ENCODING);
         return messageSource;
     }
 
@@ -64,7 +66,7 @@ public class ConfigMessageSource implements WebMvcConfigurer {
                 "classpath:/messages/validation/account/message",
                 "classpath:/messages/validation/password/message"
         );
-        messageSource.setDefaultEncoding("utf-8");
+        messageSource.setDefaultEncoding(DEFAULT_ENCODING);
         return messageSource;
     }
 

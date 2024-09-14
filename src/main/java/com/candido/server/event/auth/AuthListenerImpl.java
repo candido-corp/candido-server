@@ -14,12 +14,6 @@ import org.springframework.stereotype.Component;
 @Component
 public class AuthListenerImpl implements AuthListenerService {
 
-    @Autowired
-    private EmailService emailService;
-
-    @Autowired
-    private UtilService utilService;
-
     @Value("${application.name}")
     private String applicationName;
 
@@ -28,6 +22,16 @@ public class AuthListenerImpl implements AuthListenerService {
 
     @Value("${application.client.domain}")
     private String clientDomain;
+
+    private final EmailService emailService;
+
+    private final UtilService utilService;
+
+    @Autowired
+    public AuthListenerImpl(EmailService emailService, UtilService utilService) {
+        this.emailService = emailService;
+        this.utilService = utilService;
+    }
 
     @Async
     @Override
