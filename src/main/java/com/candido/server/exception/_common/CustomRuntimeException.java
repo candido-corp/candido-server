@@ -17,43 +17,50 @@ public class CustomRuntimeException extends RuntimeException {
     /**
      * The message associated with the exception.
      */
-    private String message;
+    private final String message;
 
     /**
      * Extra messages associated with the exception.
      */
-    private String[] extraMessages;
+    private final String[] extraMessages;
 
     /**
      * Arguments associated with the exception message.
      */
-    private Object[] args;
+    private final transient Object[] args;
 
     /**
      * Details associated with the exception.
      */
-    private Map<String, Object> details;
+    private final transient Map<String, Object> details;
 
     /**
      * The HTTP status associated with the exception.
      */
-    private HttpStatus status;
+    private final HttpStatus status;
 
     /**
      * The timestamp indicating when this exception occurred.
      */
-    private LocalDateTime timestamp;
+    private final LocalDateTime timestamp;
 
     /**
      * The list of fields associated with the exception.
      */
-    private List<String> fields;
+    private final List<String> fields;
 
     /**
      * Constructs a new CustomRuntimeException with no detail message.
      */
     public CustomRuntimeException() {
         super();
+        this.message = null;
+        this.extraMessages = null;
+        this.args = null;
+        this.details = null;
+        this.status = null;
+        this.timestamp = LocalDateTime.now();
+        this.fields = null;
     }
 
     /**
@@ -62,19 +69,31 @@ public class CustomRuntimeException extends RuntimeException {
      * @param message The detail message.
      */
     public CustomRuntimeException(String message) {
-        super();
+        super(message);
         this.message = message;
+        this.extraMessages = null;
+        this.args = null;
+        this.details = null;
+        this.status = null;
+        this.timestamp = LocalDateTime.now();
+        this.fields = null;
     }
 
     /**
      * Constructs a new CustomRuntimeException by concatenating multiple detail messages into a single message.
      *
-     * @param messages The array of detail messages to be concatenated.
+     * @param message The main detail message.
+     * @param messages The array of extra detail messages to be concatenated.
      */
-    public CustomRuntimeException(String message, String ...messages) {
+    public CustomRuntimeException(String message, String... messages) {
+        super(message);
         this.message = message;
         this.extraMessages = messages;
+        this.args = null;
+        this.details = null;
+        this.status = null;
         this.timestamp = LocalDateTime.now();
+        this.fields = null;
     }
 
     /**
@@ -84,9 +103,14 @@ public class CustomRuntimeException extends RuntimeException {
      * @param fields The list of fields associated with the exception.
      */
     public CustomRuntimeException(String message, List<String> fields) {
+        super(message);
         this.message = message;
-        this.fields = fields;
+        this.extraMessages = null;
+        this.args = null;
+        this.details = null;
+        this.status = null;
         this.timestamp = LocalDateTime.now();
+        this.fields = fields;
     }
 
     /**
@@ -96,24 +120,14 @@ public class CustomRuntimeException extends RuntimeException {
      * @param args    Arguments associated with the detail message.
      */
     public CustomRuntimeException(String message, Object[] args) {
-        super();
+        super(message);
         this.message = message;
+        this.extraMessages = null;
         this.args = args;
-    }
-
-    /**
-     * Constructs a new CustomRuntimeException with the specified detail message, arguments, and details.
-     *
-     * @param message The detail message.
-     * @param args    Arguments associated with the detail message.
-     * @param details Details associated with the exception.
-     */
-    public CustomRuntimeException(String message, Object[] args, Map<String, Object> details, List<String> fields) {
-        super();
-        this.message = message;
-        this.args = args;
-        this.details = details;
-        this.fields = fields;
+        this.details = null;
+        this.status = null;
+        this.timestamp = LocalDateTime.now();
+        this.fields = null;
     }
 
     /**
@@ -124,10 +138,33 @@ public class CustomRuntimeException extends RuntimeException {
      * @param details Details associated with the exception.
      */
     public CustomRuntimeException(String message, Object[] args, Map<String, Object> details) {
-        super();
+        super(message);
         this.message = message;
+        this.extraMessages = null;
         this.args = args;
         this.details = details;
+        this.status = null;
+        this.timestamp = LocalDateTime.now();
+        this.fields = null;
+    }
+
+    /**
+     * Constructs a new CustomRuntimeException with the specified detail message, arguments, details, and fields.
+     *
+     * @param message The detail message.
+     * @param args    Arguments associated with the detail message.
+     * @param details Details associated with the exception.
+     * @param fields  The list of fields associated with the exception.
+     */
+    public CustomRuntimeException(String message, Object[] args, Map<String, Object> details, List<String> fields) {
+        super(message);
+        this.message = message;
+        this.extraMessages = null;
+        this.args = args;
+        this.details = details;
+        this.status = null;
+        this.timestamp = LocalDateTime.now();
+        this.fields = fields;
     }
 
     /**
@@ -138,10 +175,14 @@ public class CustomRuntimeException extends RuntimeException {
      * @param timestamp  The timestamp.
      */
     public CustomRuntimeException(String message, HttpStatus status, LocalDateTime timestamp) {
-        super();
+        super(message);
         this.message = message;
+        this.extraMessages = null;
+        this.args = null;
+        this.details = null;
         this.status = status;
         this.timestamp = timestamp;
+        this.fields = null;
     }
 
 }

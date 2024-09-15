@@ -10,8 +10,12 @@ import java.util.List;
 @Service
 public class GenderServiceImpl implements GenderService {
 
+    private final GenderRepository genderRepository;
+
     @Autowired
-    GenderRepository genderRepository;
+    public GenderServiceImpl(GenderRepository genderRepository) {
+        this.genderRepository = genderRepository;
+    }
 
     @Override
     public List<Gender> findAll() {

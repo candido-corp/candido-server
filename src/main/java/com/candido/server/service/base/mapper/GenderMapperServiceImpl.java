@@ -5,15 +5,16 @@ import com.candido.server.dto.v1.util.GenderDto;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 @Service
 public class GenderMapperServiceImpl implements GenderMapperService {
     @Override
     public List<GenderDto> genderToGenderDto(List<Gender> genderList) {
-        if (genderList == null) return null;
+        if (genderList == null) return Collections.emptyList();
 
-        List<GenderDto> list = new ArrayList<GenderDto>(genderList.size());
+        List<GenderDto> list = new ArrayList<>(genderList.size());
         for (Gender gender : genderList) {
             list.add(genderToGenderDto1(gender));
         }

@@ -10,6 +10,8 @@ import java.util.List;
 
 public class PasswordConstraintValidator {
 
+    private PasswordConstraintValidator() {}
+
     public static CharacterData getCustomInsufficientSpecialCharacterData() {
         return new CharacterData() {
             @Override
@@ -39,7 +41,7 @@ public class PasswordConstraintValidator {
         RuleResult result = validator.validate(new PasswordData(password));
 
         List<ExceptionInvalidPasswordAccount> exceptions = new ArrayList<>();
-        result.getDetails().forEach(ruleResultDetail -> {
+        result.getDetails().forEach(ruleResultDetail ->
             exceptions.add(
                     new ExceptionInvalidPasswordAccount(
                             "ERROR_VALIDATION_PASSWORD_" + ruleResultDetail.getErrorCode(),
@@ -47,8 +49,8 @@ public class PasswordConstraintValidator {
                             ruleResultDetail.getParameters(),
                             List.of(RequestRegister.JSON_PROPERTY_PASSWORD)
                     )
-            );
-        });
+            )
+        );
 
         if(!result.isValid()) throw new ExceptionInvalidPasswordAccountList(exceptions);
         return result.isValid();

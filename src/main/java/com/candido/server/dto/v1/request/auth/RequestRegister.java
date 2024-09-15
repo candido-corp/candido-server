@@ -7,8 +7,6 @@ import com.candido.server.exception.account.*;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 @PasswordsMatch(
-        passwordField = "password",
-        confirmPasswordField = "confirmPassword",
         exception = ExceptionPasswordsDoNotMatch.class,
         exceptionName = EnumExceptionName.ERROR_VALIDATION_PASSWORDS_DO_NOT_MATCH
 )
@@ -52,7 +50,7 @@ public record RequestRegister (
                 exceptionFields = {JSON_PROPERTY_LAST_NAME}
         )
         String lastName
-) {
+) implements PasswordConfirmation {
     public static final String JSON_PROPERTY_EMAIL = "email";
     public static final String JSON_PROPERTY_PASSWORD = "password";
     public static final String JSON_PROPERTY_CONFIRM_PASSWORD = "confirm_password";

@@ -15,8 +15,12 @@ import java.util.Optional;
 @Service
 public class UserServiceImpl implements UserService {
 
+    private final UserRepository userRepository;
+
     @Autowired
-    UserRepository userRepository;
+    public UserServiceImpl(UserRepository userRepository) {
+        this.userRepository = userRepository;
+    }
 
     @Override
     public Optional<User> findUserByAccountId(int accountId) {
@@ -40,7 +44,6 @@ public class UserServiceImpl implements UserService {
     public User save(User user, RequestUpdateUserDto requestUpdateUserDto) {
         user.setFirstName(requestUpdateUserDto.firstName());
         user.setLastName(requestUpdateUserDto.lastName());
-//        user.setGender((Gender) new GenderDto(requestUpdateUserDto.genderId(), null));
         return null;
     }
 

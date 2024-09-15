@@ -2,6 +2,7 @@ package com.candido.server.security.config;
 
 import com.candido.server.domain.v1.account.AccountRepository;
 import com.candido.server.exception._common.EnumExceptionName;
+import com.candido.server.exception.security.auth.ExceptionAuth;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -32,7 +33,7 @@ public class ApplicationConfig {
                     .orElseThrow(() -> new UsernameNotFoundException(EnumExceptionName.ERROR_BUSINESS_ACCOUNT_NOT_FOUND.name()));
 
             if (!account.isEnabled())
-                throw new UsernameNotFoundException(EnumExceptionName.ERROR_BUSINESS_ACCOUNT_DISABLED.name());
+                throw new ExceptionAuth("Error.");
 
             return account;
         };

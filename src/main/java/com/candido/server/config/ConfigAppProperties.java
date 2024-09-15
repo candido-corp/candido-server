@@ -14,23 +14,23 @@ import java.util.List;
 @ConfigurationProperties(prefix = "application")
 public class ConfigAppProperties {
 
-    private List<String> authorizedRedirectUris = new ArrayList<>();
+    private final List<String> authorizedRedirectUris = new ArrayList<>();
 
-    private Security security = new Security();
+    private final Security security = new Security();
 
     @Data
     public static class Security {
-        private Jwt jwt = new Jwt();
+        private final Jwt jwt = new Jwt();
 
         @Data
         public static class Jwt {
             private String issuer;
             private String secretKey;
             private int expiration;
-            private RefreshToken refreshToken = new RefreshToken();
-            private RegistrationToken registrationToken = new RegistrationToken();
-            private ResetToken resetToken = new ResetToken();
-            private Keys keys = new Keys();
+            private final RefreshToken refreshToken = new RefreshToken();
+            private final RegistrationToken registrationToken = new RegistrationToken();
+            private final ResetToken resetToken = new ResetToken();
+            private final Keys keys = new Keys();
 
             @Data
             public static class RefreshToken {

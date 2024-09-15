@@ -4,7 +4,6 @@ import com.candido.server.domain.v1.account.AccountPermissionEnum;
 import com.candido.server.domain.v1.account.AccountRoleEnum;
 import com.candido.server.security.JwtAuthenticationEntryPoint;
 import com.candido.server.security.JwtAuthenticationFilter;
-import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
@@ -28,9 +27,10 @@ import java.util.List;
 
 @Configuration
 @EnableWebSecurity
-@RequiredArgsConstructor
 @EnableMethodSecurity
 public class SecurityConfig {
+
+    private static final String ADMIN_PATH = "/api/v1/admin/**";
 
     private final JwtAuthenticationFilter jwtAuthFilter;
 
@@ -40,16 +40,28 @@ public class SecurityConfig {
 
     private final JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint;
 
+    public SecurityConfig(
+            JwtAuthenticationFilter jwtAuthFilter,
+            AuthenticationProvider authenticationProvider,
+            LogoutHandler logoutHandler,
+            JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint
+    ) {
+        this.jwtAuthFilter = jwtAuthFilter;
+        this.authenticationProvider = authenticationProvider;
+        this.logoutHandler = logoutHandler;
+        this.jwtAuthenticationEntryPoint = jwtAuthenticationEntryPoint;
+    }
+
     CorsConfigurationSource corsConfigurationSource() {
         final var configuration = new CorsConfiguration();
-        long MAX_AGE_SECS = 3600;
+        long maxAgeSecs = 3600;
 
         configuration.addAllowedOriginPattern("*");
         configuration.setExposedHeaders(List.of("*"));
         configuration.setAllowCredentials(true);
         configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"));
         configuration.setAllowedHeaders(List.of("*"));
-        configuration.setMaxAge(MAX_AGE_SECS);
+        configuration.setMaxAge(maxAgeSecs);
 
         final var source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", configuration);
@@ -57,13 +69,15 @@ public class SecurityConfig {
         return source;
     }
 
+    @SuppressWarnings("java:S4502")
     @Bean
     public SecurityFilterChain jwtSecurityFilterChain(HttpSecurity httpSecurity) throws Exception {
         httpSecurity
+                // CSRF protection is disabled because the application is stateless and uses JWT tokens for authentication.
+                // No session or cookies are used, minimizing the risk of CSRF attacks.
                 .csrf(AbstractHttpConfigurer::disable)
                 .cors(httpSecurityCorsConfigurer -> httpSecurityCorsConfigurer.configurationSource(corsConfigurationSource()))
                 .authorizeHttpRequests(auth -> auth
-                        // TODO: Elimina i path che non c'entrano
                         .requestMatchers(
                                 "/api/v1/auth/**", "/oauth2/**", "/",
                                 "/error",
@@ -77,9 +91,9 @@ public class SecurityConfig {
                         .permitAll()
 
                         // Admin
-                        .requestMatchers("/api/v1/admin/**").hasAnyRole(AccountRoleEnum.ADMIN.name())
-                        .requestMatchers(HttpMethod.GET, "/api/v1/admin/**").hasAuthority(AccountPermissionEnum.ADMIN_READ.name())
-                        .requestMatchers(HttpMethod.POST, "/api/v1/admin/**").hasAuthority(AccountPermissionEnum.ADMIN_CREATE.name())
+                        .requestMatchers(ADMIN_PATH).hasAnyRole(AccountRoleEnum.ADMIN.name())
+                        .requestMatchers(HttpMethod.GET, ADMIN_PATH).hasAuthority(AccountPermissionEnum.ADMIN_READ.name())
+                        .requestMatchers(HttpMethod.POST, ADMIN_PATH).hasAuthority(AccountPermissionEnum.ADMIN_CREATE.name())
 
                         .anyRequest()
                         .authenticated()

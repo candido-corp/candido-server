@@ -4,7 +4,7 @@ import com.candido.server.config.ConfigAppProperties;
 import com.candido.server.domain.v1.account.Account;
 import com.candido.server.domain.v1.token.EnumJwtExceptionState;
 import com.candido.server.exception._common.CustomExceptionResolver;
-import com.candido.server.exception._common.resolver.DispatchMessageResolver;
+import com.candido.server.exception.security.auth.ExceptionAuth;
 import com.candido.server.exception.security.auth.ExceptionVerifyRegistrationToken;
 import com.candido.server.exception.security.jwt.ExceptionInvalidJWTToken;
 import com.candido.server.exception.security.jwt.ExceptionSecurityJwt;
@@ -37,17 +37,22 @@ import java.util.function.Function;
 @Service
 public class JwtService {
 
-    @Autowired
-    private CustomExceptionResolver customExceptionResolver;
+    private final CustomExceptionResolver customExceptionResolver;
+
+    private final ConfigAppProperties configAppProperties;
+
+    private final KeyLoader keyLoader;
 
     @Autowired
-    private DispatchMessageResolver dispatchMessageResolver;
-
-    @Autowired
-    private ConfigAppProperties configAppProperties;
-
-    @Autowired
-    private KeyLoader keyLoader;
+    public JwtService(
+            CustomExceptionResolver customExceptionResolver,
+            ConfigAppProperties configAppProperties,
+            KeyLoader keyLoader
+    ) {
+        this.customExceptionResolver = customExceptionResolver;
+        this.configAppProperties = configAppProperties;
+        this.keyLoader = keyLoader;
+    }
 
     /**
      * Extracts the username from the provided JWT token.
@@ -165,7 +170,7 @@ public class JwtService {
         try {
             privateKey = keyLoader.loadPrivateKey();
         } catch (Exception e) {
-            throw new RuntimeException(e);
+            throw new ExceptionAuth(e.getMessage());
         }
 
         return Jwts
@@ -225,8 +230,9 @@ public class JwtService {
         try {
             publicKey = keyLoader.loadPublicKey();
         } catch (Exception e) {
-            throw new RuntimeException(e);
+            throw new ExceptionAuth(e.getMessage());
         }
+
         try {
             return Jwts
                     .parser()
@@ -236,10 +242,10 @@ public class JwtService {
                     .getPayload();
         } catch (JwtException ex) {
             handleJwtException(ex, token);
-            return null;
+            return Jwts.claims().build();
         } catch (IllegalArgumentException ex) {
             handleIllegalArgumentException(ex);
-            return null;
+            return Jwts.claims().build();
         }
     }
 

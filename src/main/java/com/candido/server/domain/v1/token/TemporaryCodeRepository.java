@@ -8,7 +8,6 @@ import java.util.Optional;
 
 @Repository
 public interface TemporaryCodeRepository extends JpaRepository<TemporaryCode, Integer>, JpaSpecificationExecutor<TemporaryCode> {
-
     Optional<TemporaryCode> findFirstByTokenId(Integer tokenId);
-
+    Optional<TemporaryCode> findByCode(String code);
 }

@@ -1,27 +1,20 @@
 package com.candido.server.exception._common.validation;
 
+import com.candido.server.dto.v1.request.auth.PasswordConfirmation;
 import com.candido.server.exception._common.EnumExceptionName;
-import com.candido.server.exception.security.auth.ExceptionValidationAuth;
 import com.candido.server.exception.util.ExceptionValidation;
-import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.validation.ConstraintValidator;
 import jakarta.validation.ConstraintValidatorContext;
 
-import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 /**
  * Validator for checking if two password fields match.
  * Implements the ConstraintValidator interface.
  */
-public class PasswordsMatchValidator implements ConstraintValidator<PasswordsMatch, Object> {
-
-    // Field names for password and confirm password
-    private String passwordField;
-    private String confirmPasswordField;
+public class PasswordsMatchValidator implements ConstraintValidator<PasswordsMatch, PasswordConfirmation> {
 
     /**
      * The exception class to be thrown when validation fails.
@@ -45,8 +38,6 @@ public class PasswordsMatchValidator implements ConstraintValidator<PasswordsMat
      */
     @Override
     public void initialize(PasswordsMatch constraintAnnotation) {
-        this.passwordField = constraintAnnotation.passwordField();
-        this.confirmPasswordField = constraintAnnotation.confirmPasswordField();
         this.exceptionClass = constraintAnnotation.exception();
         this.exceptionMessage = constraintAnnotation.exceptionName().name();
         this.fields = new ArrayList<>();
@@ -60,49 +51,11 @@ public class PasswordsMatchValidator implements ConstraintValidator<PasswordsMat
      * @return true if the fields match, false otherwise.
      */
     @Override
-    public boolean isValid(Object value, ConstraintValidatorContext context) {
-        String password;
-        String confirmPassword;
-
-        getFields(value);
-
-        try {
-            password = getFieldValue(value, passwordField);
-            confirmPassword = getFieldValue(value, confirmPasswordField);
-        } catch (Exception e) {
-            return false;
-        }
-
+    public boolean isValid(PasswordConfirmation value, ConstraintValidatorContext context) {
+        String password = value.password();
+        String confirmPassword = value.confirmPassword();
         if(password != null && !password.equals(confirmPassword)) throwException();
         return true;
-    }
-
-    /**
-     * Retrieves the fields to validate from the object.
-     *
-     * @param value The object from which to retrieve the fields.
-     */
-    private void getFields(Object value) {
-        fields.clear();
-        Arrays.stream(value.getClass().getDeclaredFields())
-                .filter(field ->
-                        field.isAnnotationPresent(JsonProperty.class) &&
-                                (field.getName().equals(passwordField) || field.getName().equals(confirmPasswordField)))
-                .forEach(field -> fields.add(field.getAnnotation(JsonProperty.class).value()));
-    }
-
-    /**
-     * Retrieves the value of a field from an object.
-     *
-     * @param object The object from which to retrieve the field value.
-     * @param fieldName The name of the field.
-     * @return The value of the field.
-     * @throws NoSuchFieldException If the field does not exist or cannot be accessed.
-     */
-    private String getFieldValue(Object object, String fieldName) throws NoSuchFieldException, IllegalAccessException {
-        Field field = object.getClass().getDeclaredField(fieldName);
-        field.setAccessible(true);
-        return (String) field.get(object);
     }
 
     /**

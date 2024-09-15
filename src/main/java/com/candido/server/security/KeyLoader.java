@@ -1,7 +1,6 @@
 package com.candido.server.security;
 
-import com.candido.server.config.ConfigAppProperties;
-import lombok.RequiredArgsConstructor;
+import com.candido.server.exception.security.auth.ExceptionAuth;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.stereotype.Service;
 
@@ -15,11 +14,8 @@ import java.security.spec.PKCS8EncodedKeySpec;
 import java.security.spec.X509EncodedKeySpec;
 import java.util.Base64;
 
-@RequiredArgsConstructor
 @Service
 public class KeyLoader {
-
-    private final ConfigAppProperties configAppProperties;
 
     private String normalizeKey(String key, boolean isPrivate) {
         String placeholder = isPrivate ? "PRIVATE" : "PUBLIC";
@@ -52,7 +48,7 @@ public class KeyLoader {
         }
     }
 
-    public PrivateKey loadPrivateKey() throws Exception {
+    public PrivateKey loadPrivateKey() throws ExceptionAuth {
         ClassPathResource resource = new ClassPathResource("security/keys/private_key_pkcs8.pem");
         try (InputStream is = resource.getInputStream()) {
             String privateKeyPEM = normalizeKey(new String(is.readAllBytes()), true);
@@ -61,12 +57,12 @@ public class KeyLoader {
             PKCS8EncodedKeySpec keySpec = new PKCS8EncodedKeySpec(encoded);
             return generatePrivateKey(keyFactory, keySpec);
         } catch (Exception e) {
-            throw new Exception(e);
+            throw new ExceptionAuth(e.getMessage());
         }
     }
 
 
-    public PublicKey loadPublicKey() throws Exception {
+    public PublicKey loadPublicKey() throws ExceptionAuth {
         ClassPathResource resource = new ClassPathResource("security/keys/public_key.pem");
         try (InputStream is = resource.getInputStream()) {
             String privateKeyPEM = normalizeKey(new String(is.readAllBytes()), false);
@@ -75,7 +71,7 @@ public class KeyLoader {
             X509EncodedKeySpec keySpec = new X509EncodedKeySpec(encoded);
             return generatePublicKey(keyFactory, keySpec);
         } catch (Exception e) {
-            throw new Exception(e);
+            throw new ExceptionAuth(e.getMessage());
         }
     }
 

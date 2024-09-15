@@ -30,14 +30,22 @@ public class TokenServiceImpl implements TokenService {
 
     private final ConcurrentHashMap<Integer, ReentrantLock> userLocks = new ConcurrentHashMap<>();
 
-    @Autowired
-    JwtService jwtService;
+    private final JwtService jwtService;
+
+    private final TokenRepository tokenRepository;
+
+    private final TemporaryCodeService temporaryCodeService;
 
     @Autowired
-    TokenRepository tokenRepository;
-
-    @Autowired
-    TemporaryCodeService temporaryCodeService;
+    public TokenServiceImpl(
+            JwtService jwtService,
+            TokenRepository tokenRepository,
+            TemporaryCodeService temporaryCodeService
+    ) {
+        this.jwtService = jwtService;
+        this.tokenRepository = tokenRepository;
+        this.temporaryCodeService = temporaryCodeService;
+    }
 
     @PersistenceContext
     EntityManager entityManager;
@@ -92,7 +100,7 @@ public class TokenServiceImpl implements TokenService {
                     .atZone(ZoneId.systemDefault())
                     .toLocalDateTime();
 
-            String uuidAccessToken = UUID.randomUUID().toString().replaceAll("-", "");
+            String uuidAccessToken = UUID.randomUUID().toString().replace("-", "");
 
             var token = Token
                     .builder()
@@ -117,7 +125,6 @@ public class TokenServiceImpl implements TokenService {
 
             return tokenRepository.save(token);
         } catch (Exception e) {
-//            log.error("Error saving token", e);
             throw new ExceptionToken();
         } finally {
             lock.unlock();

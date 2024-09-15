@@ -17,30 +17,40 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import javax.security.auth.login.AccountException;
 import java.time.LocalDateTime;
 import java.util.Optional;
 
 @Service
 public class AccountServiceImpl implements AccountService {
 
-    @Autowired
-    private AccountRepository accountRepository;
+    private final AccountRepository accountRepository;
+
+    private final AccountRoleRepository accountRoleRepository;
+
+    private final TokenService tokenService;
+
+    private final PasswordEncoder passwordEncoder;
+
+    private final AuthProviderService authProviderService;
+
+    private final UserService userService;
 
     @Autowired
-    private AccountRoleRepository accountRoleRepository;
-
-    @Autowired
-    private TokenService tokenService;
-
-    @Autowired
-    private PasswordEncoder passwordEncoder;
-
-    @Autowired
-    private AuthProviderService authProviderService;
-
-    @Autowired
-    private UserService userService;
+    public AccountServiceImpl(
+            AccountRepository accountRepository,
+            AccountRoleRepository accountRoleRepository,
+            TokenService tokenService,
+            PasswordEncoder passwordEncoder,
+            AuthProviderService authProviderService,
+            UserService userService
+    ) {
+        this.accountRepository = accountRepository;
+        this.accountRoleRepository = accountRoleRepository;
+        this.tokenService = tokenService;
+        this.passwordEncoder = passwordEncoder;
+        this.authProviderService = authProviderService;
+        this.userService = userService;
+    }
 
     @Override
     public Optional<Account> findById(int accountId) {
