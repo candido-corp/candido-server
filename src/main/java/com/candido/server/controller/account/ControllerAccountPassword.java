@@ -1,15 +1,13 @@
 package com.candido.server.controller.account;
 
-import com.candido.server.dto.v1.request.account.RequestEditAccountPassword;
-import com.candido.server.service.base.account.AccountService;
-import jakarta.validation.Valid;
-import lombok.RequiredArgsConstructor;
+import com.candido.server.service.base.auth.AuthenticationService;
+import com.candido.server.util.UtilService;
+import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -18,21 +16,29 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/api/v1/me/password")
 public class ControllerAccountPassword {
 
-    private final AccountService accountService;
+    private final AuthenticationService authenticationService;
+
+    private final UtilService utilService;
 
     @Autowired
     public ControllerAccountPassword(
-            AccountService accountService
+            AuthenticationService authenticationService,
+            UtilService utilService
     ) {
-        this.accountService = accountService;
+        this.authenticationService = authenticationService;
+        this.utilService = utilService;
     }
 
-    @PutMapping
+    @PostMapping
     public ResponseEntity<Void> editAccountPassword(
-            @Valid @RequestBody RequestEditAccountPassword request,
-            Authentication authentication
+            Authentication authentication,
+            HttpServletRequest httpRequest
     ) {
-        accountService.editPassword(authentication.getName(), request.currentPassword(), request.password(), request.confirmPassword());
+        authenticationService.sendResetPassword(
+                authentication.getName(),
+                utilService.getClientIP(httpRequest),
+                utilService.getAppUrl(httpRequest)
+        );
         return ResponseEntity.noContent().build();
     }
 
