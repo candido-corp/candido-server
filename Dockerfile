@@ -2,8 +2,8 @@ FROM gradle:8.5.0-jdk21 AS build
 
 WORKDIR /app
 
-COPY build.gradle .
-COPY settings.gradle .
+COPY build.gradle.kts .
+COPY settings.gradle.kts .
 COPY src ./src
 
 RUN gradle clean build
