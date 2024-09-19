@@ -15,9 +15,6 @@ application:
                 expiration: 864000000 # 10 days in ms
             reset-token:
                 expiration: 864000000 # 10 days in ms
-            keys:
-                key-private: ${JWT_PRIVATE_KEY}
-                key-public: ${JWT_PUBLIC_KEY}
     email:
         host: ${SMTP_HOST}
         port: 587
@@ -46,6 +43,9 @@ application:
         uri: http://localhost:8080/terms-of-service
 
 spring:
+    sql:
+        init:
+            mode: always
     main:
         allow-bean-definition-overriding: true
     mvc:
