@@ -38,15 +38,18 @@ public class ControllerAuthEmailBasedRegistration {
     }
 
     @PostMapping("/verify")
-    public ResponseEntity<Void> verifyEmailRegistrationByUUIDAccessToken(
-            @Valid @RequestBody RequestRegisterEmailVerify request
+    public ResponseEntity<ResponseAuthentication> verifyEmailRegistrationByUUIDAccessToken(
+            @Valid @RequestBody RequestRegisterEmailVerify request,
+            HttpServletRequest httpRequest
     ) {
+        String clientIP = utilService.getClientIP(httpRequest);
+
         String uuidAccessToken = request.uuidAccessToken();
         String encryptedEmail = request.encryptedEmail();
 
         String email = encryptionService.decrypt(encryptedEmail);
-        authenticationService.verifyEmailRegistration(uuidAccessToken, email);
-        return ResponseEntity.noContent().build();
+        ResponseAuthentication responseAuthentication = authenticationService.verifyEmailRegistration(uuidAccessToken, email, clientIP);
+        return ResponseEntity.ok(responseAuthentication);
     }
 
 }

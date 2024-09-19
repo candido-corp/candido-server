@@ -16,7 +16,7 @@ public interface AuthenticationService {
     ResponseAuthentication registerByEmail(RequestRegister request, String ipAddress, String appUrl);
     ResponseRegistration registerByCode(RequestRegister request, String ipAddress, String appUrl);
 
-    void verifyEmailRegistration(String uuidAccessToken, String email);
+    ResponseAuthentication verifyEmailRegistration(String uuidAccessToken, String email, String ipAddress);
     ResponseAuthentication verifyCodeRegistration(String uuidAccessToken, String temporaryCode, String email, String ipAddress);
     void checkValidityOfUUIDAccessTokenForResetPassword(String uuidAccessToken);
     void resendCodeRegistrationByUUIDAccessToken(String uuidAccessToken, String appUrl);

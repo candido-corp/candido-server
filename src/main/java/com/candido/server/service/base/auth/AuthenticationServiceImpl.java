@@ -102,7 +102,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 
     @Transactional
     @Override
-    public void verifyEmailRegistration(String uuidAccessToken, String email) {
+    public ResponseAuthentication verifyEmailRegistration(String uuidAccessToken, String email, String ipAddress) {
         int tokenScopeCategoryId = TokenScopeCategoryEnum.REGISTRATION.getTokenScopeCategoryId();
         Token token = tokenService.findTokenByUUIDAndTokenScopeCategoryIdOrThrow(uuidAccessToken, tokenScopeCategoryId);
         var account = accountService.findByEmail(email);
@@ -115,6 +115,8 @@ public class AuthenticationServiceImpl implements AuthenticationService {
         var user = userService.findUserByAccountIdOrThrow(account.get().getId());
         var event = new OnRegistrationCompletedEvent(this, account.get(), user, token.getIpAddress());
         eventPublisher.publishEvent(event);
+
+        return createAuthentication(account.get(), ipAddress);
     }
 
     @Transactional
