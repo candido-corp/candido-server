@@ -46,7 +46,7 @@ public record RequestPasswordReset (
                 exceptionFields = {JSON_PROPERTY_CONFIRM_PASSWORD}
         )
         String confirmPassword
-) {
+) implements PasswordConfirmation {
 
     public static final String JSON_PROPERTY_UUID_ACCESS = "t";
     public static final String JSON_PROPERTY_ENCRYPTED_EMAIL = "e";
