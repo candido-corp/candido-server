@@ -8,13 +8,13 @@ import lombok.Data;
 
 @Builder
 @Data
-public class GeoRegionDto {
+public class GeoProvinceDto {
 
-    @JsonProperty("region_id")
-    private int regionId;
+    @JsonProperty("province_id")
+    private int provinceId;
 
-    @JsonProperty("region_name")
-    private String regionName;
+    @JsonProperty("province_name")
+    private String provinceName;
 
     @JsonProperty("mother_relationship")
     private Territory motherRelationship;

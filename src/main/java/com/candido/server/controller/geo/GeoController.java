@@ -1,7 +1,6 @@
 package com.candido.server.controller.geo;
 
 import com.candido.server.dto.v1.response.geo.GeoCountryDto;
-import com.candido.server.dto.v1.response.geo.GeoRegionDto;
 import com.candido.server.service.base.geo.GeoService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -25,11 +24,6 @@ public class GeoController {
     @GetMapping("/countries")
     public ResponseEntity<List<GeoCountryDto>> getAllCountries() {
         return ResponseEntity.ok(geoService.getAllCountries());
-    }
-
-    @GetMapping("/countries/{countryId}/regions")
-    public ResponseEntity<List<GeoRegionDto>> getAllRegions(@PathVariable("countryId") int countryId) {
-        return ResponseEntity.ok(geoService.getAllRegions());
     }
 
 }
