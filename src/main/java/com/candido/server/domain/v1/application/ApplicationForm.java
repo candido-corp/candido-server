@@ -7,6 +7,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 @Data
@@ -53,5 +54,25 @@ public class ApplicationForm {
     @JsonProperty("end_date")
     @Column(name = "end_date")
     private LocalDateTime endDate;
+
+    @JsonProperty("created_at")
+    @Column(name = "created_at")
+    private LocalDateTime createdAt;
+
+    @JsonProperty("updated_at")
+    @Column(name = "updated_at")
+    private LocalDateTime updatedAt;
+
+    @JsonProperty("deleted_at")
+    @Column(name = "deleted_at")
+    private LocalDateTime deletedAt;
+
+    @JsonProperty("feedback_publication_date")
+    @Column(name = "feedback_publication_date")
+    private LocalDateTime feedbackPublicationDate;
+
+    @JsonProperty("feedback_expiration_date")
+    @Column(name = "feedback_expiration_date")
+    private LocalDateTime feedbackExpirationDate;
 
 }

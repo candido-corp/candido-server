@@ -1,5 +1,6 @@
 package com.candido.server.domain.v1.application;
 
+import com.candido.server.domain.v1.account.Account;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -21,6 +22,22 @@ public class Application {
     @JsonProperty("application_id")
     @Column(name = "application_id")
     private int applicationId;
+
+    @JsonProperty("fk_account_id")
+    @Column(name = "fk_account_id")
+    private int fkAccountId;
+
+    @ManyToOne
+    @JoinColumn(name = "fk_account_id")
+    private Account account;
+
+    @OneToOne
+    @JoinColumn(name = "fk_application_form_id")
+    private ApplicationForm applicationForm;
+
+    @ManyToOne
+    @JoinColumn(name = "fk_application_status_id")
+    private ApplicationStatus applicationStatus;
 
     @JsonProperty("filled_body")
     @Column(name = "filled_body")
