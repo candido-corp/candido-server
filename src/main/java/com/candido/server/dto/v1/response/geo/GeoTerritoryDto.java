@@ -6,11 +6,12 @@ import lombok.Data;
 
 @Builder
 @Data
-public class GeoCountryDto {
+public class GeoTerritoryDto {
 
-    @JsonProperty("country_id")
-    private int countryId;
+    @JsonProperty("territory_id")
+    private int territoryId;
 
-    @JsonProperty("country_name")
-    private String countryName;
+    @JsonProperty("territory_name")
+    private String territoryName;
+
 }

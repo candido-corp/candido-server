@@ -2,9 +2,10 @@ package com.candido.server.service.base.geo;
 
 import com.candido.server.domain.v1.geo.XrefTerritorySubdivision;
 
+import java.util.List;
 import java.util.Optional;
 
 public interface XrefTerritorySubdivisionService {
-    Optional<XrefTerritorySubdivision> findByTerritoryMotherId();
-    Optional<XrefTerritorySubdivision> findByTerritorySonId();
+    List<XrefTerritorySubdivision> findByTerritoryMotherId(int motherId);
+    Optional<XrefTerritorySubdivision> findByTerritorySonId(int sonId);
 }

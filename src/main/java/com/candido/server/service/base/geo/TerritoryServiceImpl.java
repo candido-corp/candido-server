@@ -24,6 +24,26 @@ public class TerritoryServiceImpl implements TerritoryService {
     }
 
     @Override
+    public Optional<Territory> findById(int territoryId) {
+        Specification<Territory> byTerritoryId = (root, query, criteriaBuilder) ->
+            criteriaBuilder.equal(root.get(Territory_.TERRITORY_ID), territoryId);
+
+        return territoryRepository.findOne(byTerritoryId);
+    }
+
+    @Override
+    public List<Territory> findAllTerritoriesBySonListId(List<Integer> sonListId) {
+        if (sonListId == null || sonListId.isEmpty()) {
+            return List.of();
+        }
+
+        Specification<Territory> bySonListId = (root, query, criteriaBuilder) ->
+                root.get(Territory_.TERRITORY_ID).in(sonListId);
+
+        return territoryRepository.findAll(bySonListId);
+    }
+
+    @Override
     public List<Territory> findAllByCategoryId(String categoryKey) {
         Optional<TerritoryCategory> territoryCategory = territoryCategoryService.findByCategoryKey(categoryKey);
         if(territoryCategory.isEmpty()) return List.of();
