@@ -1,6 +1,7 @@
 package com.candido.server.exception._common.validation;
 
 import com.candido.server.dto.v1.request.auth.PasswordConfirmation;
+import com.candido.server.dto.v1.request.auth.RequestPasswordReset;
 import com.candido.server.exception._common.EnumExceptionName;
 import com.candido.server.exception.util.ExceptionValidation;
 import jakarta.validation.ConstraintValidator;
@@ -14,7 +15,7 @@ import java.util.List;
  * Validator for checking if two password fields match.
  * Implements the ConstraintValidator interface.
  */
-public class PasswordsMatchValidator implements ConstraintValidator<PasswordsMatch, PasswordConfirmation> {
+public class PasswordsMatchValidator implements ConstraintValidator<PasswordsMatch, Object> {
 
     /**
      * The exception class to be thrown when validation fails.
@@ -51,9 +52,9 @@ public class PasswordsMatchValidator implements ConstraintValidator<PasswordsMat
      * @return true if the fields match, false otherwise.
      */
     @Override
-    public boolean isValid(PasswordConfirmation value, ConstraintValidatorContext context) {
-        String password = value.password();
-        String confirmPassword = value.confirmPassword();
+    public boolean isValid(Object value, ConstraintValidatorContext context) {
+        String password = ((PasswordConfirmation)value).password();
+        String confirmPassword = ((PasswordConfirmation)value).confirmPassword();
         if(password != null && !password.equals(confirmPassword)) throwException();
         return true;
     }
