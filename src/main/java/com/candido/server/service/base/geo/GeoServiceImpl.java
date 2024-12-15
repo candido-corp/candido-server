@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.atomic.AtomicReference;
 
 @Service
 public class GeoServiceImpl implements GeoService {
@@ -48,10 +49,16 @@ public class GeoServiceImpl implements GeoService {
                 .map(TerritoryMapperService::mapTerritoryToGeoTerritoryDto)
                 .toList();
 
+        AtomicReference<TerritoryCategory> territoryCategory = new AtomicReference<>();
+        if(!territoryList.isEmpty()) {
+            territoryService.findById(territoryList.getFirst().getTerritoryId())
+                    .ifPresent(territory -> territoryCategory.set(territory.getTerritoryCategory()));
+        }
+
         return GeoTerritoryListDto
                 .builder()
-                .labelId(territoryOptional.get().getTerritoryCategory().getTerritoryCategoryId())
-                .labelName(territoryOptional.get().getTerritoryCategory().getTerritoryCategoryKey())
+                .labelId(territoryCategory.get().getTerritoryCategoryId())
+                .labelName(territoryCategory.get().getTerritoryCategoryKey())
                 .territoryList(territoryList)
                 .build();
     }
