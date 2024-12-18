@@ -1,5 +1,6 @@
 package com.candido.server.service.base.mapper;
 
+import com.candido.server.domain.v1.account.Account;
 import com.candido.server.domain.v1.user.Address;
 import com.candido.server.domain.v1.user.Gender;
 import com.candido.server.domain.v1.user.User;
@@ -14,13 +15,14 @@ import java.time.format.DateTimeFormatter;
 public class UserMapperServiceImpl implements UserMapperService {
 
     @Override
-    public UserDto userToUserDto(User user) {
+    public UserDto userToUserDto(User user, Account account) {
         if (user == null) return null;
 
         UserDto userDto = new UserDto();
 
         userDto.setFirstName(user.getFirstName());
         userDto.setLastName(user.getLastName());
+        userDto.setEmail(account.getEmail());
         userDto.setGender(genderToGenderDto(user.getGender()));
         userDto.setAddress(addressToAddressDto(user.getAddress()));
         userDto.setBirthdate(user.getBirthdate());

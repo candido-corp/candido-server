@@ -39,14 +39,15 @@ public class ControllerAccount {
     @GetMapping
     public ResponseEntity<AccountDto> getAccountInfo(Authentication authentication) {
         Account account = accountService.findAccountByEmailOrThrow(authentication.getName());
-        return ResponseEntity.ok(accountMapper.accountToAccountDto(account));
+        User user = userService.findUserByAccountIdOrThrow(account.getId());
+        return ResponseEntity.ok(accountMapper.accountToAccountDto(account, user));
     }
 
     @GetMapping("/details")
     public ResponseEntity<UserDto> getUserInfo(Authentication authentication) {
         Account account = accountService.findAccountByEmailOrThrow(authentication.getName());
         User user = userService.findUserByAccountIdOrThrow(account.getId());
-        UserDto userDto = userMapper.userToUserDto(user);
+        UserDto userDto = userMapper.userToUserDto(user, account);
         return ResponseEntity.ok(userDto);
     }
 
@@ -59,7 +60,7 @@ public class ControllerAccount {
 
         Account account = accountService.findAccountByEmailOrThrow(authentication.getName());
         User user = userService.findUserByAccountIdOrThrow(account.getId());
-        UserDto userDto = userMapper.userToUserDto(userService.save(user, requestUpdateUserDto));
+        UserDto userDto = userMapper.userToUserDto(userService.save(user, requestUpdateUserDto), account);
 
         return ResponseEntity.ok(userDto);
     }
