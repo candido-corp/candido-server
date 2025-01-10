@@ -5,7 +5,6 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
-import lombok.Generated;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
@@ -25,10 +24,10 @@ public class Application {
 
     @JsonProperty("fk_account_id")
     @Column(name = "fk_account_id")
-    private int fkAccountId;
+    private int accountId;
 
     @ManyToOne
-    @JoinColumn(name = "fk_account_id")
+    @JoinColumn(name = "fk_account_id", insertable = false, updatable = false)
     private Account account;
 
     @OneToOne
