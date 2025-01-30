@@ -1,15 +1,15 @@
-INSERT IGNORE INTO account(account_id, fk_account_role_id, fk_account_status_id, email, password, created_at, deleted_at)
+INSERT IGNORE INTO account(fk_account_role_id, fk_account_status_id, email, password, created_at, deleted_at)
 VALUES
-    (1, 2, 2, "admin@candidocorp.com", "", now(), null);
+    (2, 2, "admin@candidocorp.com", "", now(), null);
 
 INSERT IGNORE INTO user
-    (user_id, fk_account_id, fk_gender_id, fk_address_id, first_name, last_name, birth_date, mobile_number, phone_number, last_modified_name, created_at, deleted_at)
+    (fk_account_id, fk_gender_id, fk_address_id, first_name, last_name, birth_date, mobile_number, phone_number, last_modified_name, created_at, deleted_at)
 VALUES
-    (1, 1, 1, null, "John", "Doe", "1998-04-15", "3481138394", "3458483720", null, now(), null);
+    (1, 1, null, "John", "Doe", "1998-04-15", "3481138394", "3458483720", null, now(), null);
 
+SET @accountId = (SELECT account_id FROM account WHERE email = "admin@candidocorp.com");
 
 INSERT IGNORE INTO application_form (
-    application_form_id,
     fk_account_id,
     display_name,
     notes,
@@ -25,9 +25,7 @@ INSERT IGNORE INTO application_form (
     feedback_expiration_date
 ) VALUES
 (
-    -- Prima riga
-    1,            -- AUTO_INCREMENT
-    1,               -- fk_account_id
+    @accountId,               -- fk_account_id
     'Modulo di iscrizione',            -- display_name
     'Note iniziali del modulo di iscrizione', -- notes
     10,              -- max_applicants
@@ -42,9 +40,7 @@ INSERT IGNORE INTO application_form (
     '2024-03-01 09:00:00'  -- feedback_expiration_date
 ),
 (
-    -- Seconda riga
-    2,
-    1,
+    @accountId,
     'Modulo di feedback',
     'Note sul modulo di feedback',
     5,
@@ -59,9 +55,7 @@ INSERT IGNORE INTO application_form (
     '2024-04-01 09:00:00'
 ),
 (
-    -- Terza riga
-    3,
-    2,  -- esempio di altro account
+    @accountId,
     'Modulo avanzato',
     'Note sul modulo avanzato',
     20,
@@ -76,6 +70,10 @@ INSERT IGNORE INTO application_form (
     '2024-06-01 00:00:00'
 );
 
+SET @formIdOne = (SELECT application_form_id FROM application_form WHERE url_code = "ABCD");
+SET @formIdTwo = (SELECT application_form_id FROM application_form WHERE url_code = "EFGH");
+SET @formIdThree = (SELECT application_form_id FROM application_form WHERE url_code = "WXYZ");
+
 INSERT IGNORE INTO application (
     application_id,
     fk_account_id,
@@ -89,26 +87,62 @@ INSERT IGNORE INTO application (
     sent_at
 ) VALUES
 (
-    1,       -- AUTO INCREMENT
-    1,          -- ID account (come richiesto)
-    1,          -- Collegato al primo form inserito
-    1,          -- Esempio di status
-    'Testo compilato per la prima application',
-    50,         -- progress (esempio)
-    CURRENT_TIMESTAMP,
-    NULL,
-    NULL,
-    CURRENT_TIMESTAMP
+    1,        -- AUTO INCREMENT
+    @accountId,        -- ID account
+    @formIdOne,        -- Collegato al primo form
+    1,        -- Esempio di status
+    '{}',
+    50,
+    '2023-05-13 10:15:00',  -- created_at
+    '2023-05-14 11:20:00',  -- updated_at
+    NULL,                   -- deleted_at
+    NULL   -- sent_at
 ),
 (
     2,
-    1,
-    2,          -- Collegato al secondo form inserito
-    2,          -- Esempio di status
-    'Testo compilato per la seconda application',
+    @accountId,
+    @formIdTwo,
+    2,
+    '{}',
     100,
-    CURRENT_TIMESTAMP,
-    CURRENT_TIMESTAMP,
+    '2023-09-22 09:30:00',   -- created_at
+    '2024-01-10 14:45:00',   -- updated_at
     NULL,
-    CURRENT_TIMESTAMP
+    '2024-01-10 14:45:00'
+),
+(
+    3,
+    @accountId,
+    @formIdThree,
+    3,
+    '{}',
+    100,
+    '2024-03-01 09:00:00',   -- created_at
+    '2024-03-02 10:00:00',   -- updated_at
+    NULL,
+    '2024-03-02 10:00:00'
+),
+(
+    4,
+    @accountId,
+    @formIdOne,
+    4,
+    '{}',
+    100,
+    '2024-07-15 08:00:00',   -- created_at
+    '2024-07-15 15:00:00',   -- updated_at
+    NULL,
+    '2024-07-15 15:00:00'
+),
+(
+    5,
+    @accountId,
+    @formIdTwo,
+    5,
+    '{}',
+    98,
+    '2025-01-28 07:00:00',   -- created_at
+    '2025-01-29 08:00:00',   -- updated_at
+    NULL,
+    NULL
 );
