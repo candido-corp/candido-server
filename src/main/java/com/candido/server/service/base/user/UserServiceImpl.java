@@ -1,5 +1,6 @@
 package com.candido.server.service.base.user;
 
+import com.candido.server.domain.v1.user.Gender;
 import com.candido.server.domain.v1.user.User;
 import com.candido.server.domain.v1.user.UserRepository;
 import com.candido.server.domain.v1.user.User_;
@@ -41,10 +42,16 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public User save(User user, RequestUpdateUserDto requestUpdateUserDto) {
-        user.setFirstName(requestUpdateUserDto.firstName());
-        user.setLastName(requestUpdateUserDto.lastName());
-        return null;
+    public User save(User user, RequestUpdateUserDto requestUpdateUserDto, boolean canChangeName) {
+        if(canChangeName) {
+            user.setFirstName(requestUpdateUserDto.firstName());
+            user.setLastName(requestUpdateUserDto.lastName());
+        }
+        user.setGender(new Gender(requestUpdateUserDto.genderId()));
+        user.setBirthdate(requestUpdateUserDto.birthdate());
+        user.setMobileNumber(requestUpdateUserDto.mobileNumber());
+        user.setPhoneNumber(requestUpdateUserDto.phoneNumber());
+        return save(user);
     }
 
 }

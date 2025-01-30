@@ -5,6 +5,7 @@ import com.candido.server.domain.v1.user.User;
 import com.candido.server.dto.v1.request.account.RequestUpdateUserDto;
 import com.candido.server.dto.v1.util.UserDto;
 import com.candido.server.service.base.account.AccountService;
+import com.candido.server.service.base.application.ApplicationService;
 import com.candido.server.service.base.mapper.AccountMapperService;
 import com.candido.server.service.base.mapper.UserMapperService;
 import com.candido.server.service.base.user.UserService;
@@ -21,17 +22,20 @@ public class ControllerUser {
     private final AccountService accountService;
     private final UserMapperService userMapper;
     private final UserService userService;
+    private final ApplicationService applicationService;
 
     @Autowired
     public ControllerUser(
             AccountService accountService,
             AccountMapperService accountMapper,
             UserMapperService userMapper,
-            UserService userService
+            UserService userService,
+            ApplicationService applicationService
     ) {
         this.accountService = accountService;
         this.userMapper = userMapper;
         this.userService = userService;
+        this.applicationService = applicationService;
     }
 
     @VerifiedUser
@@ -48,11 +52,10 @@ public class ControllerUser {
             Authentication authentication,
             @RequestBody RequestUpdateUserDto requestUpdateUserDto
     ) {
-        // TODO: If an application is open the user can't change the name.
-
         Account account = accountService.findAccountByEmailOrThrow(authentication.getName());
+        boolean userHasOpenApplications = applicationService.userHasOpenApplications(account.getId());
         User user = userService.findUserByAccountIdOrThrow(account.getId());
-        UserDto userDto = userMapper.userToUserDto(userService.save(user, requestUpdateUserDto));
+        UserDto userDto = userMapper.userToUserDto(userService.save(user, requestUpdateUserDto, userHasOpenApplications));
 
         return ResponseEntity.ok(userDto);
     }

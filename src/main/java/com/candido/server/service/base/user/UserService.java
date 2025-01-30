@@ -9,5 +9,5 @@ public interface UserService {
     Optional<User> findUserByAccountId(int accountId);
     User findUserByAccountIdOrThrow(int accountId);
     User save(User user);
-    User save(User user, RequestUpdateUserDto requestUpdateUserDto);
+    User save(User user, RequestUpdateUserDto requestUpdateUserDto, boolean canChangeName);
 }
