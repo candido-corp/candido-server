@@ -27,13 +27,17 @@ public class ApplicationServiceImpl implements ApplicationService {
     public List<Application> getUserApplicationsByStatus(int accountId, int statusId) {
         Specification<Application> byStatus = (root, query, criteriaBuilder) -> criteriaBuilder.and(
                 criteriaBuilder.equal(root.get(Application_.ACCOUNT_ID), accountId),
-                criteriaBuilder.equal(root.get(Application_.APPLICATION_STATUS), statusId)
+                criteriaBuilder.equal(root.get(Application_.APPLICATION_STATUS_ID), statusId)
         );
         return applicationRepository.findAll(byStatus);
     }
 
     @Override
-    public List<ResponseUserApplication> findAllByAccountId(int accountId) {
+    public List<ResponseUserApplication> findAllByAccountId(int accountId, Integer statusId) {
+        if(statusId != null) {
+            return getUserApplicationsByStatus(accountId, statusId)
+                    .stream().map(ResponseUserApplication::mapToResponseUserApplication).toList();
+        }
         return applicationRepository.findAllByAccountId(accountId, ResponseUserApplication.class);
     }
 

@@ -35,8 +35,12 @@ public class Application {
     private ApplicationForm applicationForm;
 
     @ManyToOne
-    @JoinColumn(name = "fk_application_status_id")
+    @JoinColumn(name = "fk_application_status_id", insertable = false, updatable = false)
     private ApplicationStatus applicationStatus;
+
+    @JsonProperty("fk_application_status_id")
+    @Column(name = "fk_application_status_id")
+    private int applicationStatusId;
 
     @JsonProperty("filled_body")
     @Column(name = "filled_body")

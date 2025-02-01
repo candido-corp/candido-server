@@ -7,6 +7,6 @@ import java.util.List;
 
 public interface ApplicationService {
     List<Application> getUserApplicationsByStatus(int accountId, int statusId);
-    List<ResponseUserApplication> findAllByAccountId(int accountId);
+    List<ResponseUserApplication> findAllByAccountId(int accountId, Integer statusId);
     boolean userHasOpenApplications(int accountId);
 }

@@ -1,5 +1,7 @@
 package com.candido.server.dto.v1.response.application;
 
+import com.candido.server.domain.v1.application.Application;
+import com.candido.server.domain.v1.application.ApplicationStatus;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
 import java.time.LocalDateTime;
@@ -9,6 +11,9 @@ public class ResponseUserApplication {
 
     @JsonProperty("application_id")
     private int applicationId;
+
+    @JsonProperty("status")
+    private ApplicationStatus applicationStatus;
 
     @JsonProperty("filled_body")
     private String filledBody;
@@ -30,6 +35,7 @@ public class ResponseUserApplication {
 
     public ResponseUserApplication(
             int applicationId,
+            ApplicationStatus applicationStatus,
             String filledBody,
             int progress,
             LocalDateTime createdAt,
@@ -38,11 +44,25 @@ public class ResponseUserApplication {
             LocalDateTime sentAt
     ) {
         this.applicationId = applicationId;
+        this.applicationStatus = applicationStatus;
         this.filledBody = filledBody;
         this.progress = progress;
         this.createdAt = createdAt;
         this.updatedAt = updatedAt;
         this.deletedAt = deletedAt;
         this.sentAt = sentAt;
+    }
+
+    public static ResponseUserApplication mapToResponseUserApplication(Application application) {
+        return new ResponseUserApplication(
+                application.getApplicationId(),
+                application.getApplicationStatus(),
+                application.getFilledBody(),
+                application.getProgress(),
+                application.getCreatedAt(),
+                application.getUpdatedAt(),
+                application.getDeletedAt(),
+                application.getSentAt()
+        );
     }
 }

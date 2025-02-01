@@ -1,13 +1,15 @@
 INSERT IGNORE INTO account(fk_account_role_id, fk_account_status_id, email, password, created_at, deleted_at)
 VALUES
-    (2, 2, "admin@candidocorp.com", "", now(), null);
+    (2, 2, "admin@candidocorp.com", "", now(), null),
+    (2, 2, "client@candidocorp.com", "", now(), null);
 
 INSERT IGNORE INTO user
     (fk_account_id, fk_gender_id, fk_address_id, first_name, last_name, birth_date, mobile_number, phone_number, last_modified_name, created_at, deleted_at)
 VALUES
     (1, 1, null, "John", "Doe", "1998-04-15", "3481138394", "3458483720", null, now(), null);
 
-SET @accountId = (SELECT account_id FROM account WHERE email = "admin@candidocorp.com");
+SET @accountId_admin = (SELECT account_id FROM account WHERE email = "admin@candidocorp.com");
+SET @accountId_client = (SELECT account_id FROM account WHERE email = "client@candidocorp.com");
 
 INSERT IGNORE INTO application_form (
     fk_account_id,
@@ -25,7 +27,7 @@ INSERT IGNORE INTO application_form (
     feedback_expiration_date
 ) VALUES
 (
-    @accountId,               -- fk_account_id
+    @accountId_admin,               -- fk_account_id
     'Modulo di iscrizione',            -- display_name
     'Note iniziali del modulo di iscrizione', -- notes
     10,              -- max_applicants
@@ -40,7 +42,7 @@ INSERT IGNORE INTO application_form (
     '2024-03-01 09:00:00'  -- feedback_expiration_date
 ),
 (
-    @accountId,
+    @accountId_admin,
     'Modulo di feedback',
     'Note sul modulo di feedback',
     5,
@@ -55,7 +57,7 @@ INSERT IGNORE INTO application_form (
     '2024-04-01 09:00:00'
 ),
 (
-    @accountId,
+    @accountId_admin,
     'Modulo avanzato',
     'Note sul modulo avanzato',
     20,
@@ -88,7 +90,7 @@ INSERT IGNORE INTO application (
 ) VALUES
 (
     1,        -- AUTO INCREMENT
-    @accountId,        -- ID account
+    @accountId_client,        -- ID account
     @formIdOne,        -- Collegato al primo form
     1,        -- Esempio di status
     '{}',
@@ -100,7 +102,7 @@ INSERT IGNORE INTO application (
 ),
 (
     2,
-    @accountId,
+    @accountId_client,
     @formIdTwo,
     2,
     '{}',
@@ -112,7 +114,7 @@ INSERT IGNORE INTO application (
 ),
 (
     3,
-    @accountId,
+    @accountId_client,
     @formIdThree,
     3,
     '{}',
@@ -124,7 +126,7 @@ INSERT IGNORE INTO application (
 ),
 (
     4,
-    @accountId,
+    @accountId_client,
     @formIdOne,
     4,
     '{}',
@@ -136,7 +138,7 @@ INSERT IGNORE INTO application (
 ),
 (
     5,
-    @accountId,
+    @accountId_client,
     @formIdTwo,
     5,
     '{}',

@@ -30,9 +30,12 @@ public class ControllerApplication {
 
     @VerifiedUser
     @GetMapping
-    public ResponseEntity<List<ResponseUserApplication>> getApplications(Authentication authentication) {
+    public ResponseEntity<List<ResponseUserApplication>> getApplications(
+            Authentication authentication,
+            @RequestParam(value = "status", required = false) Integer statusId
+    ) {
         Account account = accountService.findAccountByEmailOrThrow(authentication.getName());
-        return ResponseEntity.ok(applicationService.findAllByAccountId(account.getId()));
+        return ResponseEntity.ok(applicationService.findAllByAccountId(account.getId(), statusId));
     }
 
 }
