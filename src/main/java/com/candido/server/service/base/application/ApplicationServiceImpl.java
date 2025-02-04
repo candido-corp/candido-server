@@ -1,9 +1,7 @@
 package com.candido.server.service.base.application;
 
-import com.candido.server.domain.v1.application.Application;
-import com.candido.server.domain.v1.application.ApplicationRepository;
-import com.candido.server.domain.v1.application.Application_;
-import com.candido.server.domain.v1.application.EnumApplicationStatus;
+import com.candido.server.domain.v1.application.*;
+import com.candido.server.dto.v1.response.application.ResponseApplicationForm;
 import com.candido.server.dto.v1.response.application.ResponseUserApplication;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.jpa.domain.Specification;
@@ -15,12 +13,15 @@ import java.util.List;
 public class ApplicationServiceImpl implements ApplicationService {
 
     private final ApplicationRepository applicationRepository;
+    private final XrefAccountApplicationSavedRepository xrefAccountApplicationSavedRepository;
 
     @Autowired
     public ApplicationServiceImpl(
-            ApplicationRepository applicationRepository
+            ApplicationRepository applicationRepository,
+            XrefAccountApplicationSavedRepository xrefAccountApplicationSavedRepository
     ) {
         this.applicationRepository = applicationRepository;
+        this.xrefAccountApplicationSavedRepository = xrefAccountApplicationSavedRepository;
     }
 
     @Override
@@ -39,6 +40,17 @@ public class ApplicationServiceImpl implements ApplicationService {
                     .stream().map(ResponseUserApplication::mapToResponseUserApplication).toList();
         }
         return applicationRepository.findAllByAccountId(accountId, ResponseUserApplication.class);
+    }
+
+    @Override
+    public List<ResponseApplicationForm> findAllApplicationsSavedByAccountId(int accountId) {
+        return xrefAccountApplicationSavedRepository.findAllByAccountId(accountId)
+                .stream()
+                .map(xrefAccountApplicationSaved ->
+                        ResponseApplicationForm.mapToResponseApplicationForm(
+                                xrefAccountApplicationSaved.getApplicationForm()
+                        )
+                ).toList();
     }
 
     @Override

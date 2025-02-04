@@ -3,13 +3,14 @@ VALUES
     (2, 2, "admin@candidocorp.com", "", now(), null),
     (2, 2, "client@candidocorp.com", "", now(), null);
 
+SET @accountId_admin = (SELECT account_id FROM account WHERE email = "admin@candidocorp.com");
+SET @accountId_client = (SELECT account_id FROM account WHERE email = "client@candidocorp.com");
+
 INSERT IGNORE INTO user
     (fk_account_id, fk_gender_id, fk_address_id, first_name, last_name, birth_date, mobile_number, phone_number, last_modified_name, created_at, deleted_at)
 VALUES
-    (1, 1, null, "John", "Doe", "1998-04-15", "3481138394", "3458483720", null, now(), null);
-
-SET @accountId_admin = (SELECT account_id FROM account WHERE email = "admin@candidocorp.com");
-SET @accountId_client = (SELECT account_id FROM account WHERE email = "client@candidocorp.com");
+    (@accountId_admin, 1, null, "Admin", "Doe", "1998-04-15", "12345678", "", null, now(), null),
+    (@accountId_client, 1, null, "Client", "Ino", "1975-10-22", "999999999", "3458483720", null, now(), null);
 
 INSERT IGNORE INTO application_form (
     fk_account_id,
@@ -147,4 +148,24 @@ INSERT IGNORE INTO application (
     '2025-01-29 08:00:00',   -- updated_at
     NULL,
     NULL
+);
+
+INSERT IGNORE INTO xref_account_application_saved (
+    fk_account_id,
+    fk_application_form_id,
+    saved_at
+) VALUES (
+    @accountId_client,
+    @formIdOne,
+    '2023-05-13 10:15:00'
+),
+(
+    @accountId_client,
+    @formIdTwo,
+    '2023-09-22 09:30:00'
+),
+(
+    @accountId_client,
+    @formIdThree,
+    '2024-03-01 09:00:00'
 );
