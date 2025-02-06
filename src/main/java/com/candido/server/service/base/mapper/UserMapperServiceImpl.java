@@ -1,21 +1,26 @@
 package com.candido.server.service.base.mapper;
 
-import com.candido.server.domain.v1.account.Account;
-import com.candido.server.domain.v1.user.Address;
 import com.candido.server.domain.v1.user.Gender;
 import com.candido.server.domain.v1.user.User;
-import com.candido.server.dto.v1.util.AddressDto;
 import com.candido.server.dto.v1.util.GenderDto;
 import com.candido.server.dto.v1.util.UserDto;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
-import java.time.format.DateTimeFormatter;
 
 @Service
 public class UserMapperServiceImpl implements UserMapperService {
 
+    private final AddressMapperService addressMapperService;
+
+    @Autowired
+    public UserMapperServiceImpl(
+            AddressMapperService addressMapperService
+    ) {
+        this.addressMapperService = addressMapperService;
+    }
+
     @Override
-    public UserDto userToUserDto(User user, Account account) {
+    public UserDto userToUserDto(User user, boolean hasOpenApplications) {
         if (user == null) return null;
 
         UserDto userDto = new UserDto();
@@ -24,13 +29,12 @@ public class UserMapperServiceImpl implements UserMapperService {
         userDto.setLastName(user.getLastName());
         userDto.setEmail(account.getEmail());
         userDto.setGender(genderToGenderDto(user.getGender()));
-        userDto.setAddress(addressToAddressDto(user.getAddress()));
+        userDto.setAddress(addressMapperService.addressToUserAddressDto(user.getAddress()));
         userDto.setBirthdate(user.getBirthdate());
         userDto.setMobileNumber(user.getMobileNumber());
         userDto.setPhoneNumber(user.getPhoneNumber());
         userDto.setCreatedAt(user.getCreatedAt());
-        userDto.setDeletedAt(user.getDeletedAt());
-        userDto.setCanChangeName(user.getLastModifiedName());
+        userDto.setCanChangeName(user.getLastModifiedName(), hasOpenApplications);
 
         return userDto;
     }
@@ -40,19 +44,6 @@ public class UserMapperServiceImpl implements UserMapperService {
         return new GenderDto(
                 gender.getId(),
                 gender.getDescription()
-        );
-    }
-
-    protected AddressDto addressToAddressDto(Address address) {
-        if (address == null) return null;
-        return new AddressDto(
-                address.getId(),
-                address.getCountry(),
-                address.getRegion(),
-                address.getCity(),
-                address.getPostalCode(),
-                address.getStreet(),
-                address.getHouseNumber()
         );
     }
 

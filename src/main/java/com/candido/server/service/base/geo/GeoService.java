@@ -5,6 +5,6 @@ import com.candido.server.dto.v1.response.geo.*;
 import java.util.List;
 
 public interface GeoService {
-    List<GeoTerritoryDto> getTerritories(String territoryKey);
-    GeoTerritoryListDto getTerritoryChildren(int territoryId);
+    List<ResponseGeoTerritoryDto> getTerritories(String territoryKey);
+    ResponseGeoTerritoryListDto getTerritoryChildren(int territoryId);
 }
