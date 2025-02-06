@@ -5,9 +5,6 @@ import com.candido.server.domain.v1.user.User;
 import lombok.Getter;
 import org.springframework.context.ApplicationEvent;
 
-import java.io.IOException;
-import java.io.Serial;
-
 @Getter
 public class OnResetAccountCompletedEvent extends ApplicationEvent {
 

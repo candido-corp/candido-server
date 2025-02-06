@@ -25,8 +25,14 @@ public class DummyDataLoader {
     @Bean
     public CommandLineRunner loadData(AccountRepository repository) {
         return args -> {
-            Optional<Account> optionalAccount = repository.findByEmail("admin@candidocorp.com");
-            optionalAccount.ifPresent(account -> {
+            Optional<Account> optionalAdminAccount = repository.findByEmail("admin@candidocorp.com");
+            optionalAdminAccount.ifPresent(account -> {
+                account.setPassword(passwordEncoder.encode("password"));
+                repository.save(account);
+            });
+
+            Optional<Account> optionalClientAccount = repository.findByEmail("client@candidocorp.com");
+            optionalClientAccount.ifPresent(account -> {
                 account.setPassword(passwordEncoder.encode("password"));
                 repository.save(account);
             });

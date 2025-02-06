@@ -1,4 +1,4 @@
-package com.candido.server.controller.user;
+package com.candido.server.controller.gender;
 
 import com.candido.server.domain.v1.user.Gender;
 import com.candido.server.dto.v1.util.GenderDto;
