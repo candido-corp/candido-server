@@ -21,6 +21,9 @@ public class UserDto {
     @JsonProperty("last_name")
     String lastName;
 
+    @JsonProperty("email")
+    String email;
+
     @JsonProperty("gender")
     GenderDto gender;
 
