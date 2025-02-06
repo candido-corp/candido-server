@@ -27,6 +27,7 @@ public class UserMapperServiceImpl implements UserMapperService {
 
         userDto.setFirstName(user.getFirstName());
         userDto.setLastName(user.getLastName());
+        userDto.setEmail(account.getEmail());
         userDto.setGender(genderToGenderDto(user.getGender()));
         userDto.setAddress(addressMapperService.addressToUserAddressDto(user.getAddress()));
         userDto.setBirthdate(user.getBirthdate());

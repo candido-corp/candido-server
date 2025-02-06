@@ -32,7 +32,8 @@ public class ControllerAccount {
     @GetMapping
     public ResponseEntity<AccountDto> getAccountInfo(Authentication authentication) {
         Account account = accountService.findAccountByEmailOrThrow(authentication.getName());
-        return ResponseEntity.ok(accountMapper.accountToAccountDto(account));
+        User user = userService.findUserByAccountIdOrThrow(account.getId());
+        return ResponseEntity.ok(accountMapper.accountToAccountDto(account, user));
     }
 
 }
