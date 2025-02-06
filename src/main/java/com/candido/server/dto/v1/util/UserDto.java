@@ -1,5 +1,6 @@
 package com.candido.server.dto.v1.util;
 
+import com.candido.server.dto.v1.response.geo.ResponseUserAddress;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -25,7 +26,7 @@ public class UserDto {
     GenderDto gender;
 
     @JsonProperty("address")
-    AddressDto address;
+    ResponseUserAddress address;
 
     @JsonProperty("birthdate")
     LocalDate birthdate;
@@ -39,15 +40,17 @@ public class UserDto {
     @JsonProperty("created_at")
     LocalDateTime createdAt;
 
-    @JsonProperty("deleted_at")
-    LocalDateTime deletedAt;
-
     @JsonProperty("can_change_name")
     boolean canChangeName;
 
-    public void setCanChangeName(LocalDateTime lastModifiedName) {
+    public void setCanChangeName(LocalDateTime lastModifiedName, boolean hasOpenApplications) {
         this.canChangeName =
-                lastModifiedName == null ||
-                        lastModifiedName.plusDays(NAME_CHANGE_TIME_THRESHOLD).isBefore(LocalDateTime.now());
+                !hasOpenApplications &&
+                        (
+                                lastModifiedName == null ||
+                                lastModifiedName
+                                        .plusDays(NAME_CHANGE_TIME_THRESHOLD)
+                                        .isBefore(LocalDateTime.now())
+                        );
     }
 }

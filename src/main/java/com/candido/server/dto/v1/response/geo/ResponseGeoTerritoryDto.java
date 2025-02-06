@@ -6,7 +6,7 @@ import lombok.Data;
 
 @Builder
 @Data
-public class GeoTerritoryDto {
+public class ResponseGeoTerritoryDto {
 
     @JsonProperty("territory_id")
     private int territoryId;

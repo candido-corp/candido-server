@@ -22,6 +22,9 @@ public class Gender {
     @Column(name = "description")
     private String description;
 
+    public Gender() {
+    }
+
     public Gender(int genderId) {
         this.id = genderId;
     }

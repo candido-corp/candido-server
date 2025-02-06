@@ -26,7 +26,7 @@ public class GeoServiceImpl implements GeoService {
     }
 
     @Override
-    public List<GeoTerritoryDto> getTerritories(String territoryKey) {
+    public List<ResponseGeoTerritoryDto> getTerritories(String territoryKey) {
         return territoryService.findAllByCategoryId(territoryKey)
                 .stream()
                 .map(TerritoryMapperService::mapTerritoryToGeoTerritoryDto)
@@ -34,9 +34,9 @@ public class GeoServiceImpl implements GeoService {
     }
 
     @Override
-    public GeoTerritoryListDto getTerritoryChildren(int territoryId) {
+    public ResponseGeoTerritoryListDto getTerritoryChildren(int territoryId) {
         Optional<Territory> territoryOptional = territoryService.findById(territoryId);
-        if(territoryOptional.isEmpty()) return GeoTerritoryListDto.builder().build();
+        if(territoryOptional.isEmpty()) return ResponseGeoTerritoryListDto.builder().build();
 
         List<Integer> xrefTerritorySubdivisionList = xrefTerritorySubdivisionService
                 .findByTerritoryMotherId(territoryId)
@@ -44,7 +44,7 @@ public class GeoServiceImpl implements GeoService {
                 .map(XrefTerritorySubdivision::getTerritorySonId)
                 .toList();
 
-        List<GeoTerritoryDto> territoryList = territoryService.findAllTerritoriesBySonListId(xrefTerritorySubdivisionList)
+        List<ResponseGeoTerritoryDto> territoryList = territoryService.findAllTerritoriesBySonListId(xrefTerritorySubdivisionList)
                 .stream()
                 .map(TerritoryMapperService::mapTerritoryToGeoTerritoryDto)
                 .toList();
@@ -55,7 +55,7 @@ public class GeoServiceImpl implements GeoService {
                     .ifPresent(territory -> territoryCategory.set(territory.getTerritoryCategory()));
         }
 
-        return GeoTerritoryListDto
+        return ResponseGeoTerritoryListDto
                 .builder()
                 .labelId(territoryCategory.get().getTerritoryCategoryId())
                 .labelName(territoryCategory.get().getTerritoryCategoryKey())
