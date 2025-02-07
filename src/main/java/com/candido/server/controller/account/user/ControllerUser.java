@@ -50,7 +50,7 @@ public class ControllerUser {
         Account account = accountService.findAccountByEmailOrThrow(authentication.getName());
         User user = userService.findUserByAccountIdOrThrow(account.getId());
         boolean userHasOpenApplications = applicationService.userHasOpenApplications(account.getId());
-        UserDto userDto = userMapper.userToUserDto(user, userHasOpenApplications);
+        UserDto userDto = userMapper.userToUserDto(user, account, userHasOpenApplications);
         return ResponseEntity.ok(userDto);
     }
 
@@ -74,6 +74,7 @@ public class ControllerUser {
         User user = userService.findUserByAccountIdOrThrow(account.getId());
         UserDto userDto = userMapper.userToUserDto(
                 userService.save(user, requestUpdateUserDto, userHasOpenApplications),
+                account,
                 userHasOpenApplications
         );
 

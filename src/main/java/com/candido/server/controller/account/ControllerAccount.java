@@ -1,10 +1,10 @@
 package com.candido.server.controller.account;
 
 import com.candido.server.domain.v1.account.Account;
+import com.candido.server.domain.v1.user.User;
 import com.candido.server.dto.v1.util.AccountDto;
 import com.candido.server.service.base.account.AccountService;
 import com.candido.server.service.base.mapper.AccountMapperService;
-import com.candido.server.service.base.mapper.UserMapperService;
 import com.candido.server.service.base.user.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -17,16 +17,17 @@ public class ControllerAccount {
 
     private final AccountService accountService;
     private final AccountMapperService accountMapper;
+    private final UserService userService;
 
     @Autowired
     public ControllerAccount(
             AccountService accountService,
             AccountMapperService accountMapper,
-            UserMapperService userMapper,
             UserService userService
     ) {
         this.accountService = accountService;
         this.accountMapper = accountMapper;
+        this.userService = userService;
     }
 
     @GetMapping

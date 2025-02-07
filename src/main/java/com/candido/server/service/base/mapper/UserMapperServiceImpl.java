@@ -1,5 +1,6 @@
 package com.candido.server.service.base.mapper;
 
+import com.candido.server.domain.v1.account.Account;
 import com.candido.server.domain.v1.user.Gender;
 import com.candido.server.domain.v1.user.User;
 import com.candido.server.dto.v1.util.GenderDto;
@@ -20,7 +21,7 @@ public class UserMapperServiceImpl implements UserMapperService {
     }
 
     @Override
-    public UserDto userToUserDto(User user, boolean hasOpenApplications) {
+    public UserDto userToUserDto(User user, Account account, boolean hasOpenApplications) {
         if (user == null) return null;
 
         UserDto userDto = new UserDto();
