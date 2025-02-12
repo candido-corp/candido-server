@@ -19,52 +19,53 @@ import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/api/v1/me/details")
-public class ControllerUser {
+@RequestMapping("/api/v1/me/details/addresses")
+public class ControllerUserAddress {
 
     private final AccountService accountService;
-    private final UserMapperService userMapper;
+    private final AddressMapperService addressMapper;
     private final UserService userService;
-    private final ApplicationService applicationService;
 
     @Autowired
-    public ControllerUser(
+    public ControllerUserAddress(
             AccountService accountService,
-            UserMapperService userMapper,
-            UserService userService,
-            ApplicationService applicationService
+            AddressMapperService addressMapper,
+            UserService userService
     ) {
         this.accountService = accountService;
-        this.userMapper = userMapper;
+        this.addressMapper = addressMapper;
         this.userService = userService;
-        this.applicationService = applicationService;
     }
 
+    @VerifiedUser
     @GetMapping
-    public ResponseEntity<UserDto> getUserInfo(Authentication authentication) {
+    public ResponseEntity<ResponseUserAddress> getUserAddresses(Authentication authentication) {
         Account account = accountService.findAccountByEmailOrThrow(authentication.getName());
         User user = userService.findUserByAccountIdOrThrow(account.getId());
-        boolean userHasOpenApplications = applicationService.userHasOpenApplications(account.getId());
-        UserDto userDto = userMapper.userToUserDto(user, account, userHasOpenApplications);
-        return ResponseEntity.ok(userDto);
+        ResponseUserAddress responseUserAddress = addressMapper.addressToUserAddressDto(user.getAddress());
+        return responseUserAddress == null ? ResponseEntity.noContent().build() : ResponseEntity.ok(responseUserAddress);
     }
 
     @VerifiedUser
     @PutMapping
-    public ResponseEntity<UserDto> postUserInfo(
+    public ResponseEntity<ResponseUserAddress> putUserAddresses(
             Authentication authentication,
-            @RequestBody RequestUpdateUser requestUpdateUser
+            @RequestBody RequestAddress requestUserAddressDto
     ) {
         Account account = accountService.findAccountByEmailOrThrow(authentication.getName());
-        boolean userHasOpenApplications = applicationService.userHasOpenApplications(account.getId());
         User user = userService.findUserByAccountIdOrThrow(account.getId());
-        UserDto userDto = userMapper.userToUserDto(
-                userService.save(user, requestUpdateUser, userHasOpenApplications),
-                account,
-                userHasOpenApplications
-        );
+        user = userService.updateAddress(user, requestUserAddressDto);
+        ResponseUserAddress responseUserAddress = addressMapper.addressToUserAddressDto(user.getAddress());
+        return responseUserAddress == null ? ResponseEntity.noContent().build() : ResponseEntity.ok(responseUserAddress);
+    }
 
-        return ResponseEntity.ok(userDto);
+    @VerifiedUser
+    @DeleteMapping
+    public ResponseEntity<Void> deleteUserAddresses(Authentication authentication) {
+        Account account = accountService.findAccountByEmailOrThrow(authentication.getName());
+        User user = userService.findUserByAccountIdOrThrow(account.getId());
+        userService.deleteAddress(user);
+        return ResponseEntity.noContent().build();
     }
 
 }

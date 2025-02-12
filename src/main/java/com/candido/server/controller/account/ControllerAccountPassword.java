@@ -2,6 +2,7 @@ package com.candido.server.controller.account;
 
 import com.candido.server.service.base.auth.AuthenticationService;
 import com.candido.server.util.UtilService;
+import com.candido.server.validation.annotations.VerifiedUser;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -29,6 +30,7 @@ public class ControllerAccountPassword {
         this.utilService = utilService;
     }
 
+    @VerifiedUser
     @PostMapping
     public ResponseEntity<Void> editAccountPassword(
             Authentication authentication,

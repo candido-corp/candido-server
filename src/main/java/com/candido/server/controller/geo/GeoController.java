@@ -1,8 +1,8 @@
 package com.candido.server.controller.geo;
 
 import com.candido.server.domain.v1.geo.EnumTerritoryCategoryKey;
-import com.candido.server.dto.v1.response.geo.ResponseGeoTerritoryDto;
-import com.candido.server.dto.v1.response.geo.ResponseGeoTerritoryListDto;
+import com.candido.server.dto.v1.response.geo.ResponseGeoTerritory;
+import com.candido.server.dto.v1.response.geo.ResponseGeoTerritoryList;
 import com.candido.server.service.base.geo.GeoService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -24,15 +24,15 @@ public class GeoController {
     }
 
     @GetMapping
-    public ResponseEntity<List<ResponseGeoTerritoryDto>> getAllCountries() {
+    public ResponseEntity<List<ResponseGeoTerritory>> getAllCountries() {
         return ResponseEntity.ok(geoService.getTerritories(EnumTerritoryCategoryKey.T_COUNTRY.name()));
     }
 
     @GetMapping("/{territoryId}/children")
-    public ResponseEntity<ResponseGeoTerritoryListDto> getAllChildrenByTerritoryId(
+    public ResponseEntity<ResponseGeoTerritoryList> getAllChildrenByTerritoryId(
             @PathVariable("territoryId") int territoryId
     ) {
-        ResponseGeoTerritoryListDto territoryList = geoService.getTerritoryChildren(territoryId);
+        ResponseGeoTerritoryList territoryList = geoService.getTerritoryChildren(territoryId);
         return ResponseEntity.ok(territoryList);
     }
 

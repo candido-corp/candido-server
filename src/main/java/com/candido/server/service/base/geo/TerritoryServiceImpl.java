@@ -1,7 +1,7 @@
 package com.candido.server.service.base.geo;
 
 import com.candido.server.domain.v1.geo.*;
-import com.candido.server.dto.v1.response.geo.ResponseGeoTerritoryDto;
+import com.candido.server.dto.v1.response.geo.ResponseGeoTerritory;
 import com.candido.server.dto.v1.response.geo.ResponseUserAddressTerritory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.jpa.domain.Specification;
@@ -65,7 +65,7 @@ public class TerritoryServiceImpl implements TerritoryService {
         Territory territory = findById(territoryId).orElse(null);
         if (territory == null) return null;
 
-        ResponseGeoTerritoryDto responseGeoTerritoryDto = ResponseGeoTerritoryDto
+        ResponseGeoTerritory responseGeoTerritory = ResponseGeoTerritory
                 .builder()
                 .territoryId(territory.getTerritoryId())
                 .territoryName(territory.getTerritoryName())
@@ -74,7 +74,7 @@ public class TerritoryServiceImpl implements TerritoryService {
         return ResponseUserAddressTerritory
                 .builder()
                 .orderId(0)
-                .territory(responseGeoTerritoryDto)
+                .territory(responseGeoTerritory)
                 .labelName(territory.getTerritoryCategory().getTerritoryCategoryKey())
                 .labelId(territory.getTerritoryCategoryId())
                 .build();
