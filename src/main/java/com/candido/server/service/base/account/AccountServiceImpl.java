@@ -3,8 +3,9 @@ package com.candido.server.service.base.account;
 import com.candido.server.domain.v1.account.*;
 import com.candido.server.domain.v1.provider.AuthProviderEnum;
 import com.candido.server.domain.v1.user.User;
+import com.candido.server.dto.v1.request.account.RequestAccountSettings;
 import com.candido.server.dto.v1.request.auth.RequestRegister;
-import com.candido.server.dto.v1.util.AccountUserPair;
+import com.candido.server.dto.v1.util.AccountUserPairDto;
 import com.candido.server.exception._common.EnumExceptionName;
 import com.candido.server.exception.account.*;
 import com.candido.server.service.base.auth.provider.AuthProviderService;
@@ -18,6 +19,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -35,6 +37,8 @@ public class AccountServiceImpl implements AccountService {
 
     private final UserService userService;
 
+    private final AccountSettingsService accountSettingsService;
+
     @Autowired
     public AccountServiceImpl(
             AccountRepository accountRepository,
@@ -42,7 +46,8 @@ public class AccountServiceImpl implements AccountService {
             TokenService tokenService,
             PasswordEncoder passwordEncoder,
             AuthProviderService authProviderService,
-            UserService userService
+            UserService userService,
+            AccountSettingsService accountSettingsService
     ) {
         this.accountRepository = accountRepository;
         this.accountRoleRepository = accountRoleRepository;
@@ -50,6 +55,7 @@ public class AccountServiceImpl implements AccountService {
         this.passwordEncoder = passwordEncoder;
         this.authProviderService = authProviderService;
         this.userService = userService;
+        this.accountSettingsService = accountSettingsService;
     }
 
     @Override
@@ -125,9 +131,14 @@ public class AccountServiceImpl implements AccountService {
         save(account);
     }
 
+    @Override
+    public void saveAccountSettings(int accountId, List<RequestAccountSettings<?>> settings) {
+        settings.forEach(setting -> accountSettingsService.saveAccountSetting(accountId, setting.key(), setting.value()));
+    }
+
     @Transactional
     @Override
-    public AccountUserPair createAccount(RequestRegister request) {
+    public AccountUserPairDto createAccount(RequestRegister request) {
         // Verifica l'esistenza di un account duplicato
         var duplicateAccount = findByEmail(request.email());
         if (duplicateAccount.isPresent())
@@ -170,7 +181,7 @@ public class AccountServiceImpl implements AccountService {
         // Aggiunta del provider di autenticazione
         authProviderService.addProviderToAccount(AuthProviderEnum.LOCAL.getProviderId(), savedAccount.getId());
 
-        return new AccountUserPair(savedAccount, user);
+        return new AccountUserPairDto(savedAccount, user);
     }
 
 

@@ -1,9 +1,11 @@
 package com.candido.server.service.base.account;
 
 import com.candido.server.domain.v1.account.Account;
+import com.candido.server.dto.v1.request.account.RequestAccountSettings;
 import com.candido.server.dto.v1.request.auth.RequestRegister;
-import com.candido.server.dto.v1.util.AccountUserPair;
+import com.candido.server.dto.v1.util.AccountUserPairDto;
 
+import java.util.List;
 import java.util.Optional;
 
 public interface AccountService {
@@ -15,7 +17,7 @@ public interface AccountService {
     void enableAccount(int accountId);
     void editPassword(String email, String currentPassword, String password, String confirmPassword);
     void activateAccount(Account account);
+    void saveAccountSettings(int accountId, List<RequestAccountSettings<?>> settings);
 
-
-    AccountUserPair createAccount(RequestRegister request);
+    AccountUserPairDto createAccount(RequestRegister request);
 }

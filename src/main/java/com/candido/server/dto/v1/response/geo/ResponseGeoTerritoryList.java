@@ -8,7 +8,7 @@ import java.util.List;
 
 @Builder
 @Data
-public class ResponseGeoTerritoryListDto {
+public class ResponseGeoTerritoryList {
 
     @JsonProperty("label_id")
     private int labelId;
@@ -17,6 +17,6 @@ public class ResponseGeoTerritoryListDto {
     private String labelName;
 
     @JsonProperty("territory_list")
-    private List<ResponseGeoTerritoryDto> territoryList;
+    private List<ResponseGeoTerritory> territoryList;
 
 }

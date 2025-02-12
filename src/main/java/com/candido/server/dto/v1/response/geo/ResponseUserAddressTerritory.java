@@ -19,6 +19,6 @@ public class ResponseUserAddressTerritory {
     private String labelName;
 
     @JsonUnwrapped
-    private ResponseGeoTerritoryDto territory;
+    private ResponseGeoTerritory territory;
 
 }

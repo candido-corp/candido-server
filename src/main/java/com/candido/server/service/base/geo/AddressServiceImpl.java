@@ -2,7 +2,7 @@ package com.candido.server.service.base.geo;
 
 import com.candido.server.domain.v1.geo.Address;
 import com.candido.server.domain.v1.geo.AddressRepository;
-import com.candido.server.dto.v1.request.geo.RequestAddressDto;
+import com.candido.server.dto.v1.request.geo.RequestAddress;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -27,8 +27,8 @@ public class AddressServiceImpl implements AddressService {
     }
 
     @Override
-    public Address saveAddress(Integer addressId, RequestAddressDto requestAddressDto) {
-        if(requestAddressDto.territoryId() == null || requestAddressDto.addressTypeId() == null) {
+    public Address saveAddress(Integer addressId, RequestAddress requestAddress) {
+        if(requestAddress.territoryId() == null || requestAddress.addressTypeId() == null) {
             return null;
         }
 
@@ -42,11 +42,11 @@ public class AddressServiceImpl implements AddressService {
             address.setCreatedAt(LocalDateTime.now());
         }
 
-        address.setTerritoryId(requestAddressDto.territoryId());
-        address.setAddressTypeId(requestAddressDto.addressTypeId());
-        address.setZip(requestAddressDto.zip());
-        address.setStreet(requestAddressDto.street());
-        address.setHouseNumber(requestAddressDto.houseNumber());
+        address.setTerritoryId(requestAddress.territoryId());
+        address.setAddressTypeId(requestAddress.addressTypeId());
+        address.setZip(requestAddress.zip());
+        address.setStreet(requestAddress.street());
+        address.setHouseNumber(requestAddress.houseNumber());
 
         return addressRepository.save(address);
     }

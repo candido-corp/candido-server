@@ -63,31 +63,31 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     @Override
     public ResponseAuthentication registerByEmail(RequestRegister request, String ipAddress, String appUrl) {
         var accountUserPair = accountService.createAccount(request);
-        var token = tokenService.createRegistrationToken(accountUserPair.getAccount(), ipAddress);
+        var token = tokenService.createRegistrationToken(accountUserPair.account(), ipAddress);
 
         var event = new OnEmailRegistrationEvent(
                 this,
-                accountUserPair.getAccount(),
-                accountUserPair.getUser(),
+                accountUserPair.account(),
+                accountUserPair.user(),
                 token.getUuidAccessToken(),
                 appUrl
         );
         eventPublisher.publishEvent(event);
 
-        return createAuthentication(accountUserPair.getAccount(), ipAddress);
+        return createAuthentication(accountUserPair.account(), ipAddress);
     }
 
     @Transactional
     @Override
     public ResponseRegistration registerByCode(RequestRegister request, String ipAddress, String appUrl) {
         var accountUserPair = accountService.createAccount(request);
-        var token = tokenService.createRegistrationToken(accountUserPair.getAccount(), ipAddress);
+        var token = tokenService.createRegistrationToken(accountUserPair.account(), ipAddress);
         var temporaryCode = temporaryCodeService.assignCode(token.getId());
 
         var event = new OnCodeRegistrationEvent(
                 this,
-                accountUserPair.getAccount(),
-                accountUserPair.getUser(),
+                accountUserPair.account(),
+                accountUserPair.user(),
                 token.getUuidAccessToken(),
                 temporaryCode.getCode(),
                 appUrl

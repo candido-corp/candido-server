@@ -5,8 +5,8 @@ import com.candido.server.dto.v1.response.geo.*;
 
 public interface TerritoryMapperService {
 
-    static ResponseGeoTerritoryDto mapTerritoryToGeoTerritoryDto(Territory territory) {
-        return ResponseGeoTerritoryDto
+    static ResponseGeoTerritory mapTerritoryToGeoTerritoryDto(Territory territory) {
+        return ResponseGeoTerritory
                 .builder()
                 .territoryId(territory.getTerritoryId())
                 .territoryName(territory.getTerritoryName())

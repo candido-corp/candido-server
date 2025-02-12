@@ -1,16 +1,14 @@
 package com.candido.server.service.base.user;
 
 import com.candido.server.domain.v1.geo.Address;
-import com.candido.server.domain.v1.user.Gender;
 import com.candido.server.domain.v1.user.User;
 import com.candido.server.domain.v1.user.UserRepository;
 import com.candido.server.domain.v1.user.User_;
-import com.candido.server.dto.v1.request.account.RequestUpdateUserDto;
-import com.candido.server.dto.v1.request.geo.RequestAddressDto;
+import com.candido.server.dto.v1.request.account.RequestUpdateUser;
+import com.candido.server.dto.v1.request.geo.RequestAddress;
 import com.candido.server.exception._common.EnumExceptionName;
 import com.candido.server.exception.account.ExceptionAccountNotFound;
 import com.candido.server.service.base.geo.AddressService;
-import com.candido.server.service.base.geo.AddressServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
@@ -53,21 +51,21 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public User save(User user, RequestUpdateUserDto requestUpdateUserDto, boolean canChangeName) {
+    public User save(User user, RequestUpdateUser requestUpdateUser, boolean canChangeName) {
         if(canChangeName) {
-            user.setFirstName(requestUpdateUserDto.firstName());
-            user.setLastName(requestUpdateUserDto.lastName());
+            user.setFirstName(requestUpdateUser.firstName());
+            user.setLastName(requestUpdateUser.lastName());
             user.setLastModifiedName(LocalDateTime.now());
         }
 
-        user.setGenderId(requestUpdateUserDto.genderId());
-        user.setBirthdate(requestUpdateUserDto.birthdate());
-        user.setMobileNumber(requestUpdateUserDto.mobileNumber());
-        user.setPhoneNumber(requestUpdateUserDto.phoneNumber());
+        user.setGenderId(requestUpdateUser.genderId());
+        user.setBirthdate(requestUpdateUser.birthdate());
+        user.setMobileNumber(requestUpdateUser.mobileNumber());
+        user.setPhoneNumber(requestUpdateUser.phoneNumber());
 
-        if (requestUpdateUserDto.address() != null) {
+        if (requestUpdateUser.address() != null) {
             Address address = addressService.saveAddress(
-                    user.getAddressId(), requestUpdateUserDto.address()
+                    user.getAddressId(), requestUpdateUser.address()
             );
             user.setAddressId(address.getAddressId());
         }
@@ -77,7 +75,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public User updateAddress(User user, RequestAddressDto requestUserAddressDto) {
+    public User updateAddress(User user, RequestAddress requestUserAddressDto) {
         if (requestUserAddressDto != null) {
             Address address = addressService.saveAddress(
                     user.getAddressId(), requestUserAddressDto
