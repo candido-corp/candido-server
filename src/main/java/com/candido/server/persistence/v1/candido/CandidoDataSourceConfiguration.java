@@ -44,20 +44,32 @@ public class CandidoDataSourceConfiguration extends HikariDataSource {
     public LocalContainerEntityManagerFactoryBean candidoEntityManager(
             @Qualifier(DATASOURCE) final HikariDataSource hikariDataSource
     ) {
-        return new LocalContainerEntityManagerFactoryBean() {{
-            setDataSource(hikariDataSource);
-            setPersistenceProviderClass(HibernatePersistenceProvider.class);
-            setPersistenceUnitName(PERSISTENCE_UNIT_NAME);
-            setPackagesToScan(MODEL_PACKAGE);
-            HashMap<String, String> MAP_PROPERTIES = new HashMap<>();
-            MAP_PROPERTIES.put(CommonDataSourceConfigurationConstant.HIBERNATE_SHOW_SQL, environment.getProperty(CommonDataSourceConfigurationConstant.COMMON_PROPERTIES_SHOW_SQL));
-            MAP_PROPERTIES.put(CommonDataSourceConfigurationConstant.HIBERNATE_JTA_PLATFORM, environment.getProperty(CONFIGURATION_PROPERTIES +  ".jta-platform"));
-            setJpaPropertyMap(MAP_PROPERTIES);
-        }};
+        LocalContainerEntityManagerFactoryBean localContainer =
+            new LocalContainerEntityManagerFactoryBean();
+
+        localContainer.setDataSource(hikariDataSource);
+        localContainer.setPersistenceProviderClass(HibernatePersistenceProvider.class);
+        localContainer.setPersistenceUnitName(PERSISTENCE_UNIT_NAME);
+        localContainer.setPackagesToScan(MODEL_PACKAGE);
+
+        HashMap<String, String> properties = new HashMap<>();
+        properties.put(
+                CommonDataSourceConfigurationConstant.HIBERNATE_SHOW_SQL,
+                environment.getProperty(CommonDataSourceConfigurationConstant.COMMON_PROPERTIES_SHOW_SQL)
+        );
+        properties.put(
+                CommonDataSourceConfigurationConstant.HIBERNATE_JTA_PLATFORM,
+                environment.getProperty(CONFIGURATION_PROPERTIES +  ".jta-platform")
+        );
+        localContainer.setJpaPropertyMap(properties);
+
+        return localContainer;
     }
 
     @Bean(name = TRANSACTION_MANAGER)
-    public PlatformTransactionManager candidoTransactionManager(@Qualifier(ENTITY_MANAGER) EntityManagerFactory candidoEntityManager) {
+    public PlatformTransactionManager candidoTransactionManager(
+            @Qualifier(ENTITY_MANAGER) EntityManagerFactory candidoEntityManager
+    ) {
         return new JpaTransactionManager(candidoEntityManager);
     }
 
