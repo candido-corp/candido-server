@@ -7,15 +7,6 @@ import java.util.List;
 import java.util.Optional;
 
 public interface TokenRepository extends JpaRepository<Token, Integer> {
-
-    @Query(value = """
-        select t\s
-        from Token t\s
-        inner join Account a on t.account.id = a.id\s
-        where a.id = :id\s
-    """)
-    List<Token> findAllValidTokenByUser(Integer id);
-
     List<Token> findAllByAccountId(Integer id);
 
     Optional<Token> findByAccessToken(String accessToken);
