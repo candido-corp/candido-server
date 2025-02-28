@@ -2,6 +2,7 @@ package com.candido.server.config;
 
 import com.candido.server.domain.v1.account.Account;
 import com.candido.server.domain.v1.account.AccountRepository;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Bean;
@@ -11,6 +12,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.util.Optional;
 
+@Slf4j
 @Configuration
 @Profile("dev")
 public class DummyDataLoader {
@@ -27,6 +29,8 @@ public class DummyDataLoader {
     @Bean
     public CommandLineRunner loadData(AccountRepository repository) {
         return args -> {
+            log.info("Changing the password of the default accounts to 'Password123@@'");
+
             Optional<Account> optionalAdminAccount = repository.findByEmail("admin@candidocorp.com");
             optionalAdminAccount.ifPresent(account -> {
                 account.setPassword(passwordEncoder.encode("Password123@@"));
