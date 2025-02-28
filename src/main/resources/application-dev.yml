@@ -43,6 +43,8 @@ application:
         uri: http://localhost:8080/terms-of-service
 
 spring:
+    application:
+        name: candido
     sql:
         init:
             mode: always
@@ -70,18 +72,27 @@ spring:
         properties:
             hibernate:
                 generate_statistics: true
-                format_sql: true
 
                 # PLEASE, DO NOT CHANGE THIS PROPERTY - DEFAULT SCHEMA IS PUBLIC, but we are using a custom schema
                 default_schema: ${DB_NAME}
 
-logging:
-    level:
-      org:
-          hibernate:
-                SQL: DEBUG
-                stat: DEBUG
-                type:
-                    descriptor:
-                        sql:
-                            BasicBinder: TRACE
+management:
+    endpoint:
+        health:
+            show-details: always
+    endpoints:
+        web:
+            exposure:
+                include: '*'
+    metrics:
+        enable:
+            all: true
+            hibernate: true
+            jdbc: true
+        tags:
+            application: ${spring.application.name}
+        distribution:
+            percentiles-histogram:
+                all: true
+            percentiles:
+                all: [0.5, 0.75, 0.95, 0.99]

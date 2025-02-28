@@ -33,6 +33,7 @@ val jsonwebtokenVersion = "0.12.6"
 val springdocOpenApiVersion = "2.3.0"
 val passayVersion = "1.6.4"
 val hibernateJpaModelGeneratorVersion = "6.5.2.Final"
+val micrometerVersion = "1.14.4"
 
 // Don't remove this block. You can use commands like ./gradlew flywayInfo
 buildscript {
@@ -84,9 +85,17 @@ dependencies {
 	// https://mvnrepository.com/artifact/org.hibernate.orm/hibernate-jpamodelgen
 	annotationProcessor("org.hibernate.orm:hibernate-jpamodelgen:$hibernateJpaModelGeneratorVersion")
 
-	// -- Lombok (compileOnly)
+	// -- Lombok (compileOnly) --
 	// https://mvnrepository.com/artifact/org.projectlombok/lombok
 	compileOnly("org.projectlombok:lombok")
+
+	// -- Profiler --
+	// https://mvnrepository.com/artifact/io.micrometer/micrometer-registry-prometheus
+	implementation("io.micrometer:micrometer-registry-prometheus:$micrometerVersion")
+	// https://mvnrepository.com/artifact/io.micrometer/micrometer-core
+	implementation("io.micrometer:micrometer-core:$micrometerVersion")
+	// https://mvnrepository.com/artifact/io.micrometer/micrometer-observation
+	implementation("io.micrometer:micrometer-observation:$micrometerVersion")
 
 	// -- Testing --
 	testImplementation("org.springframework.boot:spring-boot-starter-test")
