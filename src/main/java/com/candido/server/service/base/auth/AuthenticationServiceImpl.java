@@ -30,6 +30,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.http.HttpHeaders;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -141,8 +142,8 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 
     @Override
     public ResponseAuthentication authenticate(RequestAuthentication request, String ipAddress) {
-        authenticationManager.authenticate(request.toUsernamePasswordAuthenticationToken());
-        var account = accountService.findAccountByEmailOrThrow(request.email());
+        Authentication auth = authenticationManager.authenticate(request.toUsernamePasswordAuthenticationToken());
+        var account = (Account)  auth.getPrincipal();
         return createAuthentication(account, ipAddress);
     }
 
@@ -158,18 +159,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
             throw new ExceptionInvalidJWTToken();
 
         String ipAddress = request.getRemoteAddr();
-        Token token = tokenService.createLoginToken(account, ipAddress);
-
-        var expires = configAppProperties.getSecurity().getJwt().getExpiration();
-        var refreshExpires = configAppProperties.getSecurity().getJwt().getRefreshToken().getExpiration();
-
-        return ResponseAuthentication
-                .builder()
-                .accessToken(token.getAccessToken())
-                .expiresIn(expires)
-                .refreshToken(token.getRefreshToken())
-                .refreshExpiresIn(refreshExpires)
-                .build();
+        return createAuthentication(account, ipAddress);
     }
 
     @Override

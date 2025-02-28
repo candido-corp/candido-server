@@ -1,10 +1,7 @@
 package com.candido.server.domain.v1.token;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import java.time.LocalDateTime;
 
@@ -21,7 +18,8 @@ public class TemporaryCode {
     @Column(name = "temporary_code_id")
     private int id;
 
-    @OneToOne
+    @ToString.Exclude
+    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     @JoinColumn(name = "fk_token_id", insertable = false, updatable = false)
     private Token token;
 

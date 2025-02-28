@@ -9,6 +9,7 @@ import lombok.NoArgsConstructor;
 import org.hibernate.annotations.SQLRestriction;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Data
 @Builder
@@ -56,6 +57,9 @@ public class Token {
 
     @Column(name = "valid")
     private boolean valid;
+
+    @OneToMany(mappedBy = "token", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<TemporaryCode> temporaryCodes;
 
     public boolean isAccessTokenExpired() {
         return getAccessTokenExpiration().isBefore(LocalDateTime.now());
