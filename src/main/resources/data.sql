@@ -6,11 +6,22 @@ VALUES
 SET @accountId_admin = (SELECT account_id FROM account WHERE email = "admin@candidocorp.com");
 SET @accountId_client = (SELECT account_id FROM account WHERE email = "client@candidocorp.com");
 
+INSERT IGNORE INTO address (address_id, fk_territory_id, fk_address_type_id, zip, street, house_number, created_at, updated_at, deleted_at)
+VALUES
+    (1, 7272, 1, '20121', 'Via Roma', '10', '2024-02-01 09:00:00', '2024-02-01 11:23:00', NULL),
+    (2, 7271, 2, '30110', 'Via Milano', '25', '2024-02-01 09:00:00', '2024-02-01 11:23:00', NULL);
+
+SET @address_1 = (SELECT address_id FROM address WHERE zip = "20121");
+SET @address_2 = (SELECT address_id FROM address WHERE zip = "30110");
+
 INSERT IGNORE INTO user
     (fk_account_id, fk_gender_id, fk_address_id, first_name, last_name, birth_date, mobile_number, phone_number, last_modified_name, created_at, deleted_at)
 VALUES
-    (@accountId_admin, 1, null, "Admin", "Doe", "1998-04-15", "12345678", "", null, now(), null),
-    (@accountId_client, 1, null, "Client", "Ino", "1975-10-22", "999999999", "3458483720", null, now(), null);
+    (@accountId_admin, 1, @address_1, "Admin", "Doe", "1998-04-15", "12345678", "", null, now(), null),
+    (@accountId_client, 1, @address_2, "Client", "Ino", "1975-10-22", "999999999", "3458483720", null, now(), null);
+
+UPDATE user SET fk_address_id = @address_1 WHERE fk_account_id = @accountId_admin;
+UPDATE user SET fk_address_id = @address_2 WHERE fk_account_id = @accountId_client;
 
 INSERT IGNORE INTO application_form (
     fk_account_id,
