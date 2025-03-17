@@ -1,6 +1,7 @@
 package com.candido.server.service.base.user;
 
 import com.candido.server.domain.v1.geo.Address;
+import com.candido.server.domain.v1.user.Gender;
 import com.candido.server.domain.v1.user.User;
 import com.candido.server.domain.v1.user.UserRepository;
 import com.candido.server.domain.v1.user.User_;
@@ -21,14 +22,16 @@ public class UserServiceImpl implements UserService {
 
     private final UserRepository userRepository;
     private final AddressService addressService;
+    private final GenderService genderService;
 
     @Autowired
     public UserServiceImpl(
             UserRepository userRepository,
-            AddressService addressService
-    ) {
+            AddressService addressService,
+            GenderService genderService) {
         this.userRepository = userRepository;
         this.addressService = addressService;
+        this.genderService = genderService;
     }
 
     @Override
@@ -58,7 +61,8 @@ public class UserServiceImpl implements UserService {
             user.setLastModifiedName(LocalDateTime.now());
         }
 
-        user.setGenderId(requestUpdateUser.genderId());
+        Gender gender = genderService.findGenderByIdOrThrow(requestUpdateUser.genderId());
+        user.setGenderId(gender.getId());
         user.setBirthdate(requestUpdateUser.birthdate());
         user.setMobileNumber(requestUpdateUser.mobileNumber());
         user.setPhoneNumber(requestUpdateUser.phoneNumber());
