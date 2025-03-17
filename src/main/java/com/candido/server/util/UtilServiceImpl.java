@@ -72,13 +72,14 @@ public class UtilServiceImpl implements UtilService {
     }
 
     @Override
-    public String buildCodeVerificationLink(String token, String email) {
+    public String buildCodeVerificationLink(String token, String email, String code) {
         return UriComponentsBuilder
                 .fromHttpUrl(clientDomain)
                 .path("/register/verify")
                 .queryParam("t", token)
                 .queryParam("e", encryptionService.encrypt(email))
                 .queryParam("a", "code")
+                .queryParam("c", code)
                 .toUriString();
     }
 

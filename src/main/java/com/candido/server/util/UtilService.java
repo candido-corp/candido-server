@@ -9,6 +9,6 @@ public interface UtilService {
     String getTemplateContentFromLocalResources(String pathResource, String functionError);
 
     String buildEmailVerificationLink(String token, String email);
-    String buildCodeVerificationLink(String token, String email);
+    String buildCodeVerificationLink(String token, String email, String code);
     String buildResetPasswordLink(String token, String email);
 }

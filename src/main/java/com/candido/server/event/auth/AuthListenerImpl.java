@@ -58,7 +58,7 @@ public class AuthListenerImpl implements AuthListenerService {
         log.info("[Event::CodeRegistration] Account -> {}", event.getAccount());
 
         String email = event.getAccount().getEmail();
-        String linkToVerify = utilService.buildCodeVerificationLink(event.getRegistrationToken(), email);
+        String linkToVerify = utilService.buildCodeVerificationLink(event.getRegistrationToken(), email, event.getTemporaryCode());
         String content = emailService.buildCodeVerificationEmailContent(event.getAccount(), event.getUser(), event.getTemporaryCode(), linkToVerify);
 
         emailService.sendSimpleMessage(
