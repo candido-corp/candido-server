@@ -27,13 +27,13 @@ public class DummyDataLoader {
         return args -> {
             Optional<Account> optionalAdminAccount = repository.findByEmail("admin@candidocorp.com");
             optionalAdminAccount.ifPresent(account -> {
-                account.setPassword(passwordEncoder.encode("password"));
+                account.setPassword(passwordEncoder.encode("Password123@@"));
                 repository.save(account);
             });
 
             Optional<Account> optionalClientAccount = repository.findByEmail("client@candidocorp.com");
             optionalClientAccount.ifPresent(account -> {
-                account.setPassword(passwordEncoder.encode("password"));
+                account.setPassword(passwordEncoder.encode("Password123@@"));
                 repository.save(account);
             });
         };
