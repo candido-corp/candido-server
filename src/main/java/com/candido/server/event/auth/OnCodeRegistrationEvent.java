@@ -13,6 +13,7 @@ public class OnCodeRegistrationEvent extends ApplicationEvent {
     private final String registrationToken;
     private final String temporaryCode;
     private final String appUrl;
+    private final String encryptedEmail;
 
     public OnCodeRegistrationEvent(
             Object source,
@@ -20,7 +21,8 @@ public class OnCodeRegistrationEvent extends ApplicationEvent {
             final User user,
             final String registrationToken,
             final String temporaryCode,
-            final String appUrl
+            final String appUrl,
+            final String encryptedEmail
     ) {
         super(source);
         this.account = account;
@@ -28,6 +30,7 @@ public class OnCodeRegistrationEvent extends ApplicationEvent {
         this.registrationToken = registrationToken;
         this.temporaryCode = temporaryCode;
         this.appUrl = appUrl;
+        this.encryptedEmail = encryptedEmail;
     }
 
 }

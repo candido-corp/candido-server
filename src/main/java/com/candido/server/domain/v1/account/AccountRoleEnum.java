@@ -17,7 +17,16 @@ public enum AccountRoleEnum {
             )
     ),
 
-    USER(2, Collections.emptySet());
+    USER_VERIFIED(2,
+            Set.of(
+                    AccountPermissionEnum.USER_READ,
+                    AccountPermissionEnum.USER_CREATE,
+                    AccountPermissionEnum.USER_UPDATE,
+                    AccountPermissionEnum.USER_DELETE
+            )
+    ),
+
+    USER_NOT_VERIFIED(3, Collections.emptySet());
 
     @Getter
     private final int roleId;

@@ -153,7 +153,7 @@ public class AccountServiceImpl implements AccountService {
         if (!request.password().equals(request.confirmPassword()))
             throw new ExceptionPasswordsDoNotMatch(EnumExceptionName.ERROR_VALIDATION_PASSWORDS_DO_NOT_MATCH.name());
 
-        AccountRole role = accountRoleRepository.findById(AccountRoleEnum.USER.getRoleId())
+        AccountRole role = accountRoleRepository.findById(AccountRoleEnum.USER_NOT_VERIFIED.getRoleId())
                 .orElseThrow(() -> new ExceptionAccountRoleNotFound(EnumExceptionName.ERROR_BUSINESS_ACCOUNT_ROLE_NOT_FOUND.name()));
 
         // Creazione dell'account

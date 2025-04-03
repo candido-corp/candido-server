@@ -1,5 +1,6 @@
 package com.candido.server.service.base.auth.token;
 
+import com.candido.server.config.ConfigTemporaryCode;
 import com.candido.server.domain.v1.token.TemporaryCode;
 import com.candido.server.domain.v1.token.TemporaryCodeRepository;
 import com.candido.server.domain.v1.token.TemporaryCode_;
@@ -11,27 +12,9 @@ import org.springframework.stereotype.Service;
 
 import java.security.SecureRandom;
 import java.text.DecimalFormat;
-import java.time.LocalDateTime;
 
 @Service
 public class TemporaryCodePoolServiceImpl implements TemporaryCodePoolService {
-
-    /**
-     * This represents the max size of the pool for the temporary code.
-     */
-    private static final int MIN_TEMPORARY_CODE_POOL_SIZE = 20;
-
-    /**
-     * This represents the max size of a single temporary code.
-     * This is intended to be MAX - 1 because the random algorithm exclude the last value.
-     * Basically if the number is 1_000_000 the code would be of 6 digit.
-     */
-    private static final int MAX_TEMPORARY_CODE_SIZE = 1_000_000;
-
-    /**
-     * This represents the max number of seconds (S) that the code can be active.
-     */
-    private static final int MAX_TEMPORARY_CODE_DURATION = 300;
 
     private final TemporaryCodeRepository temporaryCodeRepository;
 
@@ -61,8 +44,8 @@ public class TemporaryCodePoolServiceImpl implements TemporaryCodePoolService {
     @Override
     public void checkTemporaryCodePoolSize() {
         long currentPoolSize = countCodeList((root, query, criteriaBuilder) -> root.get(TemporaryCode_.TOKEN_ID).isNull());
-        if (currentPoolSize < MIN_TEMPORARY_CODE_POOL_SIZE) {
-            for (int i = 0; i < MIN_TEMPORARY_CODE_POOL_SIZE - currentPoolSize; i++) {
+        if (currentPoolSize < ConfigTemporaryCode.MIN_TEMPORARY_CODE_POOL_SIZE) {
+            for (int i = 0; i < ConfigTemporaryCode.MIN_TEMPORARY_CODE_POOL_SIZE - currentPoolSize; i++) {
                 generateCode(null);
             }
         }
@@ -80,17 +63,17 @@ public class TemporaryCodePoolServiceImpl implements TemporaryCodePoolService {
         SecureRandom random = new SecureRandom();
         int randomNumber;
         String formattedNumber;
-        int digits = utilService.countDigits(MAX_TEMPORARY_CODE_SIZE - 1L);
+        int digits = utilService.countDigits(ConfigTemporaryCode.MAX_TEMPORARY_CODE_SIZE - 1L);
 
         do {
-            randomNumber = random.nextInt(MAX_TEMPORARY_CODE_SIZE);
+            randomNumber = random.nextInt(ConfigTemporaryCode.MAX_TEMPORARY_CODE_SIZE);
             formattedNumber = generateFormattedNumber(randomNumber, digits);
         } while(temporaryCodeRepository.findByCode(formattedNumber).isPresent());
 
         var temporaryCode = TemporaryCode.builder()
                 .code(formattedNumber)
                 .tokenId(tokenId)
-                .expirationDate(LocalDateTime.now().plusSeconds(MAX_TEMPORARY_CODE_DURATION))
+                .expirationDate(null)
                 .build();
 
         return temporaryCodeRepository.save(temporaryCode);

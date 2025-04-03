@@ -12,19 +12,22 @@ public class OnResetAccountEvent extends ApplicationEvent {
     private final transient User user;
     private final String resetToken;
     private final String appUrl;
+    private final String encryptedEmail;
 
     public OnResetAccountEvent(
             Object source,
             final Account account,
             User user,
             String resetToken,
-            String appUrl
+            String appUrl,
+            String encryptedEmail
     ) {
         super(source);
         this.account = account;
         this.user = user;
         this.resetToken = resetToken;
         this.appUrl = appUrl;
+        this.encryptedEmail = encryptedEmail;
     }
 
 }
