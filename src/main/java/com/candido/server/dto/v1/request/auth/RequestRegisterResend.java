@@ -5,7 +5,7 @@ import com.candido.server.exception._common.validation.CustomNotBlank;
 import com.candido.server.exception.security.auth.ExceptionValidationAuth;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-public record RequestRegisterCodeResend (
+public record RequestRegisterResend(
         @JsonProperty(JSON_PROPERTY_UUID_ACCESS)
         @CustomNotBlank(
                 exception = ExceptionValidationAuth.class,

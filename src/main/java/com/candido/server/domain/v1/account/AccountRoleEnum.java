@@ -6,6 +6,7 @@ import lombok.RequiredArgsConstructor;
 import java.util.Collections;
 import java.util.Set;
 
+@Getter
 @RequiredArgsConstructor
 public enum AccountRoleEnum {
     ADMIN(1,
@@ -26,12 +27,14 @@ public enum AccountRoleEnum {
             )
     ),
 
-    USER_NOT_VERIFIED(3, Collections.emptySet());
+    USER_NOT_VERIFIED(3,
+            Set.of(
+                AccountPermissionEnum.USER_READ
+            )
+    );
 
-    @Getter
     private final int roleId;
 
-    @Getter
     private final Set<AccountPermissionEnum> accountPermissionEnums;
 
 }

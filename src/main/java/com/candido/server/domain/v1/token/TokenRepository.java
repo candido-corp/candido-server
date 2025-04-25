@@ -21,6 +21,7 @@ public interface TokenRepository extends JpaRepository<Token, Integer> {
     Optional<Token> findByAccessToken(String accessToken);
     Optional<Token> findByRefreshToken(String refreshToken);
     Optional<Token> findByUuidAccessTokenAndTokenScopeCategoryId(String uuidAccessToken, int tokenScopeCategoryId);
+    Optional<Token> findByAccessTokenAndTokenScopeCategoryId(String accessToken, int tokenScopeCategoryId);
     Optional<Token> findByAccountIdAndTokenScopeCategoryId(int accountId, int tokenScopeCategoryId);
 
 }
