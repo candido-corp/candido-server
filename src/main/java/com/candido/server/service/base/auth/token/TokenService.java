@@ -14,8 +14,10 @@ public interface TokenService {
     Optional<Token> findByRefreshToken(String refreshToken);
     Optional<Token> findByUUIDAndTokenScopeCategoryId(String uuid, int tokenScopeCategoryId);
     Optional<Token> findByAccountIdAndTokenScopeCategoryId(int accountId, int tokenScopeCategoryId);
+    Optional<Token> findByAccessTokenAndTokenScopeCategoryId(String accessToken, int tokenScopeCategoryId);
 
     Token findTokenByUUIDAndTokenScopeCategoryIdOrThrow(String uuid, int tokenScopeCategoryId);
+    Token findTokenByAccessTokenAndTokenScopeCategoryIdOrThrow(String accessToken, int tokenScopeCategoryId);
     Token findTokenByRefreshTokenOrThrow(String refreshToken);
 
     Token saveUserToken(

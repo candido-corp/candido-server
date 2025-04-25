@@ -16,18 +16,22 @@ public interface AuthenticationService {
     ResponseAuthentication registerByEmail(RequestRegister request, String ipAddress, String appUrl);
     ResponseRegistration registerByCode(RequestRegister request, String ipAddress, String appUrl);
 
+    ResponseAuthentication createAuthentication(Account account, String ipAddress, Token token);
+    ResponseAuthentication authenticate(RequestAuthentication request, String ipAddress);
+    ResponseAuthentication refreshToken(HttpServletRequest request, HttpServletResponse response);
+
+    String getTokenFromAuthorizationHeaderRequest(HttpServletRequest request);
+
+    // From email (UUID is correct)
     ResponseAuthentication verifyEmailRegistration(String uuidAccessToken, String email, String ipAddress);
     ResponseAuthentication verifyCodeRegistration(String uuidAccessToken, String temporaryCode, String email, String ipAddress);
     void checkValidityOfUUIDAccessTokenForResetPassword(String uuidAccessToken);
-    void resendCodeRegistrationByUUIDAccessToken(String uuidAccessToken, String appUrl);
-
-    ResponseAuthentication createAuthentication(Account account, String ipAddress);
-    ResponseAuthentication authenticate(RequestAuthentication request, String ipAddress);
-    ResponseAuthentication refreshToken(HttpServletRequest request, HttpServletResponse response);
-    void sendResetPassword(String email, String ipAddress, String appUrl);
     ResponseAuthentication resetPassword(String uuidAccessToken, String email, RequestPasswordReset request, String ipAddress);
 
-    String getTokenFromAuthorizationHeaderRequest(HttpServletRequest request);
+    // From web
+    void resendEmailRegistration(String email, String appUrl, String ipAddress);
+    void resendCodeRegistrationByUUIDAccessToken(String uuidAccessToken, String appUrl);
+    void sendResetPassword(String email, String ipAddress, String appUrl);
 
     // TODO: Elimina i servizi qui sotto
     void temp_verifyRegistrationByEmail(String email);

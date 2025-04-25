@@ -7,6 +7,7 @@ import com.candido.server.exception.email.ExceptionEmail;
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.InternetAddress;
 import jakarta.mail.internet.MimeMessage;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.mail.javamail.JavaMailSender;
@@ -19,6 +20,7 @@ import java.io.UnsupportedEncodingException;
 import java.util.HashMap;
 import java.util.Map;
 
+@Slf4j
 @Service
 public class EmailServiceImpl implements EmailService {
 
@@ -41,6 +43,7 @@ public class EmailServiceImpl implements EmailService {
 
     @Override
     public void sendSimpleMessage(String from, String fromPersonal, String to, String subject, String text) {
+        log.info("[smtp_can_send::{}] Sending email to {} to {}", smtpCanSend, to, from);
         if(smtpCanSend) {
             MimeMessage message = emailSender.createMimeMessage();
             MimeMessageHelper helper;

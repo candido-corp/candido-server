@@ -12,6 +12,7 @@ import com.candido.server.dto.v1.request.auth.RequestPasswordReset;
 import com.candido.server.dto.v1.request.auth.RequestRegister;
 import com.candido.server.dto.v1.response.auth.ResponseAuthentication;
 import com.candido.server.dto.v1.response.auth.ResponseRegistration;
+import com.candido.server.dto.v1.util.AccountUserPairDto;
 import com.candido.server.event.auth.*;
 import com.candido.server.exception._common.EnumExceptionName;
 import com.candido.server.exception.account.ExceptionAccountNotFound;
@@ -65,9 +66,9 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     @Transactional
     @Override
     public ResponseAuthentication registerByEmail(RequestRegister request, String ipAddress, String appUrl) {
-        var accountUserPair = accountService.createAccount(request);
-        var token = tokenService.createRegistrationToken(accountUserPair.account(), ipAddress);
-        var encryptedEmail = encryptionService.encrypt(request.email());
+        AccountUserPairDto accountUserPair = accountService.createAccount(request);
+        Token token = tokenService.createRegistrationToken(accountUserPair.account(), ipAddress);
+        String encryptedEmail = encryptionService.encrypt(request.email());
 
         var event = new OnEmailRegistrationEvent(
                 this,
@@ -79,7 +80,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
         );
         eventPublisher.publishEvent(event);
 
-        return createAuthentication(accountUserPair.account(), ipAddress);
+        return createAuthentication(accountUserPair.account(), ipAddress, token);
     }
 
     @Transactional
@@ -124,7 +125,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
         var event = new OnRegistrationCompletedEvent(this, account.get(), user, token.getIpAddress());
         eventPublisher.publishEvent(event);
 
-        return createAuthentication(account.get(), ipAddress);
+        return createAuthentication(account.get(), ipAddress, null);
     }
 
     @Transactional
@@ -144,14 +145,14 @@ public class AuthenticationServiceImpl implements AuthenticationService {
         var event = new OnRegistrationCompletedEvent(this, account.get(), user, ipAddress);
         eventPublisher.publishEvent(event);
 
-        return createAuthentication(account.get(), ipAddress);
+        return createAuthentication(account.get(), ipAddress, null);
     }
 
     @Override
     public ResponseAuthentication authenticate(RequestAuthentication request, String ipAddress) {
         authenticationManager.authenticate(request.toUsernamePasswordAuthenticationToken());
-        var account = accountService.findAccountByEmailOrThrow(request.email());
-        return createAuthentication(account, ipAddress);
+        Account account = accountService.findAccountByEmailOrThrow(request.email());
+        return createAuthentication(account, ipAddress, null);
     }
 
     @Override
@@ -261,6 +262,27 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     }
 
     @Override
+    public void resendEmailRegistration(String email, String appUrl, String ipAddress) {
+        Optional<Account> account = accountService.findByEmail(email);
+
+        if(account.isPresent() && account.get().isEnabled()) {
+            Token token = tokenService.createRegistrationToken(account.get(), ipAddress);
+            Optional<User> user = userService.findUserByAccountId(account.get().getId());
+            if (user.isEmpty()) return;
+            var encryptedEmail = encryptionService.encrypt(account.get().getEmail());
+            var event = new OnEmailRegistrationEvent(
+                this,
+                account.get(),
+                user.get(),
+                token.getUuidAccessToken(),
+                appUrl,
+                encryptedEmail
+            );
+            eventPublisher.publishEvent(event);
+        }
+    }
+
+    @Override
     public void resendCodeRegistrationByUUIDAccessToken(String uuidAccessToken, String appUrl) {
         int tokenScopeCategoryId = TokenScopeCategoryEnum.REGISTRATION.getTokenScopeCategoryId();
         var token = tokenService.findTokenByUUIDAndTokenScopeCategoryIdOrThrow(uuidAccessToken, tokenScopeCategoryId);
@@ -282,8 +304,8 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     }
 
     @Override
-    public ResponseAuthentication createAuthentication(Account account, String ipAddress) {
-        Token token = tokenService.createLoginToken(account, ipAddress);
+    public ResponseAuthentication createAuthentication(Account account, String ipAddress, Token token) {
+        token = token != null ? token : tokenService.createLoginToken(account, ipAddress);
 
         var expires = configAppProperties.getSecurity().getJwt().getExpiration();
         var refreshExpires = configAppProperties.getSecurity().getJwt().getRefreshToken().getExpiration();

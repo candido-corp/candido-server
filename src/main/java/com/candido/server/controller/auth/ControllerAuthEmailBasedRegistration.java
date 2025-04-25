@@ -1,6 +1,5 @@
 package com.candido.server.controller.auth;
 
-import com.candido.server.dto.v1.request.auth.RequestAuthentication;
 import com.candido.server.dto.v1.request.auth.RequestRegister;
 import com.candido.server.dto.v1.request.auth.RequestRegisterEmailVerify;
 import com.candido.server.dto.v1.response.auth.ResponseAuthentication;
@@ -11,6 +10,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
@@ -35,6 +35,17 @@ public class ControllerAuthEmailBasedRegistration {
         String appURL = utilService.getAppUrl(httpRequest);
         var responseAuthentication = authenticationService.registerByEmail(request, clientIP, appURL);
         return ResponseEntity.ok(responseAuthentication);
+    }
+
+    @PostMapping("/resend")
+    public ResponseEntity<Void> resendEmailForEmailVerification(
+            Authentication authentication,
+            HttpServletRequest httpRequest
+    ) {
+        String appURL = utilService.getAppUrl(httpRequest);
+        String ipAddress = utilService.getClientIP(httpRequest);
+        authenticationService.resendEmailRegistration(authentication.getName(), appURL, ipAddress);
+        return ResponseEntity.noContent().build();
     }
 
     @PostMapping("/verify")

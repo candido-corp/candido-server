@@ -1,7 +1,7 @@
 package com.candido.server.controller.auth;
 
 import com.candido.server.dto.v1.request.auth.RequestRegister;
-import com.candido.server.dto.v1.request.auth.RequestRegisterCodeResend;
+import com.candido.server.dto.v1.request.auth.RequestRegisterResend;
 import com.candido.server.dto.v1.request.auth.RequestRegisterCodeVerify;
 import com.candido.server.dto.v1.response.auth.ResponseAuthentication;
 import com.candido.server.dto.v1.response.auth.ResponseRegistration;
@@ -40,7 +40,7 @@ public class ControllerAuthCodeBasedRegistration {
 
     @PostMapping("/resend")
     public ResponseEntity<Void> resendCodeForCodeVerification(
-            @Valid @RequestBody RequestRegisterCodeResend request,
+            @Valid @RequestBody RequestRegisterResend request,
             HttpServletRequest httpRequest
     ) {
         String uuidAccessToken = request.uuidAccessToken();
