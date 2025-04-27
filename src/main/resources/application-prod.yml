@@ -1,0 +1,132 @@
+server:
+    port: ${SERVER_PORT}
+    compression:
+        enabled: true
+        mime-types: application/json
+        min-response-size: 1024
+    error:
+        include-message: never
+        include-binding-errors: never
+        whitelabel:
+            enabled: false  # Evita pagine di errore di default
+
+spring:
+    application:
+        name: candido
+    sql:
+        init:
+            mode: never  # Non eseguire script SQL all'avvio in produzione
+    main:
+        allow-bean-definition-overriding: false
+    mvc:
+        view:
+            prefix: /templates
+            suffix: .html
+        pathpattern:
+            matching-strategy: ANT_PATH_MATCHER
+    datasource:
+        url: jdbc:postgresql://${DB_HOST}:${DB_PORT}/${DB_NAME}
+        username: ${DB_USER}
+        password: ${DB_PASSWORD}
+        driver-class-name: org.postgresql.Driver
+        hikari:
+            maximum-pool-size: 50
+            minimum-idle: 10
+            idle-timeout: 60000
+            max-lifetime: 1800000
+            connection-timeout: 5000
+            leak-detection-threshold: 60000
+    flyway:
+        enabled: true
+        create-schemas: true
+        baseline-on-migrate: true
+        schemas: ${DB_NAME}
+
+        # Allows Flyway to perform database cleaning operations.
+        # Set to false to enable cleaning, which can be useful during development
+        # but should be used with caution in production environments.
+        clean-disabled: false
+
+        # Specifies the location of Flyway migration scripts.
+        # In production, dummy data is excluded to ensure only essential migrations are applied.
+        locations: classpath:db/migration
+    jpa:
+        open-in-view: false
+        hibernate:
+            ddl-auto: none
+        show-sql: false
+        properties:
+            hibernate:
+                generate_statistics: false
+
+                # PLEASE, DO NOT CHANGE THIS PROPERTY - DEFAULT SCHEMA IS PUBLIC, but we are using a custom schema
+                default_schema: ${DB_NAME}
+
+management:
+    endpoint:
+        health:
+            show-details: when-authorized  # Evita di esporre dettagli a utenti anonimi
+    endpoints:
+        web:
+            exposure:
+                include: health, metrics, prometheus  # Solo endpoint sicuri esposti
+    metrics:
+        enable:
+            all: true
+            hibernate: true
+            jdbc: true
+        tags:
+            application: ${spring.application.name}
+        distribution:
+            percentiles-histogram:
+                all: true
+            percentiles:
+                all: [0.5, 0.75, 0.95, 0.99]
+
+logging:
+    level:
+        root: INFO  # Riduce il numero di log generati
+        org.springframework: WARN  # Mostra solo warning ed errori
+        org.hibernate.SQL: WARN  # Evita logging di ogni query SQL
+        org.apache.coyote.http11.Http11NioProtocol: ERROR
+
+application:
+    name: candido
+    client:
+        domain: http://client.candido.com
+    security:
+        jwt:
+            issuer: Candido
+            expiration: 86400000 # 1 day in ms
+            refresh-token:
+                expiration: 604800000 # 7 days in ms
+            registration-token:
+                expiration: 864000000 # 10 days in ms
+            reset-token:
+                expiration: 864000000 # 10 days in ms
+    email:
+        host: ${SMTP_HOST}
+        port: 587
+        username: apikey
+        password: ${SMTP_PASSWORD}
+        protocol: smtp
+        smtp:
+            auth: true
+            starttls:
+                enable: true
+        debug: false
+        no-reply: ${SMTP_NO_REPLY}
+        can-send: ${SMTP_CAN_SEND}
+    support:
+        phone: 1234567890
+        email: support@candido.com
+    api:
+        version: 0.0.1
+        description: API for managing the entire online application project.
+        server:
+            development:
+                url: http://localhost:8080/
+            production:
+                url: http://candido.com:8080/
+    tos:
+        uri: http://localhost:8080/terms-of-service

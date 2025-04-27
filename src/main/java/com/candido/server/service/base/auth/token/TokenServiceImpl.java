@@ -144,7 +144,6 @@ public class TokenServiceImpl implements TokenService {
 
     @Override
     public void delete(Token token) {
-        temporaryCodeService.deleteTemporaryCodeByTokenId(token.getId());
         token.setValid(false);
         tokenRepository.save(token);
     }

@@ -1,0 +1,46 @@
+<configuration>
+
+    <!-- Usa la configurazione di Spring Boot -->
+    <property name="LOG_PATH" value="logs/spring-boot.log" />
+
+    <!-- Layout personalizzato leggibile per FILE -->
+    <appender name="FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>${LOG_PATH}</file>
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <fileNamePattern>logs/spring-boot-%d{yyyy-MM-dd}.log</fileNamePattern>
+            <maxHistory>7</maxHistory>
+        </rollingPolicy>
+        <encoder>
+            <pattern>
+                %d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %replace(%msg){'[\r\n]+', ' '}%n
+            </pattern>
+        </encoder>
+    </appender>
+
+    <!-- Layout personalizzato leggibile per CONSOLE -->
+    <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder>
+            <pattern>
+                %highlight(%d{yyyy-MM-dd HH:mm:ss.SSS}) [%thread] %magenta(%-5level) %cyan(%logger{36}) - %replace(%msg){'[\r\n]+', ' '}%n
+            </pattern>
+        </encoder>
+    </appender>
+
+    <!-- Session Metrics -->
+    <logger name="org.hibernate.engine.internal.StatisticalLoggingSessionEventListener" level="INFO">
+        <appender-ref ref="CONSOLE"/>
+        <appender-ref ref="FILE"/>
+    </logger>
+
+    <!-- Livelli di log -->
+    <logger name="org.hibernate.SQL" level="DEBUG"/>
+    <logger name="org.hibernate.stat" level="DEBUG"/>
+    <logger name="org.hibernate.type.descriptor.sql.BasicBinder" level="TRACE"/>
+
+    <!-- Root logger -->
+    <root level="INFO">
+        <appender-ref ref="CONSOLE"/>
+        <appender-ref ref="FILE"/>
+    </root>
+
+</configuration>
