@@ -71,8 +71,18 @@ public class TokenServiceImpl implements TokenService {
     }
 
     @Override
+    public Optional<Token> findByAccessTokenAndTokenScopeCategoryId(String accessToken, int tokenScopeCategoryId) {
+        return tokenRepository.findByAccessTokenAndTokenScopeCategoryId(accessToken, tokenScopeCategoryId);
+    }
+
+    @Override
     public Token findTokenByUUIDAndTokenScopeCategoryIdOrThrow(String uuid, int tokenScopeCategoryId) {
         return findByUUIDAndTokenScopeCategoryId(uuid, tokenScopeCategoryId).orElseThrow(ExceptionToken::new);
+    }
+
+    @Override
+    public Token findTokenByAccessTokenAndTokenScopeCategoryIdOrThrow(String accessToken, int tokenScopeCategoryId) {
+        return findByAccessTokenAndTokenScopeCategoryId(accessToken, tokenScopeCategoryId).orElseThrow(ExceptionToken::new);
     }
 
     @Override

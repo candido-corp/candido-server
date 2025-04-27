@@ -11,4 +11,7 @@ public class ResponseRegistration {
     @JsonProperty("t")
     private String t;
 
+    @JsonProperty("e")
+    private String e;
+
 }

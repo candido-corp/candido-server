@@ -17,8 +17,6 @@ import java.time.LocalDateTime;
 @Service
 public class UtilServiceImpl implements UtilService {
 
-    private final EncryptionService encryptionService;
-
     @Value("${application.client.domain}")
     private String clientDomain;
 
@@ -61,34 +59,35 @@ public class UtilServiceImpl implements UtilService {
     }
 
     @Override
-    public String buildEmailVerificationLink(String token, String email) {
+    public String buildEmailVerificationLink(String token, String encryptedEmail) {
         return UriComponentsBuilder
                 .fromHttpUrl(clientDomain)
                 .path("/register/verify")
                 .queryParam("t", token)
-                .queryParam("e", encryptionService.encrypt(email))
+                .queryParam("e", encryptedEmail)
                 .queryParam("a", "email")
                 .toUriString();
     }
 
     @Override
-    public String buildCodeVerificationLink(String token, String email) {
+    public String buildCodeVerificationLink(String token, String encryptedEmail, String code) {
         return UriComponentsBuilder
                 .fromHttpUrl(clientDomain)
                 .path("/register/verify")
                 .queryParam("t", token)
-                .queryParam("e", encryptionService.encrypt(email))
+                .queryParam("e", encryptedEmail)
                 .queryParam("a", "code")
+                .queryParam("c", code)
                 .toUriString();
     }
 
     @Override
-    public String buildResetPasswordLink(String token, String email) {
+    public String buildResetPasswordLink(String token, String encryptedEmail) {
         return UriComponentsBuilder
                 .fromHttpUrl(clientDomain)
                 .path("/reset-password/verify")
                 .queryParam("t", token)
-                .queryParam("e", encryptionService.encrypt(email))
+                .queryParam("e", encryptedEmail)
                 .toUriString();
     }
 

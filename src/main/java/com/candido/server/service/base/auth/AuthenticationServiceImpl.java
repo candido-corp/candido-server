@@ -12,6 +12,7 @@ import com.candido.server.dto.v1.request.auth.RequestPasswordReset;
 import com.candido.server.dto.v1.request.auth.RequestRegister;
 import com.candido.server.dto.v1.response.auth.ResponseAuthentication;
 import com.candido.server.dto.v1.response.auth.ResponseRegistration;
+import com.candido.server.dto.v1.util.AccountUserPairDto;
 import com.candido.server.event.auth.*;
 import com.candido.server.exception._common.EnumExceptionName;
 import com.candido.server.exception.account.ExceptionAccountNotFound;
@@ -23,6 +24,7 @@ import com.candido.server.service.base.account.AccountService;
 import com.candido.server.service.base.auth.token.TemporaryCodeService;
 import com.candido.server.service.base.auth.token.TokenService;
 import com.candido.server.service.base.user.UserService;
+import com.candido.server.util.EncryptionService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.transaction.Transactional;
@@ -60,22 +62,26 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 
     private final TemporaryCodeService temporaryCodeService;
 
+    private final EncryptionService encryptionService;
+
     @Transactional
     @Override
     public ResponseAuthentication registerByEmail(RequestRegister request, String ipAddress, String appUrl) {
-        var accountUserPair = accountService.createAccount(request);
-        var token = tokenService.createRegistrationToken(accountUserPair.account(), ipAddress);
+        AccountUserPairDto accountUserPair = accountService.createAccount(request);
+        Token token = tokenService.createRegistrationToken(accountUserPair.account(), ipAddress);
+        String encryptedEmail = encryptionService.encrypt(request.email());
 
         var event = new OnEmailRegistrationEvent(
                 this,
                 accountUserPair.account(),
                 accountUserPair.user(),
                 token.getUuidAccessToken(),
-                appUrl
+                appUrl,
+                encryptedEmail
         );
         eventPublisher.publishEvent(event);
 
-        return createAuthentication(accountUserPair.account(), ipAddress);
+        return createAuthentication(accountUserPair.account(), ipAddress, token);
     }
 
     @Transactional
@@ -84,6 +90,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
         var accountUserPair = accountService.createAccount(request);
         var token = tokenService.createRegistrationToken(accountUserPair.account(), ipAddress);
         var temporaryCode = temporaryCodeService.assignCode(token.getId());
+        var encryptedEmail = encryptionService.encrypt(request.email());
 
         var event = new OnCodeRegistrationEvent(
                 this,
@@ -91,13 +98,15 @@ public class AuthenticationServiceImpl implements AuthenticationService {
                 accountUserPair.user(),
                 token.getUuidAccessToken(),
                 temporaryCode.getCode(),
-                appUrl
+                appUrl,
+                encryptedEmail
         );
         eventPublisher.publishEvent(event);
 
         return ResponseRegistration
                 .builder()
                 .t(token.getUuidAccessToken())
+                .e(encryptedEmail)
                 .build();
     }
 
@@ -117,7 +126,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
         var event = new OnRegistrationCompletedEvent(this, account.get(), user, token.getIpAddress());
         eventPublisher.publishEvent(event);
 
-        return createAuthentication(account.get(), ipAddress);
+        return createAuthentication(account.get(), ipAddress, null);
     }
 
     @Transactional
@@ -137,14 +146,14 @@ public class AuthenticationServiceImpl implements AuthenticationService {
         var event = new OnRegistrationCompletedEvent(this, account.get(), user, ipAddress);
         eventPublisher.publishEvent(event);
 
-        return createAuthentication(account.get(), ipAddress);
+        return createAuthentication(account.get(), ipAddress, null);
     }
 
     @Override
     public ResponseAuthentication authenticate(RequestAuthentication request, String ipAddress) {
         Authentication auth = authenticationManager.authenticate(request.toUsernamePasswordAuthenticationToken());
-        var account = (Account)  auth.getPrincipal();
-        return createAuthentication(account, ipAddress);
+        Account account = (Account)  auth.getPrincipal();
+        return createAuthentication(account, ipAddress, null);
     }
 
     @Override
@@ -175,7 +184,15 @@ public class AuthenticationServiceImpl implements AuthenticationService {
             Token token = tokenService.createResetToken(account.get(), ipAddress);
             Optional<User> user = userService.findUserByAccountId(account.get().getId());
             if(user.isEmpty()) return;
-            var event = new OnResetAccountEvent(this, account.get(), user.get(), token.getUuidAccessToken(), appUrl);
+            var encryptedEmail = encryptionService.encrypt(account.get().getEmail());
+            var event = new OnResetAccountEvent(
+                    this,
+                    account.get(),
+                    user.get(),
+                    token.getUuidAccessToken(),
+                    appUrl,
+                    encryptedEmail
+            );
             eventPublisher.publishEvent(event);
         }
     }
@@ -235,6 +252,27 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     }
 
     @Override
+    public void resendEmailRegistration(String email, String appUrl, String ipAddress) {
+        Optional<Account> account = accountService.findByEmail(email);
+
+        if(account.isPresent() && account.get().isEnabled()) {
+            Token token = tokenService.createRegistrationToken(account.get(), ipAddress);
+            Optional<User> user = userService.findUserByAccountId(account.get().getId());
+            if (user.isEmpty()) return;
+            var encryptedEmail = encryptionService.encrypt(account.get().getEmail());
+            var event = new OnEmailRegistrationEvent(
+                this,
+                account.get(),
+                user.get(),
+                token.getUuidAccessToken(),
+                appUrl,
+                encryptedEmail
+            );
+            eventPublisher.publishEvent(event);
+        }
+    }
+
+    @Override
     public void resendCodeRegistrationByUUIDAccessToken(String uuidAccessToken, String appUrl) {
         int tokenScopeCategoryId = TokenScopeCategoryEnum.REGISTRATION.getTokenScopeCategoryId();
         var token = tokenService.findTokenByUUIDAndTokenScopeCategoryIdOrThrow(uuidAccessToken, tokenScopeCategoryId);
@@ -242,20 +280,22 @@ public class AuthenticationServiceImpl implements AuthenticationService {
         temporaryCodeService.deleteTemporaryCodeByTokenId(token.getId());
         var temporaryCode = temporaryCodeService.assignCode(token.getId());
         var user = userService.findUserByAccountIdOrThrow(account.getId());
+        var encryptedEmail = encryptionService.encrypt(account.getEmail());
         var event = new OnCodeRegistrationEvent(
                 this,
                 account,
                 user,
                 token.getUuidAccessToken(),
                 temporaryCode.getCode(),
-                appUrl
+                appUrl,
+                encryptedEmail
         );
         eventPublisher.publishEvent(event);
     }
 
     @Override
-    public ResponseAuthentication createAuthentication(Account account, String ipAddress) {
-        Token token = tokenService.createLoginToken(account, ipAddress);
+    public ResponseAuthentication createAuthentication(Account account, String ipAddress, Token token) {
+        token = token != null ? token : tokenService.createLoginToken(account, ipAddress);
 
         var expires = configAppProperties.getSecurity().getJwt().getExpiration();
         var refreshExpires = configAppProperties.getSecurity().getJwt().getRefreshToken().getExpiration();

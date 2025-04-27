@@ -1,5 +1,6 @@
 package com.candido.server.service.base.auth.token;
 
+import com.candido.server.config.ConfigTemporaryCode;
 import com.candido.server.domain.v1.token.TemporaryCode;
 import com.candido.server.domain.v1.token.TemporaryCodeRepository;
 import com.candido.server.domain.v1.token.TemporaryCode_;
@@ -9,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.Objects;
 import java.util.Optional;
 
@@ -68,6 +70,7 @@ public class TemporaryCodeServiceImpl implements TemporaryCodeService {
 
         if(temporaryCode.getTokenId() == null) {
             temporaryCode.setTokenId(tokenId);
+            temporaryCode.setExpirationDate(LocalDateTime.now().plusSeconds(ConfigTemporaryCode.MAX_TEMPORARY_CODE_DURATION));
             temporaryCodeRepository.save(temporaryCode);
         }
 

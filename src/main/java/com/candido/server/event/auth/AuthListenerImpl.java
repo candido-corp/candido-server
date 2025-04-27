@@ -39,8 +39,12 @@ public class AuthListenerImpl implements AuthListenerService {
         log.info("[Event::EmailRegistration] Account -> {}", event.getAccount());
 
         String email = event.getAccount().getEmail();
-        String linkToVerify = utilService.buildEmailVerificationLink(event.getRegistrationToken(), email);
-        String content = emailService.buildRegistrationEmailContent(event.getAccount(), event.getUser(), linkToVerify);
+        String linkToVerify = utilService.buildEmailVerificationLink(
+                event.getRegistrationToken(), event.getEncryptedEmail()
+        );
+        String content = emailService.buildRegistrationEmailContent(
+                event.getAccount(), event.getUser(), linkToVerify
+        );
 
         emailService.sendSimpleMessage(
                 noReply,
@@ -58,8 +62,12 @@ public class AuthListenerImpl implements AuthListenerService {
         log.info("[Event::CodeRegistration] Account -> {}", event.getAccount());
 
         String email = event.getAccount().getEmail();
-        String linkToVerify = utilService.buildCodeVerificationLink(event.getRegistrationToken(), email);
-        String content = emailService.buildCodeVerificationEmailContent(event.getAccount(), event.getUser(), event.getTemporaryCode(), linkToVerify);
+        String linkToVerify = utilService.buildCodeVerificationLink(
+                event.getRegistrationToken(), event.getEncryptedEmail(), event.getTemporaryCode()
+        );
+        String content = emailService.buildCodeVerificationEmailContent(
+                event.getAccount(), event.getUser(), event.getTemporaryCode(), linkToVerify
+        );
 
         emailService.sendSimpleMessage(
                 noReply,
@@ -96,7 +104,9 @@ public class AuthListenerImpl implements AuthListenerService {
         log.info("[Event::ResetPassword] Account -> {}", event.getAccount());
 
         String email = event.getAccount().getEmail();
-        String linkToVerify = utilService.buildResetPasswordLink(event.getResetToken(), email);
+        String linkToVerify = utilService.buildResetPasswordLink(
+                event.getResetToken(), event.getEncryptedEmail()
+        );
         String content = emailService.buildResetPasswordEmailContent(
                 event.getAccount(), event.getUser(), linkToVerify
         );

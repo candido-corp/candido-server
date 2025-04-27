@@ -14,10 +14,7 @@ public interface AccountService {
     Account findAccountByEmailOrThrow(String email);
     Account findAccountByIdOrThrow(int accountId);
     Account save(Account account);
-    void enableAccount(int accountId);
-    void editPassword(String email, String currentPassword, String password, String confirmPassword);
     void activateAccount(Account account);
-    void saveAccountSettings(int accountId, List<RequestAccountSettings<?>> settings);
 
     AccountUserPairDto createAccount(RequestRegister request);
 }

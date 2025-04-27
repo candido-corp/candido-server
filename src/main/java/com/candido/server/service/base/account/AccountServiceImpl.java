@@ -98,42 +98,10 @@ public class AccountServiceImpl implements AccountService {
     }
 
     @Override
-    public void enableAccount(int accountId) {
-        findById(accountId).ifPresent(account -> {
-            account.setStatus(new AccountStatus(AccountStatusEnum.VERIFIED.getStatusId()));
-            save(account);
-            tokenService.revokeAllAccountTokens(account);
-        });
-    }
-
-    @Override
-    public void editPassword(String email, String currentPassword, String password, String confirmPassword) {
-        Account account = findByEmail(email)
-                .orElseThrow(() -> new ExceptionAccountNotFound(EnumExceptionName.ERROR_BUSINESS_ACCOUNT_NOT_FOUND.name()));
-
-        // Controllo che l'email corrente sia giusta
-        if(!passwordEncoder.matches(currentPassword, account.getPassword()))
-            throw new ExceptionPasswordsDoNotMatch(EnumExceptionName.ERROR_VALIDATION_CURRENT_PASSWORD_DOES_NOT_MATCH.name());
-
-        // Controllo che la password soddisfi i requisiti minimi
-        PasswordConstraintValidator.isValid(password);
-        if (!password.equals(confirmPassword))
-            throw new ExceptionPasswordsDoNotMatch(EnumExceptionName.ERROR_VALIDATION_PASSWORDS_DO_NOT_MATCH.name());
-
-        account.setPassword(passwordEncoder.encode(password));
-        save(account);
-    }
-
-    @Override
     public void activateAccount(Account account) {
         // Abilito l'account
         account.setStatus(new AccountStatus(AccountStatusEnum.VERIFIED.getStatusId()));
         save(account);
-    }
-
-    @Override
-    public void saveAccountSettings(int accountId, List<RequestAccountSettings<?>> settings) {
-        settings.forEach(setting -> accountSettingsService.saveAccountSetting(accountId, setting.key(), setting.value()));
     }
 
     @Transactional
@@ -153,7 +121,7 @@ public class AccountServiceImpl implements AccountService {
         if (!request.password().equals(request.confirmPassword()))
             throw new ExceptionPasswordsDoNotMatch(EnumExceptionName.ERROR_VALIDATION_PASSWORDS_DO_NOT_MATCH.name());
 
-        AccountRole role = accountRoleRepository.findById(AccountRoleEnum.USER.getRoleId())
+        AccountRole role = accountRoleRepository.findById(AccountRoleEnum.USER_NOT_VERIFIED.getRoleId())
                 .orElseThrow(() -> new ExceptionAccountRoleNotFound(EnumExceptionName.ERROR_BUSINESS_ACCOUNT_ROLE_NOT_FOUND.name()));
 
         // Creazione dell'account
