@@ -21,7 +21,7 @@ SET row_security = off;
 -- Name: candido; Type: SCHEMA; Schema: -; Owner: postgres
 --
 
-CREATE SCHEMA candido;
+CREATE SCHEMA IF NOT EXISTS candido;
 
 
 ALTER SCHEMA candido OWNER TO postgres;
