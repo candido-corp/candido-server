@@ -168,7 +168,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
             throw new ExceptionInvalidJWTToken();
 
         String ipAddress = request.getRemoteAddr();
-        return createAuthentication(account, ipAddress);
+        return createAuthentication(account, ipAddress, null);
     }
 
     @Override
