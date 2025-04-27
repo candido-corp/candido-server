@@ -51,7 +51,7 @@ spring:
         name: candido
     sql:
         init:
-            mode: always
+            mode: never
     main:
         allow-bean-definition-overriding: true
     mvc:
@@ -71,10 +71,14 @@ spring:
             idle-timeout: 60000
             max-lifetime: 1800000
             connection-timeout: 5000
-            leak-detection-threshold: 2000
+            leak-detection-threshold: 60000
     flyway:
         enabled: true
         locations: classpath:db/migration,classpath:db/dummy-data
+        create-schemas: true
+        clean-disabled: false
+        baseline-on-migrate: true
+        schemas: ${DB_NAME}
     jpa:
         open-in-view: false
         hibernate:

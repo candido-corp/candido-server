@@ -35,11 +35,20 @@ spring:
             idle-timeout: 60000
             max-lifetime: 1800000
             connection-timeout: 5000
-            leak-detection-threshold: 2000
+            leak-detection-threshold: 60000
     flyway:
         enabled: true
+        create-schemas: true
+        baseline-on-migrate: true
+        schemas: ${DB_NAME}
 
-        # This not contains the dummy migration
+        # Allows Flyway to perform database cleaning operations.
+        # Set to false to enable cleaning, which can be useful during development
+        # but should be used with caution in production environments.
+        clean-disabled: false
+
+        # Specifies the location of Flyway migration scripts.
+        # In production, dummy data is excluded to ensure only essential migrations are applied.
         locations: classpath:db/migration
     jpa:
         open-in-view: false
