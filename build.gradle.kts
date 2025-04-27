@@ -9,6 +9,7 @@ plugins {
 
 	// Flyway (official plugin)
 	id("org.flywaydb.flyway") version "11.3.2"
+	kotlin("jvm")
 }
 
 group = "com.candido"
@@ -99,6 +100,7 @@ dependencies {
 
 	// -- Testing --
 	testImplementation("org.springframework.boot:spring-boot-starter-test")
+	implementation(kotlin("stdlib-jdk8"))
 }
 
 // ----------------------------------------------------------------------
@@ -109,9 +111,19 @@ flyway {
 	url = project.findProperty("DB_URL") as String?
 	user = project.findProperty("DB_USER") as String?
 	password = project.findProperty("DB_PASSWORD") as String?
+	schemas = arrayOf(project.findProperty("DB_SCHEMA") as String?)
+	locations = arrayOf(
+		project.findProperty("FLYWAY_LOCATION_MIGRATION") as String?,
+		project.findProperty("FLYWAY_LOCATION_DUMMY_MIGRATION") as String?
+	)
+
+	// Determines whether Flyway's clean operation is disabled.
+	// This property is typically set via an environment variable (FLYWAY_CLEAN_DISABLED).
+	// Disabling clean is recommended in production to prevent accidental data loss.
+	cleanDisabled = (project.findProperty("FLYWAY_CLEAN_DISABLED") as String?)?.toBoolean() ?: false
 
 	// Optional: If Flyway has trouble auto-detecting, you can set:
-	driver = "org.postgresql.Driver"
+	driver = project.findProperty("DB_DRIVER") as String?
 }
 
 // ----------------------------------------------------------------------
