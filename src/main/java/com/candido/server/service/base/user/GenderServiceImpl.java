@@ -3,8 +3,7 @@ package com.candido.server.service.base.user;
 import com.candido.server.domain.v1.user.Gender;
 import com.candido.server.domain.v1.user.GenderRepository;
 import com.candido.server.exception._common.EnumExceptionName;
-import com.candido.server.exception.user.ExceptionAddressNotFound;
-import com.candido.server.exception.user.ExceptionUserNotFound;
+import com.candido.server.exception.geo.ExceptionAddressNotFound;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 

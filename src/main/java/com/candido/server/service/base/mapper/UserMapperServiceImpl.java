@@ -11,15 +11,6 @@ import org.springframework.stereotype.Service;
 @Service
 public class UserMapperServiceImpl implements UserMapperService {
 
-    private final AddressMapperService addressMapperService;
-
-    @Autowired
-    public UserMapperServiceImpl(
-            AddressMapperService addressMapperService
-    ) {
-        this.addressMapperService = addressMapperService;
-    }
-
     @Override
     public UserDto userToUserDto(User user, Account account, boolean hasOpenApplications) {
         if (user == null) return null;
@@ -30,7 +21,6 @@ public class UserMapperServiceImpl implements UserMapperService {
         userDto.setLastName(user.getLastName());
         userDto.setEmail(account.getEmail());
         userDto.setGender(genderToGenderDto(user.getGender()));
-        userDto.setAddress(addressMapperService.addressToUserAddressDto(user.getAddress()));
         userDto.setBirthdate(user.getBirthdate());
         userDto.setMobileNumber(user.getMobileNumber());
         userDto.setPhoneNumber(user.getPhoneNumber());

@@ -7,5 +7,6 @@ public record RequestAddress(
         @JsonProperty("type_id") Integer addressTypeId,
         @JsonProperty("zip") String zip,
         @JsonProperty("street") String street,
-        @JsonProperty("house_number") String houseNumber
+        @JsonProperty("house_number") String houseNumber,
+        @JsonProperty("is_primary") boolean isPrimary
 ) {}

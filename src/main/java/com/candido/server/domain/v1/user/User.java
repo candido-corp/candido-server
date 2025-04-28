@@ -1,6 +1,5 @@
 package com.candido.server.domain.v1.user;
 
-import com.candido.server.domain.v1.geo.Address;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
 import lombok.*;
@@ -29,14 +28,6 @@ public class User {
     @JsonProperty("gender_id")
     @Column(name = "fk_gender_id")
     private Integer genderId;
-
-    @OneToOne
-    @JoinColumn(name = "fk_address_id", insertable = false, updatable = false)
-    private Address address;
-
-    @JsonProperty("address_id")
-    @Column(name = "fk_address_id")
-    private Integer addressId;
 
     @Column(name = "fk_account_id")
     private int accountId;
