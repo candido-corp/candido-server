@@ -5,7 +5,6 @@ import com.candido.server.domain.v1.user.Gender;
 import com.candido.server.domain.v1.user.User;
 import com.candido.server.dto.v1.util.GenderDto;
 import com.candido.server.dto.v1.util.UserDto;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 @Service
