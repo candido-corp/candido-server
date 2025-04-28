@@ -98,7 +98,7 @@ public class JwtService {
      */
     public String generateRegistrationToken(UserDetails userDetails) {
         int expirationTimeMillis = configAppProperties.getSecurity().getJwt().getRegistrationToken().getExpiration();
-        return buildToken(new HashMap<>(), userDetails, expirationTimeMillis);
+        return generateToken(new HashMap<>(), userDetails, expirationTimeMillis);
     }
 
     /**
@@ -109,7 +109,7 @@ public class JwtService {
      */
     public String generateResetToken(UserDetails userDetails) {
         int expirationTimeMillis = configAppProperties.getSecurity().getJwt().getResetToken().getExpiration();
-        return buildToken(new HashMap<>(), userDetails, expirationTimeMillis);
+        return generateToken(new HashMap<>(), userDetails, expirationTimeMillis);
     }
 
     /**
@@ -119,7 +119,8 @@ public class JwtService {
      * @return a string representing the generated JWT token.
      */
     public String generateToken(UserDetails userDetails) {
-        return generateToken(new HashMap<>(), userDetails);
+        int expirationTimeMillis = configAppProperties.getSecurity().getJwt().getExpiration();
+        return generateToken(new HashMap<>(), userDetails, expirationTimeMillis);
     }
 
     /**
@@ -127,10 +128,10 @@ public class JwtService {
      *
      * @param extraClaims additional claims to include in the token.
      * @param userDetails the user details for which the token is to be generated.
+     * @param expirationTimeMillis the expiration time of the token in milliseconds.
      * @return a string representing the generated JWT token.
      */
-    public String generateToken(Map<String, Object> extraClaims, UserDetails userDetails) {
-        int expirationTimeMillis = configAppProperties.getSecurity().getJwt().getExpiration();
+    public String generateToken(Map<String, Object> extraClaims, UserDetails userDetails, long expirationTimeMillis) {
         if (userDetails instanceof Account account) {
             extraClaims.put("roles", account.getRoles());
             extraClaims.put("permissions", account.getPermissions());
