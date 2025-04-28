@@ -1,4 +1,4 @@
-package com.candido.server.exception.user;
+package com.candido.server.exception.geo;
 
 import com.candido.server.exception._common.CustomRuntimeException;
 

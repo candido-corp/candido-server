@@ -1,11 +1,11 @@
 package com.candido.server.domain.v1.geo;
 
+import com.candido.server.domain.v1.user.User;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.hibernate.annotations.SQLRestriction;
 
 import java.time.LocalDateTime;
 
@@ -30,13 +30,25 @@ public class Address {
     @Column(name = "fk_territory_id")
     private int territoryId;
 
-    @OneToOne
+    @OneToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "fk_address_type_id", insertable = false, updatable = false)
     private AddressType addressType;
 
     @JsonProperty("type_id")
     @Column(name = "fk_address_type_id")
     private int addressTypeId;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "fk_user_id", nullable = false, insertable = false, updatable = false)
+    private User user;
+
+    @JsonProperty("user_id")
+    @Column(name = "fk_user_id")
+    private int userId;
+
+    @JsonProperty("is_primary")
+    @Column(name = "is_primary")
+    private Boolean isPrimary;
 
     @JsonProperty("zip")
     @Column(name = "zip")

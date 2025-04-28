@@ -2,7 +2,6 @@ package com.candido.server.service.base.user;
 
 import com.candido.server.domain.v1.user.User;
 import com.candido.server.dto.v1.request.account.RequestUpdateUser;
-import com.candido.server.dto.v1.request.geo.RequestAddress;
 
 import java.util.Optional;
 
@@ -11,6 +10,4 @@ public interface UserService {
     User findUserByAccountIdOrThrow(int accountId);
     User save(User user);
     User save(User user, RequestUpdateUser requestUpdateUser, boolean canChangeName);
-    User updateAddress(User user, RequestAddress requestUserAddressDto);
-    void deleteAddress(User user);
 }

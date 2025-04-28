@@ -11,7 +11,6 @@ SELECT account_id INTO accountId_client FROM candido.account WHERE email = 'clie
 INSERT INTO candido."user" (
     fk_account_id,
     fk_gender_id,
-    fk_address_id,
     first_name,
     last_name,
     birth_date,
@@ -22,8 +21,8 @@ INSERT INTO candido."user" (
     deleted_at
 )
 VALUES
-    (accountId_admin, 1, NULL, 'Admin', 'Doe', '1998-04-15', '12345678', '', NULL, now(), NULL),
-    (accountId_client, 1, NULL, 'Client', 'Ino', '1975-10-22', '999999999', '3458483720', NULL, now(), NULL)
+    (accountId_admin, 1, 'Admin', 'Doe', '1998-04-15', '12345678', '', NULL, now(), NULL),
+    (accountId_client, 1, 'Client', 'Ino', '1975-10-22', '999999999', '3458483720', NULL, now(), NULL)
     ON CONFLICT DO NOTHING;
 END;
 $$ LANGUAGE plpgsql;
