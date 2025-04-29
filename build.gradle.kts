@@ -156,8 +156,3 @@ tasks.withType<Test> {
 tasks.withType<Jar> {
 	duplicatesStrategy = DuplicatesStrategy.EXCLUDE
 }
-
-tasks.withType<org.springframework.boot.gradle.tasks.bundling.BootJar> {
-	archiveFileName.set("candido-server.jar")
-	layered {}
-}
