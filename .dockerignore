@@ -1,0 +1,16 @@
+# Build artifacts
+.gradle
+build
+out
+
+# IDE / editor folders
+.idea
+*.iml
+.vscode
+
+# System / misc
+*.log
+*.md
+.env
+Dockerfile
+.dockerignore
