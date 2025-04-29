@@ -158,6 +158,5 @@ tasks.withType<Jar> {
 }
 
 tasks.withType<org.springframework.boot.gradle.tasks.bundling.BootJar> {
-	archiveFileName.set("candido-server.jar")
 	layered {}
 }
