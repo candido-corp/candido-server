@@ -1,14 +1,14 @@
-FROM gradle:8.5.0-jdk21 AS build
-
+# -------- BUILD STAGE --------
+FROM gradle:8.5.0-jdk21 AS builder
 WORKDIR /app
-
-COPY build.gradle.kts .
-COPY settings.gradle.kts .
+COPY build.gradle.kts settings.gradle.kts ./
+RUN gradle dependencies
 COPY src ./src
+RUN gradle clean bootJar -x test
 
-RUN gradle clean build
-
-FROM amazoncorretto:21
-COPY --from=build /app/build/libs/candido-server-*.jar /app/candido-server.jar
+# -------- RUNTIME STAGE --------
+FROM eclipse-temurin:21-jre-alpine AS runtime
+WORKDIR /app
+COPY --from=builder /app/build/libs/candido-server-*.jar candido-server.jar
 EXPOSE 8080
-CMD sleep 15 && java -jar /app/candido-server.jar
+CMD ["java", "-jar", "candido-server.jar"]
