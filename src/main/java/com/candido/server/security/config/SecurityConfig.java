@@ -78,6 +78,12 @@ public class SecurityConfig {
                 .csrf(AbstractHttpConfigurer::disable)
                 .cors(httpSecurityCorsConfigurer -> httpSecurityCorsConfigurer.configurationSource(corsConfigurationSource()))
                 .authorizeHttpRequests(auth -> auth
+
+                        // Override
+                        .requestMatchers("/api/v1/auth/register/email/resend")
+                        .authenticated()
+
+                        // Public endpoints
                         .requestMatchers(
                                 "/api/v1/auth/**", "/oauth2/**", "/",
                                 "/error",

@@ -8,7 +8,7 @@ server:
 application:
     name: candido
     client:
-        domain: http://client.candido.com
+        domain: http://localhost:3000
     security:
         jwt:
             issuer: Candido

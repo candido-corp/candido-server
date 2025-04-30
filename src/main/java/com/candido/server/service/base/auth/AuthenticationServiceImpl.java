@@ -25,6 +25,7 @@ import com.candido.server.service.base.auth.token.TemporaryCodeService;
 import com.candido.server.service.base.auth.token.TokenService;
 import com.candido.server.service.base.user.UserService;
 import com.candido.server.util.EncryptionService;
+import jakarta.persistence.EntityManager;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.transaction.Transactional;
@@ -81,7 +82,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
         );
         eventPublisher.publishEvent(event);
 
-        return createAuthentication(accountUserPair.account(), ipAddress, token);
+        return createAuthentication(accountUserPair.account(), ipAddress, null);
     }
 
     @Transactional
@@ -121,12 +122,13 @@ public class AuthenticationServiceImpl implements AuthenticationService {
             throw new ExceptionAuth(EnumExceptionName.ERROR_AUTH_VERIFICATION.name());
 
         tokenService.validateTokenAndDelete(token.getAccessToken(), tokenScopeCategoryId, account.get());
-        accountService.activateAccount(account.get());
-        var user = userService.findUserByAccountIdOrThrow(account.get().getId());
-        var event = new OnRegistrationCompletedEvent(this, account.get(), user, token.getIpAddress());
+        Account activatedAccount = accountService.activateAccount(account.get());
+
+        var user = userService.findUserByAccountIdOrThrow(activatedAccount.getId());
+        var event = new OnRegistrationCompletedEvent(this, activatedAccount, user, token.getIpAddress());
         eventPublisher.publishEvent(event);
 
-        return createAuthentication(account.get(), ipAddress, null);
+        return createAuthentication(activatedAccount, ipAddress, null);
     }
 
     @Transactional
@@ -141,12 +143,13 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 
         temporaryCodeService.validateTemporaryCode(temporaryCode, token.getId());
         tokenService.validateTokenAndDelete(token.getAccessToken(), tokenScopeCategoryId, account.get());
-        accountService.activateAccount(account.get());
-        var user = userService.findUserByAccountIdOrThrow(account.get().getId());
-        var event = new OnRegistrationCompletedEvent(this, account.get(), user, ipAddress);
+        Account activatedAccount = accountService.activateAccount(account.get());
+
+        var user = userService.findUserByAccountIdOrThrow(activatedAccount.getId());
+        var event = new OnRegistrationCompletedEvent(this, activatedAccount, user, ipAddress);
         eventPublisher.publishEvent(event);
 
-        return createAuthentication(account.get(), ipAddress, null);
+        return createAuthentication(activatedAccount, ipAddress, null);
     }
 
     @Override

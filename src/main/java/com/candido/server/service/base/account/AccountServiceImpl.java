@@ -3,7 +3,6 @@ package com.candido.server.service.base.account;
 import com.candido.server.domain.v1.account.*;
 import com.candido.server.domain.v1.provider.AuthProviderEnum;
 import com.candido.server.domain.v1.user.User;
-import com.candido.server.dto.v1.request.account.RequestAccountSettings;
 import com.candido.server.dto.v1.request.auth.RequestRegister;
 import com.candido.server.dto.v1.util.AccountUserPairDto;
 import com.candido.server.exception._common.EnumExceptionName;
@@ -13,13 +12,13 @@ import com.candido.server.service.base.auth.token.TokenService;
 import com.candido.server.service.base.user.UserService;
 import com.candido.server.validation.email.EmailConstraintValidator;
 import com.candido.server.validation.password.PasswordConstraintValidator;
+import jakarta.persistence.EntityManager;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
-import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -39,6 +38,8 @@ public class AccountServiceImpl implements AccountService {
 
     private final AccountSettingsService accountSettingsService;
 
+    private final EntityManager entityManager;
+
     @Autowired
     public AccountServiceImpl(
             AccountRepository accountRepository,
@@ -47,7 +48,8 @@ public class AccountServiceImpl implements AccountService {
             PasswordEncoder passwordEncoder,
             AuthProviderService authProviderService,
             UserService userService,
-            AccountSettingsService accountSettingsService
+            AccountSettingsService accountSettingsService,
+            EntityManager entityManager
     ) {
         this.accountRepository = accountRepository;
         this.accountRoleRepository = accountRoleRepository;
@@ -56,6 +58,7 @@ public class AccountServiceImpl implements AccountService {
         this.authProviderService = authProviderService;
         this.userService = userService;
         this.accountSettingsService = accountSettingsService;
+        this.entityManager = entityManager;
     }
 
     @Override
@@ -98,10 +101,16 @@ public class AccountServiceImpl implements AccountService {
     }
 
     @Override
-    public void activateAccount(Account account) {
-        // Abilito l'account
+    public Account activateAccount(Account account) {
+        AccountRole role = accountRoleRepository
+                .findById(AccountRoleEnum.USER_VERIFIED.getRoleId())
+                .orElseThrow(() -> new RuntimeException("Role not found"));
+
         account.setStatus(new AccountStatus(AccountStatusEnum.VERIFIED.getStatusId()));
-        save(account);
+        account.setRole(role);
+        Account savedAccount = save(account);
+        entityManager.flush();
+        return savedAccount;
     }
 
     @Transactional

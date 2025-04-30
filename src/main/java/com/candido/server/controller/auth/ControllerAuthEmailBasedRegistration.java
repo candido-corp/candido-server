@@ -1,5 +1,6 @@
 package com.candido.server.controller.auth;
 
+import com.candido.server.domain.v1.account.Account;
 import com.candido.server.dto.v1.request.auth.RequestRegister;
 import com.candido.server.dto.v1.request.auth.RequestRegisterEmailVerify;
 import com.candido.server.dto.v1.response.auth.ResponseAuthentication;
@@ -44,7 +45,8 @@ public class ControllerAuthEmailBasedRegistration {
     ) {
         String appURL = utilService.getAppUrl(httpRequest);
         String ipAddress = utilService.getClientIP(httpRequest);
-        authenticationService.resendEmailRegistration(authentication.getName(), appURL, ipAddress);
+        Account account = (Account) authentication.getPrincipal();
+        authenticationService.resendEmailRegistration(account.getEmail(), appURL, ipAddress);
         return ResponseEntity.noContent().build();
     }
 
