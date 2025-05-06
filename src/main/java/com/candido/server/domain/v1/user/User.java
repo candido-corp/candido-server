@@ -18,6 +18,8 @@ import java.time.LocalDateTime;
 public class User {
 
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @JsonProperty("id")
     @Column(name = "user_id")
     private int id;
 

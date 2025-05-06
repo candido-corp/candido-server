@@ -62,7 +62,7 @@ public class UtilServiceImpl implements UtilService {
     public String buildEmailVerificationLink(String token, String encryptedEmail) {
         return UriComponentsBuilder
                 .fromHttpUrl(clientDomain)
-                .path("/register/verify")
+                .path("/register-verify")
                 .queryParam("t", token)
                 .queryParam("e", encryptedEmail)
                 .queryParam("a", "email")
@@ -73,7 +73,7 @@ public class UtilServiceImpl implements UtilService {
     public String buildCodeVerificationLink(String token, String encryptedEmail, String code) {
         return UriComponentsBuilder
                 .fromHttpUrl(clientDomain)
-                .path("/register/verify")
+                .path("/register-verify")
                 .queryParam("t", token)
                 .queryParam("e", encryptedEmail)
                 .queryParam("a", "code")
