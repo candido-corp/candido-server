@@ -1,7 +1,6 @@
 package com.candido.server.controller.account;
 
 import com.candido.server.domain.v1.account.Account;
-import com.candido.server.domain.v1.account.AccountSettings;
 import com.candido.server.domain.v1.account.XrefAccountSettings;
 import com.candido.server.domain.v1.user.User;
 import com.candido.server.dto.v1.util.AccountDto;
