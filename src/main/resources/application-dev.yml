@@ -5,47 +5,6 @@ server:
         mime-types: application/json
         min-response-size: 1024
 
-application:
-    name: candido
-    client:
-        domain: http://localhost:3000
-    security:
-        jwt:
-            issuer: Candido
-            expiration: 86400000 # 1 day in ms
-            refresh-token:
-                expiration: 604800000 # 7 days in ms
-            registration-token:
-                expiration: 864000000 # 10 days in ms
-            reset-token:
-                expiration: 864000000 # 10 days in ms
-    email:
-        host: ${SMTP_HOST}
-        port: 587
-        username: apikey
-        password: ${SMTP_PASSWORD}
-        protocol: smtp
-        smtp:
-            auth: true
-            starttls:
-                enable: true
-        debug: false
-        no-reply: ${SMTP_NO_REPLY}
-        can-send: ${SMTP_CAN_SEND}
-    support:
-        phone: 1234567890
-        email: support@candido.com
-    api:
-        version: 0.0.1
-        description: API for managing the entire online application project.
-        server:
-            development:
-                url: http://localhost:8080/
-            production:
-                url: http://candido.com:8080/
-    tos:
-        uri: http://localhost:8080/terms-of-service
-
 spring:
     application:
         name: candido
@@ -90,6 +49,22 @@ spring:
 
                 # PLEASE, DO NOT CHANGE THIS PROPERTY - DEFAULT SCHEMA IS PUBLIC, but we are using a custom schema
                 default_schema: ${DB_NAME}
+    security:
+        oauth2:
+            client:
+                registration:
+                    keycloak:
+                        client-id: backend
+                        client-secret: HVeUzGBKo8DVKhREd8uYvF0ECd9ijO41
+                        authorization-grant-type: authorization_code
+                        redirect-uri: "{baseUrl}/login/oauth2/code/keycloak"
+                        scope: openid, profile
+                provider:
+                    keycloak:
+                        issuer-uri: http://localhost:8888/realms/candido-realm-dev
+            resourceserver:
+                jwt:
+                    issuer-uri: http://localhost:8888/realms/candido-realm-dev
 
 management:
     endpoint:
@@ -110,4 +85,47 @@ management:
             percentiles-histogram:
                 all: true
             percentiles:
-                all: [0.5, 0.75, 0.95, 0.99]
+                all: [ 0.5, 0.75, 0.95, 0.99 ]
+
+
+
+application:
+    name: candido
+    client:
+        domain: http://localhost:3000
+    security:
+        jwt:
+            issuer: Candido
+            expiration: 86400000 # 1 day in ms
+            refresh-token:
+                expiration: 604800000 # 7 days in ms
+            registration-token:
+                expiration: 864000000 # 10 days in ms
+            reset-token:
+                expiration: 864000000 # 10 days in ms
+    email:
+        host: ${SMTP_HOST}
+        port: 587
+        username: apikey
+        password: ${SMTP_PASSWORD}
+        protocol: smtp
+        smtp:
+            auth: true
+            starttls:
+                enable: true
+        debug: false
+        no-reply: ${SMTP_NO_REPLY}
+        can-send: ${SMTP_CAN_SEND}
+    support:
+        phone: 1234567890
+        email: support@candido.com
+    api:
+        version: 0.0.1
+        description: API for managing the entire online application project.
+        server:
+            development:
+                url: http://localhost:8080/
+            production:
+                url: http://candido.com:8080/
+    tos:
+        uri: http://localhost:8080/terms-of-service

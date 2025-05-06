@@ -40,6 +40,8 @@ public class ControllerAccount {
 
     @GetMapping
     public ResponseEntity<AccountDto> getAccountInfo(Authentication authentication) {
+        System.out.println(authentication);
+        System.out.println(authentication.getName());
         Account account = accountService.findAccountByEmailOrThrow(authentication.getName());
         User user = userService.findUserByAccountIdOrThrow(account.getId());
         List<XrefAccountSettings> xrefAccountSettings = accountSettingsService.getAllAccountSettings(account.getId());
