@@ -8,6 +8,7 @@ server:
 application:
     name: candido
     client:
+        # This domain is specific to the development environment. Do not use in production.
         domain: http://localhost:3000
     security:
         jwt:
