@@ -55,8 +55,11 @@ public class UserServiceImpl implements UserService {
             user.setLastModifiedName(LocalDateTime.now());
         }
 
-        Gender gender = genderService.findGenderByIdOrThrow(requestUpdateUser.genderId());
-        user.setGenderId(gender.getId());
+        if(requestUpdateUser.genderId() != null) {
+            Gender gender = genderService.findGenderByIdOrThrow(requestUpdateUser.genderId());
+            user.setGenderId(gender.getId());
+        } else user.setGenderId(null);
+
         user.setBirthdate(requestUpdateUser.birthdate());
         user.setMobileNumber(requestUpdateUser.mobileNumber());
         user.setPhoneNumber(requestUpdateUser.phoneNumber());

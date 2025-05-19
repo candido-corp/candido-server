@@ -13,6 +13,7 @@ import com.candido.server.service.base.mapper.AddressMapperService;
 import com.candido.server.service.base.mapper.UserMapperService;
 import com.candido.server.service.base.user.UserService;
 import com.candido.server.validation.annotations.VerifiedUser;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
@@ -51,9 +52,9 @@ public class ControllerUser {
 
     @VerifiedUser
     @PutMapping
-    public ResponseEntity<UserDto> postUserInfo(
+    public ResponseEntity<UserDto> editUserInfo(
             Authentication authentication,
-            @RequestBody RequestUpdateUser requestUpdateUser
+            @Valid @RequestBody RequestUpdateUser requestUpdateUser
     ) {
         Account account = accountService.findAccountByEmailOrThrow(authentication.getName());
         boolean userHasOpenApplications = applicationService.userHasOpenApplications(account.getId());

@@ -43,6 +43,9 @@ public class UserDto {
     @JsonProperty("created_at")
     LocalDateTime createdAt;
 
+    @JsonProperty("updated_at")
+    LocalDateTime updatedAt;
+
     @JsonProperty("can_change_name")
     boolean canChangeName;
 

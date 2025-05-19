@@ -24,6 +24,7 @@ public class UserMapperServiceImpl implements UserMapperService {
         userDto.setMobileNumber(user.getMobileNumber());
         userDto.setPhoneNumber(user.getPhoneNumber());
         userDto.setCreatedAt(user.getCreatedAt());
+        userDto.setUpdatedAt(user.getUpdatedAt());
         userDto.setCanChangeName(user.getLastModifiedName(), hasOpenApplications);
 
         return userDto;
