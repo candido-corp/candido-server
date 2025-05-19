@@ -55,16 +55,26 @@ spring:
                 registration:
                     keycloak:
                         client-id: backend
-                        client-secret: HVeUzGBKo8DVKhREd8uYvF0ECd9ijO41
+                        client-secret: Qh5Lg7bHMKX816MhcMf50k4Td1JNg3YS
                         authorization-grant-type: authorization_code
                         redirect-uri: "{baseUrl}/login/oauth2/code/keycloak"
                         scope: openid, profile
                 provider:
                     keycloak:
-                        issuer-uri: http://localhost:8888/realms/candido-realm-dev
+                        issuer-uri: http://localhost:8888/realms/candido-realm
             resourceserver:
                 jwt:
-                    issuer-uri: http://localhost:8888/realms/candido-realm-dev
+                    issuer-uri: http://localhost:8888/realms/candido-realm
+    kafka:
+        bootstrap-servers: localhost:9092
+        consumer:
+            group-id: candido-consumer
+            auto-offset-reset: earliest
+            key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+            value-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+        producer:
+            key-serializer: org.apache.kafka.common.serialization.StringSerializer
+            value-serializer: org.apache.kafka.common.serialization.StringSerializer
 
 management:
     endpoint:

@@ -57,6 +57,7 @@ dependencies {
 	implementation("org.springframework.boot:spring-boot-starter-actuator")
 	implementation("org.springframework.boot:spring-boot-starter-oauth2-client")
 	implementation("org.springframework.boot:spring-boot-starter-oauth2-resource-server")
+	implementation("org.springframework.kafka:spring-kafka")
 
 	// -- Flyway and PostgreSQL Driver --
 	// https://mvnrepository.com/artifact/org.flywaydb/flyway-core
