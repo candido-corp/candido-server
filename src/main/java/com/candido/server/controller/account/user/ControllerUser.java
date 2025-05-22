@@ -3,13 +3,9 @@ package com.candido.server.controller.account.user;
 import com.candido.server.domain.v1.account.Account;
 import com.candido.server.domain.v1.user.User;
 import com.candido.server.dto.v1.request.account.RequestUpdateUser;
-import com.candido.server.dto.v1.request.geo.RequestAddress;
-import com.candido.server.dto.v1.response.geo.ResponseUserAddress;
 import com.candido.server.dto.v1.util.UserDto;
 import com.candido.server.service.base.account.AccountService;
 import com.candido.server.service.base.application.ApplicationService;
-import com.candido.server.service.base.mapper.AccountMapperService;
-import com.candido.server.service.base.mapper.AddressMapperService;
 import com.candido.server.service.base.mapper.UserMapperService;
 import com.candido.server.service.base.user.UserService;
 import com.candido.server.validation.annotations.VerifiedUser;
@@ -58,9 +54,10 @@ public class ControllerUser {
     ) {
         Account account = accountService.findAccountByEmailOrThrow(authentication.getName());
         boolean userHasOpenApplications = applicationService.userHasOpenApplications(account.getId());
+        boolean canChangeName = !userHasOpenApplications;
         User user = userService.findUserByAccountIdOrThrow(account.getId());
         UserDto userDto = userMapper.userToUserDto(
-                userService.save(user, requestUpdateUser, userHasOpenApplications),
+                userService.save(user, requestUpdateUser, canChangeName),
                 account,
                 userHasOpenApplications
         );
