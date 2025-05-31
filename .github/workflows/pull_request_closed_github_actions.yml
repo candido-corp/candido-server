@@ -1,0 +1,42 @@
+name: Publish candido-server
+
+on:
+  pull_request:
+    branches:
+      - main
+      - develop
+    types: [closed]
+
+jobs:
+  docker:
+    if: github.event.pull_request.merged == true
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Log in to GitHub Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Set image tag based on base branch
+        id: vars
+        run: |
+          if [[ "${{ github.base_ref }}" == "main" ]]; then
+            echo "TAG=prod" >> $GITHUB_OUTPUT
+          elif [[ "${{ github.base_ref }}" == "develop" ]]; then
+            echo "TAG=dev" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Build and push Docker image
+        run: |
+          IMAGE_NAME=ghcr.io/${{ github.repository_owner }}/candido-server
+          TAG=${{ steps.vars.outputs.TAG }}
+          docker build -t $IMAGE_NAME:$TAG .
+          docker push $IMAGE_NAME:$TAG
