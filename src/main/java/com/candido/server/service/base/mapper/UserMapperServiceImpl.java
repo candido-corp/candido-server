@@ -1,17 +1,28 @@
 package com.candido.server.service.base.mapper;
 
 import com.candido.server.domain.v1.account.Account;
+import com.candido.server.domain.v1.geo.Address;
 import com.candido.server.domain.v1.user.Gender;
 import com.candido.server.domain.v1.user.User;
 import com.candido.server.dto.v1.util.GenderDto;
 import com.candido.server.dto.v1.util.UserDto;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 @Service
 public class UserMapperServiceImpl implements UserMapperService {
 
+    private final AddressMapperService addressMapperService;
+
+    @Autowired
+    public UserMapperServiceImpl(
+            AddressMapperService addressMapperService
+    ) {
+        this.addressMapperService = addressMapperService;
+    }
+
     @Override
-    public UserDto userToUserDto(User user, Account account, boolean hasOpenApplications) {
+    public UserDto userToUserDto(User user, Account account, boolean hasOpenApplications, Address primaryAddress) {
         if (user == null) return null;
 
         UserDto userDto = new UserDto();
@@ -26,6 +37,9 @@ public class UserMapperServiceImpl implements UserMapperService {
         userDto.setCreatedAt(user.getCreatedAt());
         userDto.setUpdatedAt(user.getUpdatedAt());
         userDto.setCanChangeName(user.getLastModifiedName(), hasOpenApplications);
+
+
+        userDto.setAddress(addressMapperService.addressToUserAddressDto(primaryAddress));
 
         return userDto;
     }

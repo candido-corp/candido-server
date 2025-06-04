@@ -1,13 +1,8 @@
 package com.candido.server.controller.account.user;
 
-import com.candido.server.domain.v1.account.Account;
-import com.candido.server.domain.v1.user.User;
 import com.candido.server.dto.v1.request.account.RequestUpdateUser;
 import com.candido.server.dto.v1.util.UserDto;
-import com.candido.server.service.base.account.AccountService;
-import com.candido.server.service.base.application.ApplicationService;
-import com.candido.server.service.base.mapper.UserMapperService;
-import com.candido.server.service.base.user.UserService;
+import com.candido.server.service.business.user.BusinessUserService;
 import com.candido.server.validation.annotations.VerifiedUser;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,30 +14,18 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/api/v1/me/details")
 public class ControllerUser {
 
-    private final AccountService accountService;
-    private final UserMapperService userMapper;
-    private final UserService userService;
-    private final ApplicationService applicationService;
+    private final BusinessUserService businessUserService;
 
     @Autowired
     public ControllerUser(
-            AccountService accountService,
-            UserMapperService userMapper,
-            UserService userService,
-            ApplicationService applicationService
+            BusinessUserService businessUserService
     ) {
-        this.accountService = accountService;
-        this.userMapper = userMapper;
-        this.userService = userService;
-        this.applicationService = applicationService;
+        this.businessUserService = businessUserService;
     }
 
     @GetMapping
     public ResponseEntity<UserDto> getUserInfo(Authentication authentication) {
-        Account account = accountService.findAccountByEmailOrThrow(authentication.getName());
-        User user = userService.findUserByAccountIdOrThrow(account.getId());
-        boolean userHasOpenApplications = applicationService.userHasOpenApplications(account.getId());
-        UserDto userDto = userMapper.userToUserDto(user, account, userHasOpenApplications);
+        UserDto userDto = businessUserService.getUserDtoWithPrimaryAddress(authentication);
         return ResponseEntity.ok(userDto);
     }
 
@@ -52,16 +35,7 @@ public class ControllerUser {
             Authentication authentication,
             @Valid @RequestBody RequestUpdateUser requestUpdateUser
     ) {
-        Account account = accountService.findAccountByEmailOrThrow(authentication.getName());
-        boolean userHasOpenApplications = applicationService.userHasOpenApplications(account.getId());
-        boolean canChangeName = !userHasOpenApplications;
-        User user = userService.findUserByAccountIdOrThrow(account.getId());
-        UserDto userDto = userMapper.userToUserDto(
-                userService.save(user, requestUpdateUser, canChangeName),
-                account,
-                userHasOpenApplications
-        );
-
+        UserDto userDto = businessUserService.editUserInfo(authentication, requestUpdateUser);
         return ResponseEntity.ok(userDto);
     }
 
