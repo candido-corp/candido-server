@@ -23,4 +23,8 @@ public class AddressType {
     @Column(name = "description")
     private String description;
 
+    @JsonProperty("address_type_key")
+    @Column(name = "address_type_key")
+    private String addressTypeKey;
+
 }
