@@ -11,6 +11,10 @@ jobs:
     name: Build candido-server
     runs-on: ubuntu-latest
 
+    defaults:
+      run:
+        working-directory: candido-server
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
