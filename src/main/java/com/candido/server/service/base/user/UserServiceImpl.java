@@ -1,5 +1,6 @@
 package com.candido.server.service.base.user;
 
+import com.candido.server.domain.v1.account.Account;
 import com.candido.server.domain.v1.user.Gender;
 import com.candido.server.domain.v1.user.User;
 import com.candido.server.domain.v1.user.UserRepository;
@@ -9,6 +10,7 @@ import com.candido.server.exception._common.EnumExceptionName;
 import com.candido.server.exception.account.ExceptionAccountNotFound;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.jpa.domain.Specification;
+import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -26,6 +28,12 @@ public class UserServiceImpl implements UserService {
             GenderService genderService) {
         this.userRepository = userRepository;
         this.genderService = genderService;
+    }
+
+    @Override
+    public User getAuthenticatedUser(Authentication authentication) {
+        Account account = (Account) authentication.getPrincipal();
+        return findUserByAccountIdOrThrow(account.getId());
     }
 
     @Override
