@@ -18,6 +18,10 @@ public class AddressSpecifications {
         return (root, query, cb) -> cb.isTrue(root.get(Address_.IS_PRIMARY));
     }
 
+    public static Specification<Address> isActive() {
+        return (root, query, cb) -> cb.isNull(root.get(Address_.DELETED_AT));
+    }
+
     public static Specification<Address> byIdAndUserId(Integer addressId, Integer userId) {
         return Specification.where(byId(addressId)).and(byUserId(userId));
     }
