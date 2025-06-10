@@ -113,7 +113,7 @@ public class AddressServiceImpl implements AddressService {
 
         if (Boolean.TRUE.equals(requestAddress.isPrimary())) {
             List<Address> addressesToUpdate = userAddresses.stream()
-                    .filter(a -> Boolean.TRUE.equals(a.getIsPrimary()) && a.getAddressId() != addressId)
+                    .filter(a -> Boolean.TRUE.equals(a.getIsPrimary()))
                     .peek(a -> a.setIsPrimary(false))
                     .toList();
 
@@ -123,7 +123,6 @@ public class AddressServiceImpl implements AddressService {
 
         } else if (!hasPrimary) {
             address.setIsPrimary(true);
-
         } else if (addressId == null) {
             address.setIsPrimary(false);
         }
