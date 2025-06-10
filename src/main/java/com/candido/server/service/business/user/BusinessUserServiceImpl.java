@@ -44,7 +44,7 @@ public class BusinessUserServiceImpl implements BusinessUserService {
         User user = userService.findUserByAccountIdOrThrow(account.getId());
         boolean userHasOpenApplications = applicationService.userHasOpenApplications(account.getId());
 
-        Address primaryAddress = addressService.findAddressBySpecification(
+        Address primaryAddress = addressService.findActiveAddressBySpecification(
                 AddressSpecifications.byUserIdAndIsPrimary(user.getId())
         ).orElse(null);
 
@@ -59,7 +59,7 @@ public class BusinessUserServiceImpl implements BusinessUserService {
         User user = userService.findUserByAccountIdOrThrow(account.getId());
         User currentUser = userService.save(user, requestUpdateUser, canChangeName);
 
-        Address primaryAddress = addressService.findAddressBySpecification(
+        Address primaryAddress = addressService.findActiveAddressBySpecification(
                 AddressSpecifications.byUserIdAndIsPrimary(user.getId())
         ).orElse(null);
 

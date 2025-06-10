@@ -8,11 +8,11 @@ import java.util.List;
 import java.util.Optional;
 
 public interface AddressService {
-    Optional<Address> findAddressBySpecification(Specification<Address> specification);
+    Optional<Address> findActiveAddressBySpecification(Specification<Address> specification);
+    List<Address> findAllActiveAddressBySpecification(Specification<Address> specification);
     List<Address> getAllActiveAddressesByUserId(Integer userId);
-    Optional<Address> getAddressById(Integer addressId);
-    Address getAddressByIdAndUserIdOrThrow(Integer addressId, Integer userId);
+    Optional<Address> getActiveAddressById(Integer addressId);
+    Address getActiveAddressByIdAndUserIdOrThrow(Integer addressId, Integer userId);
     Address saveAddress(int userId, Integer addressId, RequestAddress requestAddress);
     void deleteAddress(Integer addressId);
-    Address updatePrimaryAddressForUser(int userId, Address address, Integer addressId, RequestAddress requestAddress);
 }
