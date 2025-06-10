@@ -34,6 +34,9 @@ public class ResponseUserAddress {
     @JsonProperty("updated_at")
     private LocalDateTime updatedAt;
 
+    @JsonProperty("is_primary")
+    private boolean isPrimary;
+
     public ResponseUserAddress(Address address) {
         this.addressId = address.getAddressId();
         this.addressTypeId = address.getAddressTypeId();
@@ -42,5 +45,6 @@ public class ResponseUserAddress {
         this.houseNumber = address.getHouseNumber();
         this.updatedAt = address.getUpdatedAt();
         this.type = address.getAddressType().getDescription();
+        this.isPrimary = address.getIsPrimary();
     }
 }

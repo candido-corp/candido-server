@@ -2,11 +2,11 @@ package com.candido.server.service.base.geo;
 
 import com.candido.server.domain.v1.geo.Address;
 import com.candido.server.domain.v1.geo.AddressRepository;
-import com.candido.server.domain.v1.geo.Address_;
 import com.candido.server.dto.v1.request.geo.RequestAddress;
 import com.candido.server.exception._common.EnumExceptionName;
 import com.candido.server.exception.geo.ExceptionAddress;
 import com.candido.server.exception.geo.ExceptionAddressNotFound;
+import com.candido.server.service.base.geo.specifications.AddressSpecifications;
 import jakarta.persistence.EntityManager;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -33,6 +33,11 @@ public class AddressServiceImpl implements AddressService {
     }
 
     @Override
+    public Optional<Address> findAddressBySpecification(Specification<Address> specification) {
+        return addressRepository.findOne(specification);
+    }
+
+    @Override
     public List<Address> getAllActiveAddressesByUserId(Integer userId) {
         return addressRepository.findByUserIdAndDeletedAtIsNull(userId);
     }
@@ -47,13 +52,7 @@ public class AddressServiceImpl implements AddressService {
         if (addressId == null || addressId == 0 || userId == null || userId == 0)
             throw new ExceptionAddressNotFound(EnumExceptionName.ERROR_BUSINESS_ADDRESS_NOT_FOUND.name());
 
-        Specification<Address> byAddressIdAndUserId = ((root, query, criteriaBuilder) ->
-                criteriaBuilder.and(
-                        criteriaBuilder.equal(root.get(Address_.ADDRESS_ID), addressId),
-                        criteriaBuilder.equal(root.get(Address_.USER_ID), userId)
-                ));
-
-        return addressRepository.findOne(byAddressIdAndUserId)
+        return findAddressBySpecification(AddressSpecifications.byIdAndUserId(addressId, userId))
                 .orElseThrow(() -> new ExceptionAddressNotFound(EnumExceptionName.ERROR_BUSINESS_ADDRESS_NOT_FOUND.name()));
     }
 

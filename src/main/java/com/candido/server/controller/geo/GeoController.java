@@ -1,6 +1,7 @@
 package com.candido.server.controller.geo;
 
 import com.candido.server.domain.v1.geo.EnumTerritoryCategoryKey;
+import com.candido.server.dto.v1.response.geo.ResponseAddressType;
 import com.candido.server.dto.v1.response.geo.ResponseGeoTerritory;
 import com.candido.server.dto.v1.response.geo.ResponseGeoTerritoryList;
 import com.candido.server.service.base.geo.GeoService;
