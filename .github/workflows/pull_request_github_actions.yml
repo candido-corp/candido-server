@@ -2,9 +2,6 @@ name: Build candido-server
 
 on:
   pull_request:
-    paths:
-      - 'candido-server/**'
-      - '.github/workflows/pull_request_github_actions.yml'
 
 jobs:
   build:
