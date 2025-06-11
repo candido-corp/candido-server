@@ -2,6 +2,7 @@ package com.candido.server.exception._common;
 
 public enum EnumExceptionName {
     ERROR_AUTH_VERIFICATION,
+    ERROR_AUTH_FORBIDDEN,
 
     ERROR_VALIDATION_INVALID_EXCEPTION_CONFIGURATION,
 
