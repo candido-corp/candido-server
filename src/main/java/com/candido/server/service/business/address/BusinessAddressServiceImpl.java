@@ -6,9 +6,11 @@ import com.candido.server.dto.v1.request.geo.RequestAddress;
 import com.candido.server.dto.v1.response.geo.ResponseUserAddress;
 import com.candido.server.exception._common.EnumExceptionName;
 import com.candido.server.exception.geo.ExceptionAddressNotFound;
+import com.candido.server.service.base._common.loader.AddressLoader;
 import com.candido.server.service.base.geo.AddressService;
 import com.candido.server.service.base.mapper.AddressMapperService;
 import com.candido.server.service.base.user.UserService;
+import com.candido.server.validation.annotations.ownership.CheckOwnership;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
@@ -52,6 +54,7 @@ public class BusinessAddressServiceImpl implements BusinessAddressService {
     }
 
     @Override
+    @CheckOwnership(idParam = "addressId", loader = AddressLoader.class)
     public ResponseUserAddress updateUserAddress(Authentication authentication, RequestAddress requestUserAddressDto, int addressId) {
         User authenticatedUser = userService.getAuthenticatedUser(authentication);
         Address address = addressService.saveAddress(authenticatedUser.getId(), addressId, requestUserAddressDto);
@@ -61,9 +64,8 @@ public class BusinessAddressServiceImpl implements BusinessAddressService {
     }
 
     @Override
-    public void deleteAddress(Authentication authentication, Integer addressId) {
-        User authenticatedUser = userService.getAuthenticatedUser(authentication);
-        addressService.getActiveAddressByIdAndUserIdOrThrow(addressId, authenticatedUser.getId());
+    @CheckOwnership(idParam = "addressId", loader = AddressLoader.class)
+    public void deleteAddress(Integer addressId) {
         addressService.deleteAddress(addressId);
     }
 }
