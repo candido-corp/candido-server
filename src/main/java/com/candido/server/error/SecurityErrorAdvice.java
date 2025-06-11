@@ -25,6 +25,19 @@ public class SecurityErrorAdvice {
     private final CustomExceptionResolver customExceptionResolver;
 
     @ExceptionHandler({
+            ExceptionForbidden.class
+    })
+    @ResponseStatus(HttpStatus.FORBIDDEN)
+    public ResponseEntity<ApiErrorResponse> handleForbiddenException(CustomRuntimeException ex, Locale locale) {
+        return customExceptionResolver.resolveException(
+                ex,
+                locale,
+                HttpStatus.FORBIDDEN,
+                EnumMessageResolverType.AUTHENTICATION
+        );
+    }
+
+    @ExceptionHandler({
             ExceptionVerifyRegistrationToken.class,
             ExceptionInvalidJWTToken.class,
             ExceptionVerifyResetToken.class,

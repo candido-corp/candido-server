@@ -1,5 +1,6 @@
 package com.candido.server.domain.v1.geo;
 
+import com.candido.server.domain.v1._common.Ownable;
 import com.candido.server.domain.v1.user.User;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
@@ -14,7 +15,7 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @Entity
 @Table(name = "address")
-public class Address {
+public class Address implements Ownable {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -74,4 +75,8 @@ public class Address {
     @Column(name = "deleted_at")
     private LocalDateTime deletedAt;
 
+    @Override
+    public Integer getOwnerId() {
+        return userId;
+    }
 }

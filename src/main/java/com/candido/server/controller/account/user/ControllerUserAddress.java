@@ -60,10 +60,9 @@ public class ControllerUserAddress {
     @VerifiedUser
     @DeleteMapping("/{addressId}")
     public ResponseEntity<Void> deleteUserAddresses(
-            Authentication authentication,
             @PathVariable("addressId") Integer addressId
     ) {
-        businessAddressService.deleteAddress(authentication, addressId);
+        businessAddressService.deleteAddress(addressId);
         return ResponseEntity.noContent().build();
     }
 
