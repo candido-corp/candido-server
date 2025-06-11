@@ -42,7 +42,7 @@ public class GeoErrorAdvice {
         return customExceptionResolver.resolveException(
                 ex,
                 locale,
-                HttpStatus.NOT_FOUND,
+                HttpStatus.BAD_REQUEST,
                 EnumMessageResolverType.BUSINESS
         );
     }

@@ -16,6 +16,7 @@ import org.springframework.stereotype.Service;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
+import java.util.function.Predicate;
 
 @Service
 public class AddressServiceImpl implements AddressService {
@@ -33,100 +34,167 @@ public class AddressServiceImpl implements AddressService {
     }
 
     @Override
-    public Optional<Address> findAddressBySpecification(Specification<Address> specification) {
+    public Optional<Address> findActiveAddressBySpecification(Specification<Address> specification) {
+        specification = specification.and(AddressSpecifications.isActive());
         return addressRepository.findOne(specification);
     }
 
     @Override
+    public List<Address> findAllActiveAddressBySpecification(Specification<Address> specification) {
+        specification = specification.and(AddressSpecifications.isActive());
+        return addressRepository.findAll(specification);
+    }
+
+    @Override
     public List<Address> getAllActiveAddressesByUserId(Integer userId) {
-        return addressRepository.findByUserIdAndDeletedAtIsNull(userId);
+        return userId != null ? findAllActiveAddressBySpecification(
+                AddressSpecifications.byUserId(userId)
+        ) : List.of();
     }
 
     @Override
-    public Optional<Address> getAddressById(Integer addressId) {
-        return addressId != null ? addressRepository.findById(addressId) : Optional.empty();
+    public Optional<Address> getActiveAddressById(Integer addressId) {
+        return addressId != null ? findActiveAddressBySpecification(
+                AddressSpecifications.byId(addressId)
+        ) : Optional.empty();
     }
 
     @Override
-    public Address getAddressByIdAndUserIdOrThrow(Integer addressId, Integer userId) {
+    public Address getActiveAddressByIdAndUserIdOrThrow(Integer addressId, Integer userId) {
         if (addressId == null || addressId == 0 || userId == null || userId == 0)
             throw new ExceptionAddressNotFound(EnumExceptionName.ERROR_BUSINESS_ADDRESS_NOT_FOUND.name());
 
-        return findAddressBySpecification(AddressSpecifications.byIdAndUserId(addressId, userId))
+        return findActiveAddressBySpecification(AddressSpecifications.byIdAndUserId(addressId, userId))
                 .orElseThrow(() -> new ExceptionAddressNotFound(EnumExceptionName.ERROR_BUSINESS_ADDRESS_NOT_FOUND.name()));
     }
 
     @Override
     @Transactional
-    public Address saveAddress(int userId, Integer addressId, RequestAddress requestAddress) {
-        if (requestAddress.territoryId() == null || requestAddress.addressTypeId() == null) {
-            throw new ExceptionAddress(EnumExceptionName.ERROR_BUSINESS_ADDRESS_FIELDS_CAN_NOT_BE_EMPTY.name());
-        }
-
+    public Address saveAddress(int userId, Integer addressId, RequestAddress request) {
+        validateRequest(request);
         LocalDateTime now = LocalDateTime.now();
 
-        Address address = getAddressById(addressId)
-                .map(existing -> {
-                    existing.setUpdatedAt(now);
-                    return existing;
-                })
-                .orElseGet(() -> {
-                    Address newAddress = new Address();
-                    newAddress.setCreatedAt(now);
-                    return newAddress;
-                });
+        Address address = addressId != null
+                ? getActiveAddressById(addressId).orElseGet(this::createNew)
+                : createNew();
 
-        address.setTerritoryId(requestAddress.territoryId());
-        address.setAddressTypeId(requestAddress.addressTypeId());
-        address.setZip(requestAddress.zip());
-        address.setStreet(requestAddress.street());
-        address.setHouseNumber(requestAddress.houseNumber());
-        address.setUserId(userId);
-        address.setIsPrimary(requestAddress.isPrimary());
+        if (address.getCreatedAt() == null) {
+            address.setCreatedAt(now);
+        }
+        address.setUpdatedAt(now);
 
-        // Check if the address is primary
-        address = updatePrimaryAddressForUser(userId, address, addressId, requestAddress);
+        mapRequestToAddress(address, request, userId);
+        enforcePrimaryConsistency(userId, address, addressId, request.isPrimary());
 
-        Address currentAddress = addressRepository.save(address);
-        entityManager.refresh(currentAddress);
-        return currentAddress;
+        entityManager.refresh(address);
+        return address;
     }
 
-
     @Override
+    @Transactional
     public void deleteAddress(Integer addressId) {
-        getAddressById(addressId).ifPresent(address -> {
-            if (address.getIsPrimary()) {
-                throw new ExceptionAddress(EnumExceptionName.ERROR_BUSINESS_ADDRESS_CANT_DELETE_PRIMARY.name());
-            }
+        getActiveAddressById(addressId).ifPresent(address -> {
+            boolean wasPrimary = address.getIsPrimary();
             address.setDeletedAt(LocalDateTime.now());
+            address.setIsPrimary(false);
             addressRepository.save(address);
+
+            if (wasPrimary) {
+                promoteAnotherPrimary(address.getUserId());
+            }
         });
     }
 
-    @Override
-    public Address updatePrimaryAddressForUser(int userId, Address address, Integer addressId, RequestAddress requestAddress) {
+    /**
+     * Enforces primary address consistency based on the user's existing addresses.
+     *
+     * @param userId    The ID of the user whose addresses are being managed.
+     * @param address   The address being saved or updated.
+     * @param addressId The ID of the address being updated, or null if creating a new one.
+     * @param isPrimary Whether the address should be set as primary.
+     */
+    private void enforcePrimaryConsistency(int userId, Address address, Integer addressId, boolean isPrimary) {
         List<Address> userAddresses = getAllActiveAddressesByUserId(userId);
+        boolean hasOtherPrimary = userAddresses.stream().anyMatch(Address::getIsPrimary);
 
-        boolean hasPrimary = userAddresses.stream().anyMatch(Address::getIsPrimary);
-
-        if (Boolean.TRUE.equals(requestAddress.isPrimary())) {
-            List<Address> addressesToUpdate = userAddresses.stream()
-                    .filter(a -> Boolean.TRUE.equals(a.getIsPrimary()))
-                    .peek(a -> a.setIsPrimary(false))
-                    .toList();
-
-            addressRepository.saveAll(addressesToUpdate);
-
+        if (isPrimary) {
+            demoteExistingPrimaries(userAddresses);
             address.setIsPrimary(true);
-
-        } else if (!hasPrimary) {
+        } else if (!hasOtherPrimary && (addressId == null)) {
             address.setIsPrimary(true);
-        } else if (addressId == null) {
+        } else {
             address.setIsPrimary(false);
         }
 
-        return address;
+        addressRepository.save(address);
+    }
+
+    /**
+     * Demotes all existing primary addresses to non-primary.
+     *
+     * @param addresses The list of addresses to check and demote if necessary.
+     */
+    private void demoteExistingPrimaries(List<Address> addresses) {
+        List<Address> primaries = addresses.stream()
+                .filter(Address::getIsPrimary)
+                .peek(a -> a.setIsPrimary(false))
+                .toList();
+
+        if (!primaries.isEmpty()) {
+            addressRepository.saveAll(primaries);
+        }
+    }
+
+    /**
+     * Promotes another address to primary if the current primary is deleted.
+     *
+     * @param userId The ID of the user whose addresses are being managed.
+     */
+    private void promoteAnotherPrimary(int userId) {
+        getAllActiveAddressesByUserId(userId).stream()
+                .filter(a -> !a.getIsPrimary())
+                .findFirst()
+                .ifPresent(a -> {
+                    a.setIsPrimary(true);
+                    addressRepository.save(a);
+                });
+    }
+
+    /**
+     * Creates a new Address entity with default values.
+     *
+     * @return A new Address instance.
+     */
+    private Address createNew() {
+        return new Address();
+    }
+
+    /**
+     * Validates the RequestAddress DTO to ensure required fields are present.
+     *
+     * @param request The RequestAddress DTO to validate.
+     * @throws ExceptionAddress if any required field is missing.
+     */
+    private void validateRequest(RequestAddress request) {
+        if (request.territoryId() == null || request.addressTypeId() == null) {
+            throw new ExceptionAddress(EnumExceptionName.ERROR_BUSINESS_ADDRESS_FIELDS_CAN_NOT_BE_EMPTY.name());
+        }
+    }
+
+    /**
+     * Maps the RequestAddress DTO to the Address entity.
+     *
+     * @param address The Address entity to be populated.
+     * @param request The RequestAddress DTO containing the data.
+     * @param userId  The ID of the user associated with this address.
+     */
+    private void mapRequestToAddress(Address address, RequestAddress request, int userId) {
+        address.setUserId(userId);
+        address.setTerritoryId(request.territoryId());
+        address.setAddressTypeId(request.addressTypeId());
+        address.setStreet(request.street());
+        address.setHouseNumber(request.houseNumber());
+        address.setZip(request.zip());
     }
 
 }
