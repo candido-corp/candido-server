@@ -7,7 +7,7 @@ public class ExceptionInvalidAccountSettingValue extends CustomRuntimeException 
         super(message);
     }
 
-    public ExceptionInvalidAccountSettingValue(String message, String ...extraMessages) {
-        super(message, extraMessages);
+    public ExceptionInvalidAccountSettingValue(String message, Object[] args) {
+        super(message, args);
     }
 }
