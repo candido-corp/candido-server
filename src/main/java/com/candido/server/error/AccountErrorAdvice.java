@@ -36,8 +36,7 @@ public class AccountErrorAdvice {
 
     @ExceptionHandler({
             ExceptionAccountNotFound.class,
-            ExceptionAccountRoleNotFound.class,
-            ExceptionAccountSettingsKeyNotFound.class
+            ExceptionAccountRoleNotFound.class
     })
     @ResponseStatus(HttpStatus.NOT_FOUND)
     public ResponseEntity<ApiErrorResponse> handleAccountNotFoundException(CustomRuntimeException ex, Locale locale) {
@@ -57,7 +56,10 @@ public class AccountErrorAdvice {
             ExceptionFirstNameEmpty.class,
             ExceptionInvalidPasswordAccount.class,
             ExceptionTemporaryCode.class,
-            ExceptionAccountSettingsKeyValue.class
+            ExceptionAccountSettingsKeyValue.class,
+            ExceptionInvalidAccountSettingValue.class,
+            ExceptionInvalidAccountSettingValue.class,
+            ExceptionAccountSettingsKeyNotFound.class
     })
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public ResponseEntity<ApiErrorResponse> handleAccountEmailPasswordException(CustomRuntimeException ex, Locale locale) {
