@@ -1,11 +1,11 @@
-name: Build candido-server 
+name: Build candido-server
 
 on:
   pull_request:
 
 jobs:
   build:
-    name: Build candido-server 
+    name: Build candido-server
     runs-on: ubuntu-latest
 
     steps:
