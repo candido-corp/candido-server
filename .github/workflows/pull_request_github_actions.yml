@@ -1,11 +1,11 @@
-name: Build candido-server
+name: Build candido-server 
 
 on:
   pull_request:
 
 jobs:
   build:
-    name: Build candido-server
+    name: Build candido-server 
     runs-on: ubuntu-latest
 
     steps:
@@ -19,7 +19,7 @@ jobs:
           java-version: '21'
 
       - name: Set up Gradle
-        uses: gradle/gradle-build-action@v3
+        uses: gradle/actions/setup-gradle@v3
 
       - name: Build with Gradle
         run: gradle clean build -x test
