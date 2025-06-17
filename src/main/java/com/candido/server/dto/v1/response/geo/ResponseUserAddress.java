@@ -37,6 +37,9 @@ public class ResponseUserAddress {
     @JsonProperty("is_primary")
     private boolean isPrimary;
 
+    @JsonProperty("display_name")
+    private String displayName;
+
     public ResponseUserAddress(Address address) {
         this.addressId = address.getAddressId();
         this.addressTypeId = address.getAddressTypeId();
@@ -46,5 +49,6 @@ public class ResponseUserAddress {
         this.updatedAt = address.getUpdatedAt();
         this.type = address.getAddressType().getDescription();
         this.isPrimary = address.getIsPrimary();
+        this.displayName = address.getDisplayName();
     }
 }

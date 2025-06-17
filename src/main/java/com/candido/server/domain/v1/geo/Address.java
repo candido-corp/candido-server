@@ -75,6 +75,10 @@ public class Address implements Ownable {
     @Column(name = "deleted_at")
     private LocalDateTime deletedAt;
 
+    @JsonProperty("display_name")
+    @Column(name = "display_name")
+    private String displayName;
+
     @Override
     public Integer getOwnerId() {
         return userId;

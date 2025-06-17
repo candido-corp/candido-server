@@ -194,6 +194,7 @@ public class AddressServiceImpl implements AddressService {
         address.setStreet(request.street());
         address.setHouseNumber(request.houseNumber());
         address.setZip(request.zip());
+        address.setDisplayName(request.displayName());
     }
 
 }
