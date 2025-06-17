@@ -33,6 +33,16 @@ public class ControllerUserAddress {
     }
 
     @VerifiedUser
+    @GetMapping("/{addressId}")
+    public ResponseEntity<ResponseUserAddress> getUserAddressById(
+            Authentication authentication,
+            @PathVariable("addressId") int addressId
+    ) {
+        ResponseUserAddress responseUserAddress = businessAddressService.getUserAddressById(addressId);
+        return ResponseEntity.ok(responseUserAddress);
+    }
+
+    @VerifiedUser
     @PostMapping
     public ResponseEntity<ResponseUserAddress> createUserAddress(
             Authentication authentication,

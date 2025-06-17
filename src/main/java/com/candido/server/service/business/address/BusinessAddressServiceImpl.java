@@ -45,6 +45,16 @@ public class BusinessAddressServiceImpl implements BusinessAddressService {
     }
 
     @Override
+    @CheckOwnership(idParam = "addressId", loader = AddressLoader.class)
+    public ResponseUserAddress getUserAddressById(int addressId) {
+        return addressService.getActiveAddressById(addressId)
+                .stream()
+                .map(addressMapper::addressToUserAddressDto)
+                .findFirst()
+                .orElseThrow(() -> new ExceptionAddressNotFound(EnumExceptionName.ERROR_BUSINESS_ADDRESS_NOT_FOUND.name()));
+    }
+
+    @Override
     public ResponseUserAddress createUserAddress(Authentication authentication, RequestAddress requestUserAddressDto) {
         User authenticatedUser = userService.getAuthenticatedUser(authentication);
         Address address = addressService.saveAddress(authenticatedUser.getId(), null, requestUserAddressDto);
