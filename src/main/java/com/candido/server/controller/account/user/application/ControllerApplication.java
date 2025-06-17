@@ -2,7 +2,6 @@ package com.candido.server.controller.account.user.application;
 
 import com.candido.server.domain.v1.account.Account;
 import com.candido.server.dto.v1.response.application.ResponseUserApplication;
-import com.candido.server.service.base.account.AccountService;
 import com.candido.server.service.base.application.ApplicationService;
 import com.candido.server.validation.annotations.VerifiedUser;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,15 +16,12 @@ import java.util.List;
 public class ControllerApplication {
 
     private final ApplicationService applicationService;
-    private final AccountService accountService;
 
     @Autowired
     public ControllerApplication(
-            ApplicationService applicationService,
-            AccountService accountService
+            ApplicationService applicationService
     ) {
         this.applicationService = applicationService;
-        this.accountService = accountService;
     }
 
     @VerifiedUser
@@ -34,7 +30,7 @@ public class ControllerApplication {
             Authentication authentication,
             @RequestParam(value = "status", required = false) Integer statusId
     ) {
-        Account account = accountService.findAccountByEmailOrThrow(authentication.getName());
+        Account account = (Account) authentication.getPrincipal();
         return ResponseEntity.ok(applicationService.findAllByAccountId(account.getId(), statusId));
     }
 
