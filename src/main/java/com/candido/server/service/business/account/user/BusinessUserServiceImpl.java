@@ -1,4 +1,4 @@
-package com.candido.server.service.business.user;
+package com.candido.server.service.business.account.user;
 
 import com.candido.server.domain.v1.account.Account;
 import com.candido.server.domain.v1.geo.Address;
@@ -40,7 +40,7 @@ public class BusinessUserServiceImpl implements BusinessUserService {
 
     @Override
     public UserDto getUserDtoWithPrimaryAddress(Authentication authentication) {
-        Account account = accountService.findAccountByEmailOrThrow(authentication.getName());
+        Account account = (Account) authentication.getPrincipal();
         User user = userService.findUserByAccountIdOrThrow(account.getId());
         boolean userHasOpenApplications = applicationService.userHasOpenApplications(account.getId());
 
@@ -53,7 +53,7 @@ public class BusinessUserServiceImpl implements BusinessUserService {
 
     @Override
     public UserDto editUserInfo(Authentication authentication, RequestUpdateUser requestUpdateUser) {
-        Account account = accountService.findAccountByEmailOrThrow(authentication.getName());
+        Account account = (Account) authentication.getPrincipal();
         boolean userHasOpenApplications = applicationService.userHasOpenApplications(account.getId());
         boolean canChangeName = !userHasOpenApplications;
         User user = userService.findUserByAccountIdOrThrow(account.getId());

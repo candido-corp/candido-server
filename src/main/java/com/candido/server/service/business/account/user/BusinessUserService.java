@@ -1,4 +1,4 @@
-package com.candido.server.service.business.user;
+package com.candido.server.service.business.account.user;
 
 import com.candido.server.dto.v1.request.account.RequestUpdateUser;
 import com.candido.server.dto.v1.util.UserDto;
