@@ -2,7 +2,7 @@ package com.candido.server.controller.account.user;
 
 import com.candido.server.dto.v1.request.account.RequestUpdateUser;
 import com.candido.server.dto.v1.util.UserDto;
-import com.candido.server.service.business.user.BusinessUserService;
+import com.candido.server.service.business.account.user.BusinessUserService;
 import com.candido.server.validation.annotations.VerifiedUser;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
