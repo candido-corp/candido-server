@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class GeoAddressTypeServiceImpl implements GeoAddressTypeService {
@@ -15,6 +16,11 @@ public class GeoAddressTypeServiceImpl implements GeoAddressTypeService {
     @Autowired
     public GeoAddressTypeServiceImpl(AddressTypeRepository addressTypeRepository) {
         this.addressTypeRepository = addressTypeRepository;
+    }
+
+    @Override
+    public Optional<AddressType> findById(int id) {
+        return addressTypeRepository.findById(id);
     }
 
     @Override
