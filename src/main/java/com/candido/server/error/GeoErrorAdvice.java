@@ -6,6 +6,7 @@ import com.candido.server.exception._common.CustomRuntimeException;
 import com.candido.server.exception._common.resolver.EnumMessageResolverType;
 import com.candido.server.exception.geo.ExceptionAddress;
 import com.candido.server.exception.geo.ExceptionAddressNotFound;
+import com.candido.server.exception.geo.ExceptionAddressTypeNotFound;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -22,7 +23,8 @@ public class GeoErrorAdvice {
     private final CustomExceptionResolver customExceptionResolver;
 
     @ExceptionHandler({
-            ExceptionAddressNotFound.class
+            ExceptionAddressNotFound.class,
+            ExceptionAddressTypeNotFound.class
     })
     @ResponseStatus(HttpStatus.NOT_FOUND)
     public ResponseEntity<ApiErrorResponse> handleAddressNotFoundException(CustomRuntimeException ex, Locale locale) {
