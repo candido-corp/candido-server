@@ -2,10 +2,12 @@ package com.candido.server.service.base.geo;
 
 import com.candido.server.domain.v1.geo.Address;
 import com.candido.server.domain.v1.geo.AddressRepository;
+import com.candido.server.domain.v1.geo.AddressType;
 import com.candido.server.dto.v1.request.geo.RequestAddress;
 import com.candido.server.exception._common.EnumExceptionName;
 import com.candido.server.exception.geo.ExceptionAddress;
 import com.candido.server.exception.geo.ExceptionAddressNotFound;
+import com.candido.server.exception.geo.ExceptionAddressTypeNotFound;
 import com.candido.server.service.base.geo.specifications.AddressSpecifications;
 import jakarta.persistence.EntityManager;
 import jakarta.transaction.Transactional;
@@ -22,14 +24,17 @@ public class AddressServiceImpl implements AddressService {
 
     private final AddressRepository addressRepository;
     private final EntityManager entityManager;
+    private final GeoAddressTypeService geoAddressTypeService;
 
     @Autowired
     public AddressServiceImpl(
             AddressRepository addressRepository,
-            EntityManager entityManager
+            EntityManager entityManager,
+            GeoAddressTypeService geoAddressTypeService
     ) {
         this.addressRepository = addressRepository;
         this.entityManager = entityManager;
+        this.geoAddressTypeService = geoAddressTypeService;
     }
 
     @Override
@@ -85,7 +90,6 @@ public class AddressServiceImpl implements AddressService {
         mapRequestToAddress(address, request, userId);
         enforcePrimaryConsistency(userId, address, addressId, request.isPrimary());
 
-        entityManager.refresh(address);
         return address;
     }
 
@@ -114,12 +118,14 @@ public class AddressServiceImpl implements AddressService {
      */
     private void enforcePrimaryConsistency(int userId, Address address, Integer addressId, boolean isPrimary) {
         List<Address> userAddresses = getAllActiveAddressesByUserId(userId);
-        boolean hasOtherPrimary = userAddresses.stream().anyMatch(Address::getIsPrimary);
+        boolean hasOtherPrimary = userAddresses.stream()
+                .filter(a -> addressId == null || a.getAddressId() != addressId)
+                .anyMatch(Address::getIsPrimary);
 
         if (isPrimary) {
             demoteExistingPrimaries(userAddresses);
             address.setIsPrimary(true);
-        } else if (!hasOtherPrimary && (addressId == null)) {
+        } else if (!hasOtherPrimary) {
             address.setIsPrimary(true);
         } else {
             address.setIsPrimary(false);
@@ -190,11 +196,18 @@ public class AddressServiceImpl implements AddressService {
     private void mapRequestToAddress(Address address, RequestAddress request, int userId) {
         address.setUserId(userId);
         address.setTerritoryId(request.territoryId());
-        address.setAddressTypeId(request.addressTypeId());
         address.setStreet(request.street());
         address.setHouseNumber(request.houseNumber());
         address.setZip(request.zip());
         address.setDisplayName(request.displayName());
+
+        AddressType addressType = geoAddressTypeService
+                .findById(request.addressTypeId())
+                .orElseThrow(() -> new ExceptionAddressTypeNotFound(
+                        EnumExceptionName.ERROR_BUSINESS_ADDRESS_TYPE_NOT_FOUND.name()
+                ));
+        address.setAddressType(addressType);
+        address.setAddressTypeId(addressType.getAddressTypeId());
     }
 
 }
