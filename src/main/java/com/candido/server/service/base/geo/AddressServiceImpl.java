@@ -85,8 +85,7 @@ public class AddressServiceImpl implements AddressService {
         mapRequestToAddress(address, request, userId);
         enforcePrimaryConsistency(userId, address, addressId, request.isPrimary());
 
-        entityManager.refresh(address);
-        return address;
+        return addressRepository.save(address);
     }
 
     @Override
@@ -124,8 +123,6 @@ public class AddressServiceImpl implements AddressService {
         } else {
             address.setIsPrimary(false);
         }
-
-        addressRepository.save(address);
     }
 
     /**
