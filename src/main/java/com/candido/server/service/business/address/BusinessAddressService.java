@@ -11,5 +11,6 @@ public interface BusinessAddressService {
     ResponseUserAddress getUserAddressById(int addressId);
     ResponseUserAddress createUserAddress(Authentication authentication, RequestAddress requestUserAddressDto);
     ResponseUserAddress updateUserAddress(Authentication authentication, RequestAddress requestUserAddressDto, int addressId);
+    ResponseUserAddress setPrimaryAddress(Authentication authentication, int addressId);
     void deleteAddress(Integer addressId);
 }

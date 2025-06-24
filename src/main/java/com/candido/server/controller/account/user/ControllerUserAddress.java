@@ -42,6 +42,16 @@ public class ControllerUserAddress {
     }
 
     @VerifiedUser
+    @PutMapping("/{addressId}/primary")
+    public ResponseEntity<Void> setPrimaryAddress(
+            Authentication authentication,
+            @PathVariable("addressId") int addressId
+    ) {
+        businessAddressService.setPrimaryAddress(authentication, addressId);
+        return ResponseEntity.noContent().build();
+    }
+
+    @VerifiedUser
     @PostMapping
     public ResponseEntity<ResponseUserAddress> createUserAddress(
             Authentication authentication,

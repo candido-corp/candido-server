@@ -15,4 +15,5 @@ public interface AddressService {
     Address getActiveAddressByIdAndUserIdOrThrow(Integer addressId, Integer userId);
     Address saveAddress(int userId, Integer addressId, RequestAddress requestAddress);
     void deleteAddress(Integer addressId);
+    Address setPrimaryAddress(Integer userId, Integer addressId);
 }

@@ -108,6 +108,19 @@ public class AddressServiceImpl implements AddressService {
         });
     }
 
+    @Override
+    public Address setPrimaryAddress(Integer userId, Integer addressId) {
+        Address address = getActiveAddressById(addressId).orElseThrow(() -> new ExceptionAddressNotFound(
+                EnumExceptionName.ERROR_BUSINESS_ADDRESS_NOT_FOUND.name()
+        ));
+
+        LocalDateTime now = LocalDateTime.now();
+        address.setUpdatedAt(now);
+        enforcePrimaryConsistency(userId, address, addressId, true);
+
+        return address;
+    }
+
     /**
      * Enforces primary address consistency based on the user's existing addresses.
      *
