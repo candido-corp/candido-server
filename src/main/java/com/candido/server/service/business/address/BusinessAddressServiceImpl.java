@@ -75,6 +75,14 @@ public class BusinessAddressServiceImpl implements BusinessAddressService {
 
     @Override
     @CheckOwnership(idParam = "addressId", loader = AddressLoader.class)
+    public ResponseUserAddress setPrimaryAddress(Authentication authentication, int addressId) {
+        User authenticatedUser = userService.getAuthenticatedUser(authentication);
+        Address address = addressService.setPrimaryAddress(authenticatedUser.getId(), addressId);
+        return addressMapper.addressToUserAddressDto(address);
+    }
+
+    @Override
+    @CheckOwnership(idParam = "addressId", loader = AddressLoader.class)
     public void deleteAddress(Integer addressId) {
         addressService.deleteAddress(addressId);
     }
