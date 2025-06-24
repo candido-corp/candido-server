@@ -101,6 +101,8 @@ dependencies {
 	// -- Testing --
 	testImplementation("org.springframework.boot:spring-boot-starter-test")
 	implementation(kotlin("stdlib-jdk8"))
+	// https://mvnrepository.com/artifact/org.mockito/mockito-junit-jupiter
+	testImplementation("org.mockito:mockito-junit-jupiter:5.18.0")
 }
 
 // ----------------------------------------------------------------------
