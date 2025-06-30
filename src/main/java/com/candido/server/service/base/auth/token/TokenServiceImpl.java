@@ -28,7 +28,7 @@ import java.util.concurrent.locks.ReentrantLock;
 @Transactional(isolation = Isolation.SERIALIZABLE)
 public class TokenServiceImpl implements TokenService {
 
-    private final ConcurrentHashMap<Integer, ReentrantLock> userLocks = new ConcurrentHashMap<>();
+    private final ConcurrentHashMap<Long, ReentrantLock> userLocks = new ConcurrentHashMap<>();
 
     private final JwtService jwtService;
 
@@ -99,7 +99,7 @@ public class TokenServiceImpl implements TokenService {
             TokenTypeEnum tokenType,
             TokenScopeCategoryEnum tokenScopeCategoryEnum
     ) {
-        ReentrantLock lock = userLocks.computeIfAbsent(Math.toIntExact(account.getId()), k -> new ReentrantLock());
+        ReentrantLock lock = userLocks.computeIfAbsent(account.getId(), k -> new ReentrantLock());
         lock.lock();
         try {
             revokeAllAccountTokensByTokenScopeCategoryId(account, tokenScopeCategoryEnum.getTokenScopeCategoryId());
