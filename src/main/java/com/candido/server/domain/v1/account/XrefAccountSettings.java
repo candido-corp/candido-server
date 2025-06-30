@@ -18,7 +18,7 @@ public class XrefAccountSettings {
 
     @Id
     @Column(name = "fk_account_id")
-    private int accountId;
+    private Long accountId;
 
     @Id
     @Column(name = "fk_account_settings_id")

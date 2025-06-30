@@ -45,7 +45,7 @@ public class Address implements Ownable {
 
     @JsonProperty("user_id")
     @Column(name = "fk_user_id")
-    private int userId;
+    private Long userId;
 
     @JsonProperty("is_primary")
     @Column(name = "is_primary")
@@ -80,7 +80,7 @@ public class Address implements Ownable {
     private String displayName;
 
     @Override
-    public Integer getOwnerId() {
+    public Long getOwnerId() {
         return userId;
     }
 }

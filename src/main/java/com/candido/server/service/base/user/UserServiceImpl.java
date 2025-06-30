@@ -37,14 +37,14 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public Optional<User> findUserByAccountId(int accountId) {
+    public Optional<User> findUserByAccountId(Long accountId) {
         Specification<User> byAccountId = ((root, query, criteriaBuilder) ->
                 criteriaBuilder.equal(root.get(User_.ACCOUNT_ID), accountId));
         return userRepository.findOne(byAccountId);
     }
 
     @Override
-    public User findUserByAccountIdOrThrow(int accountId) {
+    public User findUserByAccountIdOrThrow(Long accountId) {
         return findUserByAccountId(accountId)
                 .orElseThrow(() -> new ExceptionAccountNotFound(EnumExceptionName.ERROR_BUSINESS_USER_NOT_FOUND.name()));
     }

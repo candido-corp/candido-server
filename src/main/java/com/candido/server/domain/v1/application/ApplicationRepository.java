@@ -8,5 +8,5 @@ import java.util.List;
 
 @Repository
 public interface ApplicationRepository extends JpaRepository<Application, Integer>, JpaSpecificationExecutor<Application> {
-    <T> List<T> findAllByAccountId(int accountId, Class<T> type);
+    <T> List<T> findAllByAccountId(Long accountId, Class<T> type);
 }

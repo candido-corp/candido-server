@@ -1,7 +1,8 @@
 package com.candido.server.service.base.application;
 
 import com.candido.server.domain.v1.application.*;
-import com.candido.server.dto.v1.response.application.ResponseApplicationForm;
+import com.candido.server.domain.v1.opportunity.XrefAccountOpportunitySavedRepository;
+import com.candido.server.dto.v1.response.opportunity.ResponseOpportunity;
 import com.candido.server.dto.v1.response.application.ResponseUserApplication;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.jpa.domain.Specification;
@@ -13,19 +14,19 @@ import java.util.List;
 public class ApplicationServiceImpl implements ApplicationService {
 
     private final ApplicationRepository applicationRepository;
-    private final XrefAccountApplicationSavedRepository xrefAccountApplicationSavedRepository;
+    private final XrefAccountOpportunitySavedRepository xrefAccountOpportunitySavedRepository;
 
     @Autowired
     public ApplicationServiceImpl(
             ApplicationRepository applicationRepository,
-            XrefAccountApplicationSavedRepository xrefAccountApplicationSavedRepository
+            XrefAccountOpportunitySavedRepository xrefAccountOpportunitySavedRepository
     ) {
         this.applicationRepository = applicationRepository;
-        this.xrefAccountApplicationSavedRepository = xrefAccountApplicationSavedRepository;
+        this.xrefAccountOpportunitySavedRepository = xrefAccountOpportunitySavedRepository;
     }
 
     @Override
-    public List<Application> getUserApplicationsByStatus(int accountId, int statusId) {
+    public List<Application> getUserApplicationsByStatus(Long accountId, int statusId) {
         Specification<Application> byStatus = (root, query, criteriaBuilder) -> criteriaBuilder.and(
                 criteriaBuilder.equal(root.get(Application_.ACCOUNT_ID), accountId),
                 criteriaBuilder.equal(root.get(Application_.APPLICATION_STATUS_ID), statusId)
@@ -34,7 +35,7 @@ public class ApplicationServiceImpl implements ApplicationService {
     }
 
     @Override
-    public List<ResponseUserApplication> findAllByAccountId(int accountId, Integer statusId) {
+    public List<ResponseUserApplication> findAllByAccountId(Long accountId, Integer statusId) {
         if(statusId != null) {
             return getUserApplicationsByStatus(accountId, statusId)
                     .stream().map(ResponseUserApplication::mapToResponseUserApplication).toList();
@@ -43,18 +44,18 @@ public class ApplicationServiceImpl implements ApplicationService {
     }
 
     @Override
-    public List<ResponseApplicationForm> findAllApplicationsSavedByAccountId(int accountId) {
-        return xrefAccountApplicationSavedRepository.findAllByAccountId(accountId)
+    public List<ResponseOpportunity> findAllApplicationsSavedByAccountId(Long accountId) {
+        return xrefAccountOpportunitySavedRepository.findAllByIdAccountId(accountId)
                 .stream()
                 .map(xrefAccountApplicationSaved ->
-                        ResponseApplicationForm.mapToResponseApplicationForm(
-                                xrefAccountApplicationSaved.getApplicationForm()
+                        ResponseOpportunity.mapToResponseOpportunity(
+                                xrefAccountApplicationSaved.getOpportunity()
                         )
                 ).toList();
     }
 
     @Override
-    public boolean userHasOpenApplications(int accountId) {
+    public boolean userHasOpenApplications(Long accountId) {
         return !getUserApplicationsByStatus(accountId, EnumApplicationStatus.IN_PROGRESS.getStatusId()).isEmpty();
     }
 }

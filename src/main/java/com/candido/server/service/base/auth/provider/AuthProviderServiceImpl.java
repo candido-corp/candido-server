@@ -14,7 +14,7 @@ public class AuthProviderServiceImpl implements AuthProviderService {
     }
 
     @Override
-    public void addProviderToAccount(int providerId, int accountId) {
+    public void addProviderToAccount(int providerId, Long accountId) {
         var providerRelation = XrefAccountProvider
                 .builder()
                 .providerId(providerId)

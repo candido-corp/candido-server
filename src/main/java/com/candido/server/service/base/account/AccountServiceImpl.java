@@ -62,7 +62,7 @@ public class AccountServiceImpl implements AccountService {
     }
 
     @Override
-    public Optional<Account> findById(int accountId) {
+    public Optional<Account> findById(Long accountId) {
         return accountRepository.findById(accountId);
     }
 
@@ -84,7 +84,7 @@ public class AccountServiceImpl implements AccountService {
     }
 
     @Override
-    public Account findAccountByIdOrThrow(int accountId) {
+    public Account findAccountByIdOrThrow(Long accountId) {
         var account = findById(accountId).orElseThrow(() ->
                 new ExceptionAccountNotFound(EnumExceptionName.ERROR_BUSINESS_ACCOUNT_NOT_FOUND.name(), "ID: " + accountId)
         );

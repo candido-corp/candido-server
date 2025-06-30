@@ -44,7 +44,7 @@ public class AccountSettingsServiceImpl implements AccountSettingsService{
     }
 
     @Override
-    public List<XrefAccountSettings> getAllAccountSettings(int accountId) {
+    public List<XrefAccountSettings> getAllAccountSettings(Long accountId) {
         Specification<XrefAccountSettings> byAccountId = (root, query, criteriaBuilder) ->
                 criteriaBuilder.equal(root.get(XrefAccountSettings_.ACCOUNT_ID), accountId);
 
@@ -52,7 +52,7 @@ public class AccountSettingsServiceImpl implements AccountSettingsService{
     }
 
     @Override
-    public <T> void saveAccountSetting(int accountId, String key, T value) {
+    public <T> void saveAccountSetting(Long accountId, String key, T value) {
         Optional<AccountSettings> accountSettings = byKey(key);
         if (accountSettings.isEmpty()) {
             throw new ExceptionAccountSettingsKeyNotFound(

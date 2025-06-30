@@ -66,7 +66,7 @@ public class TokenServiceImpl implements TokenService {
     }
 
     @Override
-    public Optional<Token> findByAccountIdAndTokenScopeCategoryId(int accountId, int tokenScopeCategoryId) {
+    public Optional<Token> findByAccountIdAndTokenScopeCategoryId(Long accountId, int tokenScopeCategoryId) {
         return tokenRepository.findByAccountIdAndTokenScopeCategoryId(accountId, tokenScopeCategoryId);
     }
 
@@ -99,7 +99,7 @@ public class TokenServiceImpl implements TokenService {
             TokenTypeEnum tokenType,
             TokenScopeCategoryEnum tokenScopeCategoryEnum
     ) {
-        ReentrantLock lock = userLocks.computeIfAbsent(account.getId(), k -> new ReentrantLock());
+        ReentrantLock lock = userLocks.computeIfAbsent(Math.toIntExact(account.getId()), k -> new ReentrantLock());
         lock.lock();
         try {
             revokeAllAccountTokensByTokenScopeCategoryId(account, tokenScopeCategoryEnum.getTokenScopeCategoryId());
@@ -149,7 +149,7 @@ public class TokenServiceImpl implements TokenService {
     }
 
     @Override
-    public List<Token> findAllValidTokenByUser(Integer accountId) {
+    public List<Token> findAllValidTokenByUser(Long accountId) {
         return tokenRepository.findAllByAccountId(accountId);
     }
 

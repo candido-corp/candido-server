@@ -10,10 +10,10 @@ import java.util.Optional;
 public interface AddressService {
     Optional<Address> findActiveAddressBySpecification(Specification<Address> specification);
     List<Address> findAllActiveAddressBySpecification(Specification<Address> specification);
-    List<Address> getAllActiveAddressesByUserId(Integer userId);
+    List<Address> getAllActiveAddressesByUserId(Long userId);
     Optional<Address> getActiveAddressById(Integer addressId);
-    Address getActiveAddressByIdAndUserIdOrThrow(Integer addressId, Integer userId);
-    Address saveAddress(int userId, Integer addressId, RequestAddress requestAddress);
+    Address getActiveAddressByIdAndUserIdOrThrow(Integer addressId, Long userId);
+    Address saveAddress(Long userId, Integer addressId, RequestAddress requestAddress);
     void deleteAddress(Integer addressId);
-    Address setPrimaryAddress(Integer userId, Integer addressId);
+    Address setPrimaryAddress(Long userId, Integer addressId);
 }
