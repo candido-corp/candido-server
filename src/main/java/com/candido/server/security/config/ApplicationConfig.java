@@ -22,9 +22,9 @@ public class ApplicationConfig {
     private final AccountRepository accountRepository;
 
     /**
-     * Si occupa di cercare lo username nel database in base al nome utente.
+     * Defines the UserDetailsService used to load user information by username (email).
      *
-     * @return l'istanza di UserDetailsService configurata.
+     * @return the configured UserDetailsService instance.
      */
     @Bean
     public UserDetailsService userDetailsService() {
@@ -32,20 +32,19 @@ public class ApplicationConfig {
             var account = accountRepository.findByEmail(username)
                     .orElseThrow(() -> new UsernameNotFoundException(EnumExceptionName.ERROR_BUSINESS_ACCOUNT_NOT_FOUND.name()));
 
-            if (!account.isEnabled())
+            if (!account.isEnabled()) {
                 throw new ExceptionAuth("Error.");
+            }
 
             return account;
         };
     }
 
     /**
-     * Si occupa di configurare l'oggetto AuthenticationProvider per la gestione dell'autenticazione.
-     * Utilizza una implementazione di AuthenticationProvider tramite la classe DaoAuthenticationProvider.
-     * Viene creata questa implementazione specificando i dettagli dell'utente e la funzione per
-     * codificare la password.
+     * Configures the AuthenticationProvider using a DaoAuthenticationProvider implementation.
+     * It sets the user details service and the password encoder used for authentication.
      *
-     * @return l'istanza di AuthenticationProvider configurata.
+     * @return the configured AuthenticationProvider instance.
      */
     @Bean
     public AuthenticationProvider authenticationProvider() {
@@ -56,11 +55,11 @@ public class ApplicationConfig {
     }
 
     /**
-     * Si occupa di gestire l'autenticazione fornendo dei metodi necessari per aiutarci ad autenticare
-     * un utente solo con username e password.
+     * Provides the AuthenticationManager used for processing authentication requests.
      *
-     * @param config l'oggetto che detiene AuthenticationManager.
-     * @return l'istanza di AuthenticationManager configurata.
+     * @param config the authentication configuration containing the manager.
+     * @return the configured AuthenticationManager instance.
+     * @throws Exception in case of error during retrieval.
      */
     @Bean
     public AuthenticationManager authenticationManager(AuthenticationConfiguration config) throws Exception {
@@ -68,9 +67,9 @@ public class ApplicationConfig {
     }
 
     /**
-     * Si occupa di fornire il metodo di codifica della password.
+     * Provides the password encoder used to hash and verify user passwords.
      *
-     * @return l'istanza di PasswordEncoder configurata.
+     * @return the configured PasswordEncoder instance.
      */
     @Bean
     public PasswordEncoder passwordEncoder() {
