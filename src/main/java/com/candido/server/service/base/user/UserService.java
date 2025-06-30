@@ -8,8 +8,8 @@ import java.util.Optional;
 
 public interface UserService {
     User getAuthenticatedUser(Authentication authentication);
-    Optional<User> findUserByAccountId(int accountId);
-    User findUserByAccountIdOrThrow(int accountId);
+    Optional<User> findUserByAccountId(Long accountId);
+    User findUserByAccountIdOrThrow(Long accountId);
     User save(User user);
     User save(User user, RequestUpdateUser requestUpdateUser, boolean canChangeName);
 }

@@ -10,7 +10,7 @@ public class AddressSpecifications {
         return (root, query, cb) -> cb.equal(root.get(Address_.ADDRESS_ID), addressId);
     }
 
-    public static Specification<Address> byUserId(Integer userId) {
+    public static Specification<Address> byUserId(Long userId) {
         return (root, query, cb) -> cb.equal(root.get(Address_.USER_ID), userId);
     }
 
@@ -22,11 +22,11 @@ public class AddressSpecifications {
         return (root, query, cb) -> cb.isNull(root.get(Address_.DELETED_AT));
     }
 
-    public static Specification<Address> byIdAndUserId(Integer addressId, Integer userId) {
+    public static Specification<Address> byIdAndUserId(Integer addressId, Long userId) {
         return Specification.where(byId(addressId)).and(byUserId(userId));
     }
 
-    public static Specification<Address> byUserIdAndIsPrimary(Integer userId) {
+    public static Specification<Address> byUserIdAndIsPrimary(Long userId) {
         return Specification.where(byUserId(userId)).and(isPrimary());
     }
 }

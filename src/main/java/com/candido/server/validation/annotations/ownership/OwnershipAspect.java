@@ -43,13 +43,13 @@ public class OwnershipAspect {
         OwnershipLoader<?> loader = applicationContext.getBean(loaderClass);
         Ownable entity = loader.loadById(id);
 
-        Integer currentUserId = getCurrentUserId();
+        Long currentUserId = getCurrentUserId();
         if (!entity.getOwnerId().equals(currentUserId)) {
             throw new ExceptionForbidden(EnumExceptionName.ERROR_AUTH_FORBIDDEN.name());
         }
     }
 
-    private Integer getCurrentUserId() {
+    private Long getCurrentUserId() {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         Account account = (Account) auth.getPrincipal();
         return account.getId();

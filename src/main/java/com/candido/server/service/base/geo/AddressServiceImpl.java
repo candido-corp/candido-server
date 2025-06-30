@@ -50,7 +50,7 @@ public class AddressServiceImpl implements AddressService {
     }
 
     @Override
-    public List<Address> getAllActiveAddressesByUserId(Integer userId) {
+    public List<Address> getAllActiveAddressesByUserId(Long userId) {
         return userId != null ? findAllActiveAddressBySpecification(
                 AddressSpecifications.byUserId(userId)
         ) : List.of();
@@ -64,7 +64,7 @@ public class AddressServiceImpl implements AddressService {
     }
 
     @Override
-    public Address getActiveAddressByIdAndUserIdOrThrow(Integer addressId, Integer userId) {
+    public Address getActiveAddressByIdAndUserIdOrThrow(Integer addressId, Long userId) {
         if (addressId == null || addressId == 0 || userId == null || userId == 0)
             throw new ExceptionAddressNotFound(EnumExceptionName.ERROR_BUSINESS_ADDRESS_NOT_FOUND.name());
 
@@ -74,7 +74,7 @@ public class AddressServiceImpl implements AddressService {
 
     @Override
     @Transactional
-    public Address saveAddress(int userId, Integer addressId, RequestAddress request) {
+    public Address saveAddress(Long userId, Integer addressId, RequestAddress request) {
         validateRequest(request);
         LocalDateTime now = LocalDateTime.now();
 
@@ -109,7 +109,7 @@ public class AddressServiceImpl implements AddressService {
     }
 
     @Override
-    public Address setPrimaryAddress(Integer userId, Integer addressId) {
+    public Address setPrimaryAddress(Long userId, Integer addressId) {
         Address address = getActiveAddressById(addressId).orElseThrow(() -> new ExceptionAddressNotFound(
                 EnumExceptionName.ERROR_BUSINESS_ADDRESS_NOT_FOUND.name()
         ));
@@ -129,7 +129,7 @@ public class AddressServiceImpl implements AddressService {
      * @param addressId The ID of the address being updated, or null if creating a new one.
      * @param isPrimary Whether the address should be set as primary.
      */
-    private void enforcePrimaryConsistency(int userId, Address address, Integer addressId, boolean isPrimary) {
+    private void enforcePrimaryConsistency(Long userId, Address address, Integer addressId, boolean isPrimary) {
         List<Address> userAddresses = getAllActiveAddressesByUserId(userId);
         boolean hasOtherPrimary = userAddresses.stream()
                 .filter(a -> addressId == null || a.getAddressId() != addressId)
@@ -168,7 +168,7 @@ public class AddressServiceImpl implements AddressService {
      *
      * @param userId The ID of the user whose addresses are being managed.
      */
-    private void promoteAnotherPrimary(int userId) {
+    private void promoteAnotherPrimary(Long userId) {
         getAllActiveAddressesByUserId(userId).stream()
                 .filter(a -> !a.getIsPrimary())
                 .findFirst()
@@ -206,7 +206,7 @@ public class AddressServiceImpl implements AddressService {
      * @param request The RequestAddress DTO containing the data.
      * @param userId  The ID of the user associated with this address.
      */
-    private void mapRequestToAddress(Address address, RequestAddress request, int userId) {
+    private void mapRequestToAddress(Address address, RequestAddress request, Long userId) {
         address.setUserId(userId);
         address.setTerritoryId(request.territoryId());
         address.setStreet(request.street());

@@ -17,7 +17,7 @@ public class XrefAccountProvider {
 
     @Id
     @Column(name = "fk_account_id")
-    private int accountId;
+    private Long accountId;
 
     @Id
     @Column(name = "fk_provider_id")

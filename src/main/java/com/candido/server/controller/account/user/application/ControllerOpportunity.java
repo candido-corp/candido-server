@@ -1,7 +1,7 @@
 package com.candido.server.controller.account.user.application;
 
 import com.candido.server.domain.v1.account.Account;
-import com.candido.server.dto.v1.response.application.ResponseApplicationForm;
+import com.candido.server.dto.v1.response.opportunity.ResponseOpportunity;
 import com.candido.server.service.base.application.ApplicationService;
 import com.candido.server.validation.annotations.VerifiedUser;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,7 +28,7 @@ public class ControllerOpportunity {
 
     @VerifiedUser
     @GetMapping("/saved")
-    public ResponseEntity<List<ResponseApplicationForm>> getSavedApplications(
+    public ResponseEntity<List<ResponseOpportunity>> getSavedApplications(
             Authentication authentication
     ) {
         Account account = (Account) authentication.getPrincipal();

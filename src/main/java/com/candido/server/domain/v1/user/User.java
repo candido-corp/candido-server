@@ -21,7 +21,7 @@ public class User {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @JsonProperty("id")
     @Column(name = "user_id")
-    private int id;
+    private Long id;
 
     @ManyToOne
     @JoinColumn(name = "fk_gender_id", insertable = false, updatable = false)
@@ -32,7 +32,7 @@ public class User {
     private Integer genderId;
 
     @Column(name = "fk_account_id")
-    private int accountId;
+    private Long accountId;
 
     @Column(name = "first_name")
     private String firstName;

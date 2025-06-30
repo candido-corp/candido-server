@@ -28,7 +28,7 @@ import java.util.concurrent.locks.ReentrantLock;
 @Transactional(isolation = Isolation.SERIALIZABLE)
 public class TokenServiceImpl implements TokenService {
 
-    private final ConcurrentHashMap<Integer, ReentrantLock> userLocks = new ConcurrentHashMap<>();
+    private final ConcurrentHashMap<Long, ReentrantLock> userLocks = new ConcurrentHashMap<>();
 
     private final JwtService jwtService;
 
@@ -66,7 +66,7 @@ public class TokenServiceImpl implements TokenService {
     }
 
     @Override
-    public Optional<Token> findByAccountIdAndTokenScopeCategoryId(int accountId, int tokenScopeCategoryId) {
+    public Optional<Token> findByAccountIdAndTokenScopeCategoryId(Long accountId, int tokenScopeCategoryId) {
         return tokenRepository.findByAccountIdAndTokenScopeCategoryId(accountId, tokenScopeCategoryId);
     }
 
@@ -149,7 +149,7 @@ public class TokenServiceImpl implements TokenService {
     }
 
     @Override
-    public List<Token> findAllValidTokenByUser(Integer accountId) {
+    public List<Token> findAllValidTokenByUser(Long accountId) {
         return tokenRepository.findAllByAccountId(accountId);
     }
 

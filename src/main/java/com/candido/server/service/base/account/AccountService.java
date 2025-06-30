@@ -7,10 +7,10 @@ import com.candido.server.dto.v1.util.AccountUserPairDto;
 import java.util.Optional;
 
 public interface AccountService {
-    Optional<Account> findById(int accountId);
+    Optional<Account> findById(Long accountId);
     Optional<Account> findByEmail(String email);
     Account findAccountByEmailOrThrow(String email);
-    Account findAccountByIdOrThrow(int accountId);
+    Account findAccountByIdOrThrow(Long accountId);
     Account save(Account account);
     Account activateAccount(Account account);
 

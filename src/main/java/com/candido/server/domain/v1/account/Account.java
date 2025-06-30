@@ -26,7 +26,7 @@ public class Account implements UserDetails {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "account_id")
-    private Integer id;
+    private Long id;
 
     @ManyToOne
     @JoinColumn(name = "fk_account_role_id")

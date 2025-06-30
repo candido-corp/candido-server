@@ -8,8 +8,8 @@ import java.util.Optional;
 
 public interface AccountSettingsService {
     Optional<AccountSettings> byKey(String key);
-    List<XrefAccountSettings> getAllAccountSettings(int accountId);
-    <T> void saveAccountSetting(int accountId, String key, T value);
+    List<XrefAccountSettings> getAllAccountSettings(Long accountId);
+    <T> void saveAccountSetting(Long accountId, String key, T value);
     Optional<XrefAccountSettings> getAccountSetting(int accountId, String key);
     void deleteAccountSetting(int accountId, String key);
     void deleteAllAccountSettings(int accountId);

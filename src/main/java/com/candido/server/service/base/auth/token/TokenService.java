@@ -13,7 +13,7 @@ public interface TokenService {
     Optional<Token> findByAccessToken(String accessToken);
     Optional<Token> findByRefreshToken(String refreshToken);
     Optional<Token> findByUUIDAndTokenScopeCategoryId(String uuid, int tokenScopeCategoryId);
-    Optional<Token> findByAccountIdAndTokenScopeCategoryId(int accountId, int tokenScopeCategoryId);
+    Optional<Token> findByAccountIdAndTokenScopeCategoryId(Long accountId, int tokenScopeCategoryId);
     Optional<Token> findByAccessTokenAndTokenScopeCategoryId(String accessToken, int tokenScopeCategoryId);
 
     Token findTokenByUUIDAndTokenScopeCategoryIdOrThrow(String uuid, int tokenScopeCategoryId);
@@ -31,7 +31,7 @@ public interface TokenService {
 
     void delete(Token token);
 
-    List<Token> findAllValidTokenByUser(Integer accountId);
+    List<Token> findAllValidTokenByUser(Long accountId);
 
     void revokeAllAccountTokens(Account account);
     void revokeAllAccountTokensByTokenScopeCategoryId(Account account, int tokenScopeCategoryId);
