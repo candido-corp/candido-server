@@ -46,7 +46,10 @@ INSERT INTO opportunity_type (key, label) VALUES
     ('bootcamp', 'Bootcamp'),
     ('internship', 'Internship'),
     ('challenge', 'Challenge'),
-    ('job', 'Job');
+    ('job', 'Job'),
+    ('thesis', 'Thesis'),
+    ('volunteering', 'Volunteering'),
+    ('research', 'Research Collaboration');
 
 INSERT INTO opportunity_status (key, label) VALUES
     ('draft', 'Draft'),
