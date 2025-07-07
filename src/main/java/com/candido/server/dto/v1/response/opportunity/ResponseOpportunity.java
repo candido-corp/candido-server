@@ -29,7 +29,7 @@ public class ResponseOpportunity {
     private String urlCode;
 
     @JsonProperty("max_applicants")
-    private Integer maxApplicants;
+    private Long maxApplicants;
 
     @JsonProperty("form_schema")
     private String formSchema;
@@ -43,8 +43,8 @@ public class ResponseOpportunity {
     @JsonProperty("currency_code")
     private String currencyCode;
 
-    @JsonProperty("location")
-    private String location;
+    @JsonProperty("territory_name")
+    private String territoryName;
 
     @JsonProperty("location_type_key")
     private String locationTypeKey;
@@ -84,7 +84,7 @@ public class ResponseOpportunity {
             Long accountId,
             String displayName,
             String notes,
-            Integer maxApplicants,
+            Long maxApplicants,
             String formSchema,
             String urlCode,
             OffsetDateTime startDate,
@@ -98,7 +98,7 @@ public class ResponseOpportunity {
             BigDecimal compensationAmount,
             String compensationNote,
             String currencyCode,
-            String location,
+            String territoryName,
             String locationTypeKey,
             String opportunityTypeKey,
             String opportunityStatusKey,
@@ -122,7 +122,7 @@ public class ResponseOpportunity {
         this.compensationAmount = compensationAmount;
         this.compensationNote = compensationNote;
         this.currencyCode = currencyCode;
-        this.location = location;
+        this.territoryName = territoryName;
         this.locationTypeKey = locationTypeKey;
         this.opportunityTypeKey = opportunityTypeKey;
         this.opportunityStatusKey = opportunityStatusKey;
@@ -149,7 +149,7 @@ public class ResponseOpportunity {
                 opportunity.getCompensationAmount(),
                 opportunity.getCompensationNote(),
                 opportunity.getCurrency() != null ? opportunity.getCurrency().getCode() : null,
-                opportunity.getLocation(),
+                opportunity.getTerritory() != null ? opportunity.getTerritory().getTerritoryName() : null,
                 opportunity.getLocationType() != null ? opportunity.getLocationType().getKey() : null,
                 opportunity.getOpportunityType() != null ? opportunity.getOpportunityType().getKey() : null,
                 opportunity.getOpportunityStatus() != null ? opportunity.getOpportunityStatus().getKey() : null,

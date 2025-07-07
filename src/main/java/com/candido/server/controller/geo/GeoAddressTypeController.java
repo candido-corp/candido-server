@@ -1,10 +1,7 @@
 package com.candido.server.controller.geo;
 
-import com.candido.server.domain.v1.geo.EnumTerritoryCategoryKey;
 import com.candido.server.dto.v1.response.geo.ResponseAddressType;
-import com.candido.server.dto.v1.response.geo.ResponseGeoTerritory;
 import com.candido.server.service.base.geo.GeoAddressTypeService;
-import com.candido.server.service.base.geo.GeoService;
 import com.candido.server.service.base.mapper.AddressMapperService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
