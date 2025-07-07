@@ -1,6 +1,7 @@
 package com.candido.server.domain.v1.opportunity;
 
 import com.candido.server.domain.v1.account.Account;
+import com.candido.server.domain.v1.geo.Territory;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -25,57 +26,37 @@ public class Opportunity {
     @JoinColumn(name = "fk_account_id")
     private Account account;
 
-    @Column(name = "display_name")
+    @Column(name = "display_name", length = 128)
     private String displayName;
 
-    @Column(name = "notes")
-    private String notes;
-
-    @Column(name = "max_applicants")
-    private Integer maxApplicants;
+    @Column(name = "url_code", length = 4)
+    private String urlCode;
 
     @Column(name = "form_schema", columnDefinition = "jsonb")
     private String formSchema;
 
-    @Column(name = "url_code")
-    private String urlCode;
-
-    @Column(name = "start_date")
-    private OffsetDateTime startDate;
-
-    @Column(name = "end_date")
-    private OffsetDateTime endDate;
-
-    @Column(name = "created_at")
-    private OffsetDateTime createdAt;
-
-    @Column(name = "updated_at")
-    private OffsetDateTime updatedAt;
-
-    @Column(name = "deleted_at")
-    private OffsetDateTime deletedAt;
-
-    @Column(name = "feedback_publication_date")
-    private OffsetDateTime feedbackPublicationDate;
-
-    @Column(name = "feedback_expiration_date")
-    private OffsetDateTime feedbackExpirationDate;
+    @Column(name = "max_applicants")
+    private Long maxApplicants;
 
     @Column(name = "description", columnDefinition = "text")
     private String description;
 
-    @Column(name = "compensation_amount")
+    @Column(name = "notes", length = 255)
+    private String notes;
+
+    @Column(name = "compensation_amount", precision = 10, scale = 2)
     private BigDecimal compensationAmount;
 
-    @Column(name = "compensation_note")
+    @Column(name = "compensation_note", length = 255)
     private String compensationNote;
 
     @ManyToOne
     @JoinColumn(name = "fk_currency_id")
     private Currency currency;
 
-    @Column(name = "location")
-    private String location;
+    @ManyToOne
+    @JoinColumn(name = "fk_territory_id")
+    private Territory territory;
 
     @ManyToOne
     @JoinColumn(name = "fk_location_type_id")
@@ -92,4 +73,25 @@ public class Opportunity {
     @ManyToOne
     @JoinColumn(name = "fk_opportunity_level_id")
     private OpportunityLevel opportunityLevel;
+
+    @Column(name = "start_date")
+    private OffsetDateTime startDate;
+
+    @Column(name = "end_date")
+    private OffsetDateTime endDate;
+
+    @Column(name = "feedback_publication_date")
+    private OffsetDateTime feedbackPublicationDate;
+
+    @Column(name = "feedback_expiration_date")
+    private OffsetDateTime feedbackExpirationDate;
+
+    @Column(name = "created_at")
+    private OffsetDateTime createdAt;
+
+    @Column(name = "updated_at")
+    private OffsetDateTime updatedAt;
+
+    @Column(name = "deleted_at")
+    private OffsetDateTime deletedAt;
 }
