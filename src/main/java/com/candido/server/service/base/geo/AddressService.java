@@ -1,0 +1,19 @@
+package com.candido.server.service.base.geo;
+
+import com.candido.server.domain.v1.geo.Address;
+import com.candido.server.dto.v1.request.geo.RequestAddress;
+import org.springframework.data.jpa.domain.Specification;
+
+import java.util.List;
+import java.util.Optional;
+
+public interface AddressService {
+    Optional<Address> findActiveAddressBySpecification(Specification<Address> specification);
+    List<Address> findAllActiveAddressBySpecification(Specification<Address> specification);
+    List<Address> getAllActiveAddressesByUserId(Long userId);
+    Optional<Address> getActiveAddressById(Integer addressId);
+    Address getActiveAddressByIdAndUserIdOrThrow(Integer addressId, Long userId);
+    Address saveAddress(Long userId, Integer addressId, RequestAddress requestAddress);
+    void deleteAddress(Integer addressId);
+    Address setPrimaryAddress(Long userId, Integer addressId);
+}

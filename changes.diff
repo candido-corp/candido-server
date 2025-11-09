@@ -1,0 +1,2467 @@
+diff --git a/gradlew b/gradlew
+old mode 100644
+new mode 100755
+diff --git a/src/main/java/com/candido/server/config/HibernateMetricsConfig.java b/src/main/java/com/candido/server/config/ConfigHibernateMetrics.java
+similarity index 94%
+rename from src/main/java/com/candido/server/config/HibernateMetricsConfig.java
+rename to src/main/java/com/candido/server/config/ConfigHibernateMetrics.java
+index 7602b4e..aecfc43 100644
+--- a/src/main/java/com/candido/server/config/HibernateMetricsConfig.java
++++ b/src/main/java/com/candido/server/config/ConfigHibernateMetrics.java
+@@ -9,7 +9,7 @@ import org.springframework.context.annotation.Bean;
+ import org.springframework.context.annotation.Configuration;
+ 
+ @Configuration
+-public class HibernateMetricsConfig {
++public class ConfigHibernateMetrics {
+ 
+     @Bean
+     MeterBinder hibernateQueryMetrics(EntityManagerFactory entityManager) {
+diff --git a/src/main/java/com/candido/server/controller/account/user/application/ControllerOpportunity.java b/src/main/java/com/candido/server/controller/account/user/application/ControllerOpportunity.java
+index 5d854af..de6480d 100644
+--- a/src/main/java/com/candido/server/controller/account/user/application/ControllerOpportunity.java
++++ b/src/main/java/com/candido/server/controller/account/user/application/ControllerOpportunity.java
+@@ -1,7 +1,7 @@
+ package com.candido.server.controller.account.user.application;
+ 
+ import com.candido.server.domain.v1.account.Account;
+-import com.candido.server.dto.v1.response.application.ResponseApplicationForm;
++import com.candido.server.dto.v1.response.opportunity.ResponseOpportunity;
+ import com.candido.server.service.base.application.ApplicationService;
+ import com.candido.server.validation.annotations.VerifiedUser;
+ import org.springframework.beans.factory.annotation.Autowired;
+@@ -28,7 +28,7 @@ public class ControllerOpportunity {
+ 
+     @VerifiedUser
+     @GetMapping("/saved")
+-    public ResponseEntity<List<ResponseApplicationForm>> getSavedApplications(
++    public ResponseEntity<List<ResponseOpportunity>> getSavedApplications(
+             Authentication authentication
+     ) {
+         Account account = (Account) authentication.getPrincipal();
+diff --git a/src/main/java/com/candido/server/controller/geo/GeoAddressTypeController.java b/src/main/java/com/candido/server/controller/geo/GeoAddressTypeController.java
+index 8f92098..fc28557 100644
+--- a/src/main/java/com/candido/server/controller/geo/GeoAddressTypeController.java
++++ b/src/main/java/com/candido/server/controller/geo/GeoAddressTypeController.java
+@@ -1,10 +1,7 @@
+ package com.candido.server.controller.geo;
+ 
+-import com.candido.server.domain.v1.geo.EnumTerritoryCategoryKey;
+ import com.candido.server.dto.v1.response.geo.ResponseAddressType;
+-import com.candido.server.dto.v1.response.geo.ResponseGeoTerritory;
+ import com.candido.server.service.base.geo.GeoAddressTypeService;
+-import com.candido.server.service.base.geo.GeoService;
+ import com.candido.server.service.base.mapper.AddressMapperService;
+ import org.springframework.beans.factory.annotation.Autowired;
+ import org.springframework.http.ResponseEntity;
+diff --git a/src/main/java/com/candido/server/controller/opportunity/ControllerOpportunities.java b/src/main/java/com/candido/server/controller/opportunity/ControllerOpportunities.java
+index f767119..9d09bcc 100644
+--- a/src/main/java/com/candido/server/controller/opportunity/ControllerOpportunities.java
++++ b/src/main/java/com/candido/server/controller/opportunity/ControllerOpportunities.java
+@@ -1,9 +1,30 @@
+ package com.candido.server.controller.opportunity;
+ 
++import com.candido.server.dto.v1.response.opportunity.ResponseOpportunity;
++import com.candido.server.dto.v1.request.util.RequestPagination;
++import com.candido.server.dto.v1.response.util.ResponsePaginated;
++import com.candido.server.service.business.opportunity.BusinessOpportunityService;
++import org.springframework.beans.factory.annotation.Autowired;
++import org.springframework.data.domain.Page;
++import org.springframework.http.ResponseEntity;
++import org.springframework.web.bind.annotation.GetMapping;
+ import org.springframework.web.bind.annotation.RequestMapping;
+ import org.springframework.web.bind.annotation.RestController;
+ 
+ @RestController
+ @RequestMapping("/api/v1/opportunities")
+ public class ControllerOpportunities {
++
++    private final BusinessOpportunityService businessOpportunityService;
++
++    @Autowired
++    public ControllerOpportunities(BusinessOpportunityService businessOpportunityService) {
++        this.businessOpportunityService = businessOpportunityService;
++    }
++
++    @GetMapping
++    public ResponseEntity<ResponsePaginated<ResponseOpportunity>> getAllOpportunities(RequestPagination paginationRequest) {
++        return ResponseEntity.ok(businessOpportunityService.getAllOpportunities(paginationRequest));
++    }
++
+ }
+diff --git a/src/main/java/com/candido/server/domain/v1/_common/Ownable.java b/src/main/java/com/candido/server/domain/v1/_common/Ownable.java
+index 1934a64..bc951af 100644
+--- a/src/main/java/com/candido/server/domain/v1/_common/Ownable.java
++++ b/src/main/java/com/candido/server/domain/v1/_common/Ownable.java
+@@ -1,5 +1,5 @@
+ package com.candido.server.domain.v1._common;
+ 
+ public interface Ownable {
+-    Integer getOwnerId();
++    Long getOwnerId();
+ }
+\ No newline at end of file
+diff --git a/src/main/java/com/candido/server/domain/v1/account/Account.java b/src/main/java/com/candido/server/domain/v1/account/Account.java
+index 8ab2401..6326dce 100644
+--- a/src/main/java/com/candido/server/domain/v1/account/Account.java
++++ b/src/main/java/com/candido/server/domain/v1/account/Account.java
+@@ -26,7 +26,7 @@ public class Account implements UserDetails {
+     @Id
+     @GeneratedValue(strategy = GenerationType.IDENTITY)
+     @Column(name = "account_id")
+-    private Integer id;
++    private Long id;
+ 
+     @ManyToOne
+     @JoinColumn(name = "fk_account_role_id")
+diff --git a/src/main/java/com/candido/server/domain/v1/account/AccountRepository.java b/src/main/java/com/candido/server/domain/v1/account/AccountRepository.java
+index ec928f7..a04d7d8 100644
+--- a/src/main/java/com/candido/server/domain/v1/account/AccountRepository.java
++++ b/src/main/java/com/candido/server/domain/v1/account/AccountRepository.java
+@@ -5,7 +5,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
+ 
+ import java.util.Optional;
+ 
+-public interface AccountRepository extends JpaRepository<Account, Integer> {
++public interface AccountRepository extends JpaRepository<Account, Long> {
+ 
+     @EntityGraph(attributePaths = {"role.accountPermissions", "status", "authProviders"})
+     Optional<Account> findByEmail(String email);
+diff --git a/src/main/java/com/candido/server/domain/v1/account/XrefAccountSettings.java b/src/main/java/com/candido/server/domain/v1/account/XrefAccountSettings.java
+index 129d7a0..d7eca2e 100644
+--- a/src/main/java/com/candido/server/domain/v1/account/XrefAccountSettings.java
++++ b/src/main/java/com/candido/server/domain/v1/account/XrefAccountSettings.java
+@@ -18,7 +18,7 @@ public class XrefAccountSettings {
+ 
+     @Id
+     @Column(name = "fk_account_id")
+-    private int accountId;
++    private Long accountId;
+ 
+     @Id
+     @Column(name = "fk_account_settings_id")
+diff --git a/src/main/java/com/candido/server/domain/v1/application/Application.java b/src/main/java/com/candido/server/domain/v1/application/Application.java
+index c18e309..7ab4e51 100644
+--- a/src/main/java/com/candido/server/domain/v1/application/Application.java
++++ b/src/main/java/com/candido/server/domain/v1/application/Application.java
+@@ -1,6 +1,7 @@
+ package com.candido.server.domain.v1.application;
+ 
+ import com.candido.server.domain.v1.account.Account;
++import com.candido.server.domain.v1.opportunity.Opportunity;
+ import com.fasterxml.jackson.annotation.JsonProperty;
+ import jakarta.persistence.*;
+ import lombok.AllArgsConstructor;
+@@ -24,15 +25,15 @@ public class Application {
+ 
+     @JsonProperty("fk_account_id")
+     @Column(name = "fk_account_id")
+-    private int accountId;
++    private Long accountId;
+ 
+     @ManyToOne
+     @JoinColumn(name = "fk_account_id", insertable = false, updatable = false)
+     private Account account;
+ 
+     @OneToOne
+-    @JoinColumn(name = "fk_application_form_id")
+-    private ApplicationForm applicationForm;
++    @JoinColumn(name = "fk_opportunity_id")
++    private Opportunity opportunity;
+ 
+     @ManyToOne
+     @JoinColumn(name = "fk_application_status_id", insertable = false, updatable = false)
+diff --git a/src/main/java/com/candido/server/domain/v1/application/ApplicationForm.java b/src/main/java/com/candido/server/domain/v1/application/ApplicationForm.java
+deleted file mode 100644
+index e35af46..0000000
+--- a/src/main/java/com/candido/server/domain/v1/application/ApplicationForm.java
++++ /dev/null
+@@ -1,77 +0,0 @@
+-package com.candido.server.domain.v1.application;
+-
+-import com.candido.server.domain.v1.account.Account;
+-import com.fasterxml.jackson.annotation.JsonProperty;
+-import jakarta.persistence.*;
+-import lombok.AllArgsConstructor;
+-import lombok.Data;
+-import lombok.NoArgsConstructor;
+-
+-import java.time.LocalDateTime;
+-
+-@Data
+-@NoArgsConstructor
+-@AllArgsConstructor
+-@Entity
+-@Table(name = "application_form")
+-public class ApplicationForm {
+-
+-    @Id
+-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+-    @JsonProperty("application_form_id")
+-    @Column(name = "application_form_id")
+-    private int applicationFormId;
+-
+-    @OneToOne
+-    @JoinColumn(name = "fk_account_id")
+-    private Account account;
+-
+-    @JsonProperty("display_name")
+-    @Column(name = "display_name")
+-    private String displayName;
+-
+-    @JsonProperty("notes")
+-    @Column(name = "notes")
+-    private String notes;
+-
+-    @JsonProperty("max_applicants")
+-    @Column(name = "max_applicants")
+-    private int maxApplicants;
+-
+-    @JsonProperty("application_form_body")
+-    @Column(name = "application_form_body")
+-    private String applicationFormBody;
+-
+-    @JsonProperty("url_code")
+-    @Column(name = "url_code")
+-    private String urlCode;
+-
+-    @JsonProperty("start_date")
+-    @Column(name = "start_date")
+-    private LocalDateTime startDate;
+-
+-    @JsonProperty("end_date")
+-    @Column(name = "end_date")
+-    private LocalDateTime endDate;
+-
+-    @JsonProperty("created_at")
+-    @Column(name = "created_at")
+-    private LocalDateTime createdAt;
+-
+-    @JsonProperty("updated_at")
+-    @Column(name = "updated_at")
+-    private LocalDateTime updatedAt;
+-
+-    @JsonProperty("deleted_at")
+-    @Column(name = "deleted_at")
+-    private LocalDateTime deletedAt;
+-
+-    @JsonProperty("feedback_publication_date")
+-    @Column(name = "feedback_publication_date")
+-    private LocalDateTime feedbackPublicationDate;
+-
+-    @JsonProperty("feedback_expiration_date")
+-    @Column(name = "feedback_expiration_date")
+-    private LocalDateTime feedbackExpirationDate;
+-
+-}
+diff --git a/src/main/java/com/candido/server/domain/v1/application/ApplicationRepository.java b/src/main/java/com/candido/server/domain/v1/application/ApplicationRepository.java
+index a8e9453..c243653 100644
+--- a/src/main/java/com/candido/server/domain/v1/application/ApplicationRepository.java
++++ b/src/main/java/com/candido/server/domain/v1/application/ApplicationRepository.java
+@@ -8,5 +8,5 @@ import java.util.List;
+ 
+ @Repository
+ public interface ApplicationRepository extends JpaRepository<Application, Integer>, JpaSpecificationExecutor<Application> {
+-    <T> List<T> findAllByAccountId(int accountId, Class<T> type);
++    <T> List<T> findAllByAccountId(Long accountId, Class<T> type);
+ }
+diff --git a/src/main/java/com/candido/server/domain/v1/application/XrefAccountApplicationSaved.java b/src/main/java/com/candido/server/domain/v1/application/XrefAccountApplicationSaved.java
+deleted file mode 100644
+index f6eefdc..0000000
+--- a/src/main/java/com/candido/server/domain/v1/application/XrefAccountApplicationSaved.java
++++ /dev/null
+@@ -1,31 +0,0 @@
+-package com.candido.server.domain.v1.application;
+-
+-import com.fasterxml.jackson.annotation.JsonProperty;
+-import jakarta.persistence.*;
+-import lombok.AllArgsConstructor;
+-import lombok.Data;
+-import lombok.NoArgsConstructor;
+-
+-@Data
+-@AllArgsConstructor
+-@NoArgsConstructor
+-@Entity
+-@Table(name = "xref_account_application_saved")
+-@IdClass(XrefAccountApplicationSavedIdentity.class)
+-public class XrefAccountApplicationSaved {
+-
+-    @Id
+-    @JsonProperty("application_form_id")
+-    @Column(name = "fk_application_form_id")
+-    private int applicationFormId;
+-
+-    @Id
+-    @JsonProperty("account_id")
+-    @Column(name = "fk_account_id")
+-    private int accountId;
+-
+-    @OneToOne
+-    @JoinColumn(name = "fk_application_form_id", insertable = false, updatable = false)
+-    private ApplicationForm applicationForm;
+-
+-}
+diff --git a/src/main/java/com/candido/server/domain/v1/application/XrefAccountApplicationSavedIdentity.java b/src/main/java/com/candido/server/domain/v1/application/XrefAccountApplicationSavedIdentity.java
+deleted file mode 100644
+index 82ecba4..0000000
+--- a/src/main/java/com/candido/server/domain/v1/application/XrefAccountApplicationSavedIdentity.java
++++ /dev/null
+@@ -1,11 +0,0 @@
+-package com.candido.server.domain.v1.application;
+-
+-import lombok.Data;
+-
+-import java.io.Serializable;
+-
+-@Data
+-public class XrefAccountApplicationSavedIdentity implements Serializable {
+-    int applicationFormId;
+-    int accountId;
+-}
+diff --git a/src/main/java/com/candido/server/domain/v1/application/XrefAccountApplicationSavedRepository.java b/src/main/java/com/candido/server/domain/v1/application/XrefAccountApplicationSavedRepository.java
+deleted file mode 100644
+index 58c7e3a..0000000
+--- a/src/main/java/com/candido/server/domain/v1/application/XrefAccountApplicationSavedRepository.java
++++ /dev/null
+@@ -1,15 +0,0 @@
+-package com.candido.server.domain.v1.application;
+-
+-import org.springframework.data.jpa.repository.JpaRepository;
+-import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
+-import org.springframework.stereotype.Repository;
+-
+-import java.util.List;
+-
+-@Repository
+-public interface XrefAccountApplicationSavedRepository extends
+-        JpaRepository<XrefAccountApplicationSaved, XrefAccountApplicationSavedIdentity>,
+-        JpaSpecificationExecutor<XrefAccountApplicationSaved>
+-{
+-    List<XrefAccountApplicationSaved> findAllByAccountId(int accountId);
+-}
+diff --git a/src/main/java/com/candido/server/domain/v1/geo/Address.java b/src/main/java/com/candido/server/domain/v1/geo/Address.java
+index 2691105..71bb057 100644
+--- a/src/main/java/com/candido/server/domain/v1/geo/Address.java
++++ b/src/main/java/com/candido/server/domain/v1/geo/Address.java
+@@ -45,7 +45,7 @@ public class Address implements Ownable {
+ 
+     @JsonProperty("user_id")
+     @Column(name = "fk_user_id")
+-    private int userId;
++    private Long userId;
+ 
+     @JsonProperty("is_primary")
+     @Column(name = "is_primary")
+@@ -80,7 +80,7 @@ public class Address implements Ownable {
+     private String displayName;
+ 
+     @Override
+-    public Integer getOwnerId() {
++    public Long getOwnerId() {
+         return userId;
+     }
+ }
+diff --git a/src/main/java/com/candido/server/domain/v1/opportunity/Currency.java b/src/main/java/com/candido/server/domain/v1/opportunity/Currency.java
+new file mode 100644
+index 0000000..fc46379
+--- /dev/null
++++ b/src/main/java/com/candido/server/domain/v1/opportunity/Currency.java
+@@ -0,0 +1,31 @@
++package com.candido.server.domain.v1.opportunity;
++
++import jakarta.persistence.*;
++import lombok.AllArgsConstructor;
++import lombok.Data;
++import lombok.NoArgsConstructor;
++
++@Entity
++@Table(name = "currency", schema = "candido")
++@Data
++@NoArgsConstructor
++@AllArgsConstructor
++public class Currency {
++
++    @Id
++    @GeneratedValue(strategy = GenerationType.IDENTITY)
++    @Column(name = "currency_id")
++    private Long currencyId;
++
++    @Column(name = "code", unique = true, nullable = false, length = 3)
++    private String code;
++
++    @Column(name = "name", nullable = false)
++    private String name;
++
++    @Column(name = "symbol", length = 8)
++    private String symbol;
++
++    @Column(name = "enabled", nullable = false)
++    private Boolean enabled = true;
++}
+diff --git a/src/main/java/com/candido/server/domain/v1/opportunity/LocationType.java b/src/main/java/com/candido/server/domain/v1/opportunity/LocationType.java
+new file mode 100644
+index 0000000..28beb3e
+--- /dev/null
++++ b/src/main/java/com/candido/server/domain/v1/opportunity/LocationType.java
+@@ -0,0 +1,25 @@
++package com.candido.server.domain.v1.opportunity;
++
++import jakarta.persistence.*;
++import lombok.AllArgsConstructor;
++import lombok.Data;
++import lombok.NoArgsConstructor;
++
++@Entity
++@Table(name = "location_type", schema = "candido")
++@Data
++@NoArgsConstructor
++@AllArgsConstructor
++public class LocationType {
++
++    @Id
++    @GeneratedValue(strategy = GenerationType.IDENTITY)
++    @Column(name = "location_type_id")
++    private Long locationTypeId;
++
++    @Column(name = "key", unique = true, nullable = false)
++    private String key;
++
++    @Column(name = "label")
++    private String label;
++}
+diff --git a/src/main/java/com/candido/server/domain/v1/opportunity/Opportunity.java b/src/main/java/com/candido/server/domain/v1/opportunity/Opportunity.java
+new file mode 100644
+index 0000000..3e0e40f
+--- /dev/null
++++ b/src/main/java/com/candido/server/domain/v1/opportunity/Opportunity.java
+@@ -0,0 +1,97 @@
++package com.candido.server.domain.v1.opportunity;
++
++import com.candido.server.domain.v1.account.Account;
++import com.candido.server.domain.v1.geo.Territory;
++import jakarta.persistence.*;
++import lombok.AllArgsConstructor;
++import lombok.Data;
++import lombok.NoArgsConstructor;
++
++import java.math.BigDecimal;
++import java.time.OffsetDateTime;
++
++@Data
++@NoArgsConstructor
++@AllArgsConstructor
++@Entity
++@Table(name = "opportunity")
++public class Opportunity {
++
++    @Id
++    @GeneratedValue(strategy = GenerationType.IDENTITY)
++    @Column(name = "opportunity_id")
++    private Long opportunityId;
++
++    @ManyToOne
++    @JoinColumn(name = "fk_account_id")
++    private Account account;
++
++    @Column(name = "display_name", length = 128)
++    private String displayName;
++
++    @Column(name = "url_code", length = 4)
++    private String urlCode;
++
++    @Column(name = "form_schema", columnDefinition = "jsonb")
++    private String formSchema;
++
++    @Column(name = "max_applicants")
++    private Long maxApplicants;
++
++    @Column(name = "description", columnDefinition = "text")
++    private String description;
++
++    @Column(name = "notes", length = 255)
++    private String notes;
++
++    @Column(name = "compensation_amount", precision = 10, scale = 2)
++    private BigDecimal compensationAmount;
++
++    @Column(name = "compensation_note", length = 255)
++    private String compensationNote;
++
++    @ManyToOne
++    @JoinColumn(name = "fk_currency_id")
++    private Currency currency;
++
++    @ManyToOne
++    @JoinColumn(name = "fk_territory_id")
++    private Territory territory;
++
++    @ManyToOne
++    @JoinColumn(name = "fk_location_type_id")
++    private LocationType locationType;
++
++    @ManyToOne
++    @JoinColumn(name = "fk_opportunity_type_id")
++    private OpportunityType opportunityType;
++
++    @ManyToOne
++    @JoinColumn(name = "fk_opportunity_status_id")
++    private OpportunityStatus opportunityStatus;
++
++    @ManyToOne
++    @JoinColumn(name = "fk_opportunity_level_id")
++    private OpportunityLevel opportunityLevel;
++
++    @Column(name = "start_date")
++    private OffsetDateTime startDate;
++
++    @Column(name = "end_date")
++    private OffsetDateTime endDate;
++
++    @Column(name = "feedback_publication_date")
++    private OffsetDateTime feedbackPublicationDate;
++
++    @Column(name = "feedback_expiration_date")
++    private OffsetDateTime feedbackExpirationDate;
++
++    @Column(name = "created_at")
++    private OffsetDateTime createdAt;
++
++    @Column(name = "updated_at")
++    private OffsetDateTime updatedAt;
++
++    @Column(name = "deleted_at")
++    private OffsetDateTime deletedAt;
++}
+\ No newline at end of file
+diff --git a/src/main/java/com/candido/server/domain/v1/opportunity/OpportunityLevel.java b/src/main/java/com/candido/server/domain/v1/opportunity/OpportunityLevel.java
+new file mode 100644
+index 0000000..ee52bf0
+--- /dev/null
++++ b/src/main/java/com/candido/server/domain/v1/opportunity/OpportunityLevel.java
+@@ -0,0 +1,26 @@
++package com.candido.server.domain.v1.opportunity;
++
++import jakarta.persistence.*;
++import lombok.AllArgsConstructor;
++import lombok.Data;
++import lombok.NoArgsConstructor;
++
++@Entity
++@Table(name = "opportunity_level", schema = "candido")
++@Data
++@NoArgsConstructor
++@AllArgsConstructor
++public class OpportunityLevel {
++
++    @Id
++    @GeneratedValue(strategy = GenerationType.IDENTITY)
++    @Column(name = "opportunity_level_id")
++    private Long opportunityLevelId;
++
++    @Column(name = "key", unique = true, nullable = false)
++    private String key;
++
++    @Column(name = "label", nullable = false)
++    private String label;
++}
++
+diff --git a/src/main/java/com/candido/server/domain/v1/application/ApplicationFormRepository.java b/src/main/java/com/candido/server/domain/v1/opportunity/OpportunityRepository.java
+similarity index 51%
+rename from src/main/java/com/candido/server/domain/v1/application/ApplicationFormRepository.java
+rename to src/main/java/com/candido/server/domain/v1/opportunity/OpportunityRepository.java
+index f4a4312..d242e80 100644
+--- a/src/main/java/com/candido/server/domain/v1/application/ApplicationFormRepository.java
++++ b/src/main/java/com/candido/server/domain/v1/opportunity/OpportunityRepository.java
+@@ -1,9 +1,12 @@
+-package com.candido.server.domain.v1.application;
++package com.candido.server.domain.v1.opportunity;
+ 
+ import org.springframework.data.jpa.repository.JpaRepository;
+ import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
+ import org.springframework.stereotype.Repository;
+ 
+ @Repository
+-public interface ApplicationFormRepository extends JpaRepository<ApplicationForm, Integer>, JpaSpecificationExecutor<ApplicationForm> {
++public interface OpportunityRepository extends
++        JpaRepository<Opportunity, Long>,
++        JpaSpecificationExecutor<Opportunity>
++{
+ }
+diff --git a/src/main/java/com/candido/server/domain/v1/opportunity/OpportunityStatus.java b/src/main/java/com/candido/server/domain/v1/opportunity/OpportunityStatus.java
+new file mode 100644
+index 0000000..cd18976
+--- /dev/null
++++ b/src/main/java/com/candido/server/domain/v1/opportunity/OpportunityStatus.java
+@@ -0,0 +1,26 @@
++package com.candido.server.domain.v1.opportunity;
++
++import jakarta.persistence.*;
++import lombok.AllArgsConstructor;
++import lombok.Data;
++import lombok.NoArgsConstructor;
++
++@Entity
++@Table(name = "opportunity_status", schema = "candido")
++@Data
++@NoArgsConstructor
++@AllArgsConstructor
++public class OpportunityStatus {
++
++    @Id
++    @GeneratedValue(strategy = GenerationType.IDENTITY)
++    @Column(name = "opportunity_status_id")
++    private Long opportunityStatusId;
++
++    @Column(name = "key", unique = true, nullable = false)
++    private String key;
++
++    @Column(name = "label")
++    private String label;
++}
++
+diff --git a/src/main/java/com/candido/server/domain/v1/opportunity/OpportunityTag.java b/src/main/java/com/candido/server/domain/v1/opportunity/OpportunityTag.java
+new file mode 100644
+index 0000000..3828a8b
+--- /dev/null
++++ b/src/main/java/com/candido/server/domain/v1/opportunity/OpportunityTag.java
+@@ -0,0 +1,28 @@
++package com.candido.server.domain.v1.opportunity;
++
++import jakarta.persistence.*;
++import lombok.AllArgsConstructor;
++import lombok.Data;
++import lombok.NoArgsConstructor;
++
++@Entity
++@Table(name = "opportunity_tag", schema = "candido")
++@Data
++@NoArgsConstructor
++@AllArgsConstructor
++public class OpportunityTag {
++
++    @EmbeddedId
++    private OpportunityTagId id;
++
++    @ManyToOne
++    @MapsId("opportunityId")
++    @JoinColumn(name = "fk_opportunity_id", nullable = false)
++    private Opportunity opportunity;
++
++    @ManyToOne
++    @MapsId("tagId")
++    @JoinColumn(name = "fk_tag_id", nullable = false)
++    private Tag tag;
++}
++
+diff --git a/src/main/java/com/candido/server/domain/v1/opportunity/OpportunityTagId.java b/src/main/java/com/candido/server/domain/v1/opportunity/OpportunityTagId.java
+new file mode 100644
+index 0000000..018ce5c
+--- /dev/null
++++ b/src/main/java/com/candido/server/domain/v1/opportunity/OpportunityTagId.java
+@@ -0,0 +1,21 @@
++package com.candido.server.domain.v1.opportunity;
++
++import jakarta.persistence.Column;
++import jakarta.persistence.Embeddable;
++import lombok.AllArgsConstructor;
++import lombok.Data;
++import lombok.NoArgsConstructor;
++
++import java.io.Serializable;
++
++@Embeddable
++@Data
++@NoArgsConstructor
++@AllArgsConstructor
++public class OpportunityTagId implements Serializable {
++    @Column(name = "fk_opportunity_id")
++    private Long opportunityId;
++
++    @Column(name = "fk_tag_id")
++    private Long tagId;
++}
+diff --git a/src/main/java/com/candido/server/domain/v1/opportunity/OpportunityType.java b/src/main/java/com/candido/server/domain/v1/opportunity/OpportunityType.java
+new file mode 100644
+index 0000000..12b798e
+--- /dev/null
++++ b/src/main/java/com/candido/server/domain/v1/opportunity/OpportunityType.java
+@@ -0,0 +1,27 @@
++package com.candido.server.domain.v1.opportunity;
++
++import jakarta.persistence.*;
++import lombok.AllArgsConstructor;
++import lombok.Data;
++import lombok.NoArgsConstructor;
++
++@Entity
++@Data
++@NoArgsConstructor
++@AllArgsConstructor
++@Table(name = "opportunity_type")
++public class OpportunityType {
++
++    @Id
++    @GeneratedValue(strategy = GenerationType.IDENTITY)
++    @Column(name = "opportunity_type_id")
++    private Long opportunityTypeId;
++
++    @Column(name = "key", unique = true, nullable = false)
++    private String key;
++
++    @Column(name = "label")
++    private String label;
++}
++
++
+diff --git a/src/main/java/com/candido/server/domain/v1/opportunity/Tag.java b/src/main/java/com/candido/server/domain/v1/opportunity/Tag.java
+new file mode 100644
+index 0000000..40d4f78
+--- /dev/null
++++ b/src/main/java/com/candido/server/domain/v1/opportunity/Tag.java
+@@ -0,0 +1,26 @@
++package com.candido.server.domain.v1.opportunity;
++
++import jakarta.persistence.*;
++import lombok.AllArgsConstructor;
++import lombok.Data;
++import lombok.NoArgsConstructor;
++
++@Entity
++@Table(name = "tag", schema = "candido")
++@Data
++@NoArgsConstructor
++@AllArgsConstructor
++public class Tag {
++
++    @Id
++    @GeneratedValue(strategy = GenerationType.IDENTITY)
++    @Column(name = "tag_id")
++    private Long tagId;
++
++    @Column(name = "key", unique = true, nullable = false)
++    private String key;
++
++    @Column(name = "label", nullable = false)
++    private String label;
++}
++
+diff --git a/src/main/java/com/candido/server/domain/v1/opportunity/XrefAccountOpportunitySaved.java b/src/main/java/com/candido/server/domain/v1/opportunity/XrefAccountOpportunitySaved.java
+new file mode 100644
+index 0000000..f96ff76
+--- /dev/null
++++ b/src/main/java/com/candido/server/domain/v1/opportunity/XrefAccountOpportunitySaved.java
+@@ -0,0 +1,22 @@
++package com.candido.server.domain.v1.opportunity;
++
++import jakarta.persistence.*;
++import lombok.AllArgsConstructor;
++import lombok.Data;
++import lombok.NoArgsConstructor;
++
++@Data
++@AllArgsConstructor
++@NoArgsConstructor
++@Entity
++@Table(name = "xref_account_opportunity_saved")
++public class XrefAccountOpportunitySaved {
++
++    @EmbeddedId
++    private XrefAccountOpportunitySavedId id;
++
++    @OneToOne
++    @JoinColumn(name = "fk_opportunity_id", insertable = false, updatable = false)
++    private Opportunity opportunity;
++}
++
+diff --git a/src/main/java/com/candido/server/domain/v1/opportunity/XrefAccountOpportunitySavedId.java b/src/main/java/com/candido/server/domain/v1/opportunity/XrefAccountOpportunitySavedId.java
+new file mode 100644
+index 0000000..c50750f
+--- /dev/null
++++ b/src/main/java/com/candido/server/domain/v1/opportunity/XrefAccountOpportunitySavedId.java
+@@ -0,0 +1,22 @@
++package com.candido.server.domain.v1.opportunity;
++
++import jakarta.persistence.Column;
++import jakarta.persistence.Embeddable;
++import lombok.AllArgsConstructor;
++import lombok.Data;
++import lombok.NoArgsConstructor;
++
++import java.io.Serializable;
++
++@Embeddable
++@Data
++@NoArgsConstructor
++@AllArgsConstructor
++public class XrefAccountOpportunitySavedId implements Serializable {
++
++    @Column(name = "fk_opportunity_id")
++    private Long opportunityId;
++
++    @Column(name = "fk_account_id")
++    private Long accountId;
++}
+diff --git a/src/main/java/com/candido/server/domain/v1/opportunity/XrefAccountOpportunitySavedRepository.java b/src/main/java/com/candido/server/domain/v1/opportunity/XrefAccountOpportunitySavedRepository.java
+new file mode 100644
+index 0000000..2ae98b6
+--- /dev/null
++++ b/src/main/java/com/candido/server/domain/v1/opportunity/XrefAccountOpportunitySavedRepository.java
+@@ -0,0 +1,15 @@
++package com.candido.server.domain.v1.opportunity;
++
++import org.springframework.data.jpa.repository.JpaRepository;
++import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
++import org.springframework.stereotype.Repository;
++
++import java.util.List;
++
++@Repository
++public interface XrefAccountOpportunitySavedRepository extends
++        JpaRepository<XrefAccountOpportunitySaved, XrefAccountOpportunitySavedId>,
++        JpaSpecificationExecutor<XrefAccountOpportunitySaved>
++{
++    List<XrefAccountOpportunitySaved> findAllByIdAccountId(Long accountId);
++}
+diff --git a/src/main/java/com/candido/server/domain/v1/provider/XrefAccountProvider.java b/src/main/java/com/candido/server/domain/v1/provider/XrefAccountProvider.java
+index 2f83dbf..134753b 100644
+--- a/src/main/java/com/candido/server/domain/v1/provider/XrefAccountProvider.java
++++ b/src/main/java/com/candido/server/domain/v1/provider/XrefAccountProvider.java
+@@ -17,7 +17,7 @@ public class XrefAccountProvider {
+ 
+     @Id
+     @Column(name = "fk_account_id")
+-    private int accountId;
++    private Long accountId;
+ 
+     @Id
+     @Column(name = "fk_provider_id")
+diff --git a/src/main/java/com/candido/server/domain/v1/token/TokenRepository.java b/src/main/java/com/candido/server/domain/v1/token/TokenRepository.java
+index 40a5277..3c68f07 100644
+--- a/src/main/java/com/candido/server/domain/v1/token/TokenRepository.java
++++ b/src/main/java/com/candido/server/domain/v1/token/TokenRepository.java
+@@ -9,12 +9,12 @@ import java.util.Optional;
+ 
+ public interface TokenRepository extends JpaRepository<Token, Integer> {
+     @EntityGraph(attributePaths = {"tokenScopeCategory", "tokenType"})
+-    List<Token> findAllByAccountId(Integer id);
++    List<Token> findAllByAccountId(Long id);
+ 
+     Optional<Token> findByAccessToken(String accessToken);
+     Optional<Token> findByRefreshToken(String refreshToken);
+     Optional<Token> findByUuidAccessTokenAndTokenScopeCategoryId(String uuidAccessToken, int tokenScopeCategoryId);
+     Optional<Token> findByAccessTokenAndTokenScopeCategoryId(String accessToken, int tokenScopeCategoryId);
+-    Optional<Token> findByAccountIdAndTokenScopeCategoryId(int accountId, int tokenScopeCategoryId);
++    Optional<Token> findByAccountIdAndTokenScopeCategoryId(Long accountId, int tokenScopeCategoryId);
+ 
+ }
+diff --git a/src/main/java/com/candido/server/domain/v1/user/User.java b/src/main/java/com/candido/server/domain/v1/user/User.java
+index 119f2ed..98984c7 100644
+--- a/src/main/java/com/candido/server/domain/v1/user/User.java
++++ b/src/main/java/com/candido/server/domain/v1/user/User.java
+@@ -21,7 +21,7 @@ public class User {
+     @GeneratedValue(strategy = GenerationType.IDENTITY)
+     @JsonProperty("id")
+     @Column(name = "user_id")
+-    private int id;
++    private Long id;
+ 
+     @ManyToOne
+     @JoinColumn(name = "fk_gender_id", insertable = false, updatable = false)
+@@ -32,7 +32,7 @@ public class User {
+     private Integer genderId;
+ 
+     @Column(name = "fk_account_id")
+-    private int accountId;
++    private Long accountId;
+ 
+     @Column(name = "first_name")
+     private String firstName;
+diff --git a/src/main/java/com/candido/server/dto/v1/request/util/RequestPagination.java b/src/main/java/com/candido/server/dto/v1/request/util/RequestPagination.java
+new file mode 100644
+index 0000000..02f4ede
+--- /dev/null
++++ b/src/main/java/com/candido/server/dto/v1/request/util/RequestPagination.java
+@@ -0,0 +1,11 @@
++package com.candido.server.dto.v1.request.util;
++
++import lombok.Data;
++
++@Data
++public class RequestPagination {
++    private int page = 0;
++    private int size = 10;
++    private String sortBy = "createdAt";
++    private String direction = "DESC";
++}
+\ No newline at end of file
+diff --git a/src/main/java/com/candido/server/dto/v1/response/application/ResponseApplicationForm.java b/src/main/java/com/candido/server/dto/v1/response/application/ResponseApplicationForm.java
+deleted file mode 100644
+index 08206f2..0000000
+--- a/src/main/java/com/candido/server/dto/v1/response/application/ResponseApplicationForm.java
++++ /dev/null
+@@ -1,57 +0,0 @@
+-package com.candido.server.dto.v1.response.application;
+-
+-import com.candido.server.domain.v1.application.ApplicationForm;
+-import com.fasterxml.jackson.annotation.JsonProperty;
+-import lombok.Data;
+-
+-import java.time.LocalDateTime;
+-
+-@Data
+-public class ResponseApplicationForm {
+-
+-    @JsonProperty("application_form_id")
+-    private int applicationFormId;
+-
+-    @JsonProperty("display_name")
+-    private String displayName;
+-
+-    @JsonProperty("notes")
+-    private String notes;
+-
+-    @JsonProperty("url_code")
+-    private String urlCode;
+-
+-    @JsonProperty("start_date")
+-    private LocalDateTime startDate;
+-
+-    @JsonProperty("end_date")
+-    private LocalDateTime endDate;
+-
+-    public ResponseApplicationForm(
+-            int applicationFormId,
+-            String displayName,
+-            String notes,
+-            String urlCode,
+-            LocalDateTime startDate,
+-            LocalDateTime endDate
+-    ) {
+-        this.applicationFormId = applicationFormId;
+-        this.displayName = displayName;
+-        this.notes = notes;
+-        this.urlCode = urlCode;
+-        this.startDate = startDate;
+-        this.endDate = endDate;
+-    }
+-
+-    public static ResponseApplicationForm mapToResponseApplicationForm(ApplicationForm applicationForm) {
+-        return new ResponseApplicationForm(
+-                applicationForm.getApplicationFormId(),
+-                applicationForm.getDisplayName(),
+-                applicationForm.getNotes(),
+-                applicationForm.getUrlCode(),
+-                applicationForm.getStartDate(),
+-                applicationForm.getEndDate()
+-        );
+-    }
+-
+-}
+diff --git a/src/main/java/com/candido/server/dto/v1/response/opportunity/ResponseOpportunity.java b/src/main/java/com/candido/server/dto/v1/response/opportunity/ResponseOpportunity.java
+new file mode 100644
+index 0000000..3a98377
+--- /dev/null
++++ b/src/main/java/com/candido/server/dto/v1/response/opportunity/ResponseOpportunity.java
+@@ -0,0 +1,159 @@
++package com.candido.server.dto.v1.response.opportunity;
++
++import com.candido.server.domain.v1.opportunity.Opportunity;
++import com.fasterxml.jackson.annotation.JsonProperty;
++import lombok.Data;
++
++import java.math.BigDecimal;
++import java.time.OffsetDateTime;
++
++@Data
++public class ResponseOpportunity {
++
++    @JsonProperty("opportunity_id")
++    private Long opportunityId;
++
++    @JsonProperty("account_id")
++    private Long accountId;
++
++    @JsonProperty("display_name")
++    private String displayName;
++
++    @JsonProperty("notes")
++    private String notes;
++
++    @JsonProperty("description")
++    private String description;
++
++    @JsonProperty("url_code")
++    private String urlCode;
++
++    @JsonProperty("max_applicants")
++    private Long maxApplicants;
++
++    @JsonProperty("form_schema")
++    private String formSchema;
++
++    @JsonProperty("compensation_amount")
++    private BigDecimal compensationAmount;
++
++    @JsonProperty("compensation_note")
++    private String compensationNote;
++
++    @JsonProperty("currency_code")
++    private String currencyCode;
++
++    @JsonProperty("territory_name")
++    private String territoryName;
++
++    @JsonProperty("location_type_key")
++    private String locationTypeKey;
++
++    @JsonProperty("opportunity_type_key")
++    private String opportunityTypeKey;
++
++    @JsonProperty("opportunity_status_key")
++    private String opportunityStatusKey;
++
++    @JsonProperty("opportunity_level_key")
++    private String opportunityLevelKey;
++
++    @JsonProperty("start_date")
++    private OffsetDateTime startDate;
++
++    @JsonProperty("end_date")
++    private OffsetDateTime endDate;
++
++    @JsonProperty("feedback_publication_date")
++    private OffsetDateTime feedbackPublicationDate;
++
++    @JsonProperty("feedback_expiration_date")
++    private OffsetDateTime feedbackExpirationDate;
++
++    @JsonProperty("created_at")
++    private OffsetDateTime createdAt;
++
++    @JsonProperty("updated_at")
++    private OffsetDateTime updatedAt;
++
++    @JsonProperty("deleted_at")
++    private OffsetDateTime deletedAt;
++
++    public ResponseOpportunity(
++            Long opportunityId,
++            Long accountId,
++            String displayName,
++            String notes,
++            Long maxApplicants,
++            String formSchema,
++            String urlCode,
++            OffsetDateTime startDate,
++            OffsetDateTime endDate,
++            OffsetDateTime createdAt,
++            OffsetDateTime updatedAt,
++            OffsetDateTime deletedAt,
++            OffsetDateTime feedbackPublicationDate,
++            OffsetDateTime feedbackExpirationDate,
++            String description,
++            BigDecimal compensationAmount,
++            String compensationNote,
++            String currencyCode,
++            String territoryName,
++            String locationTypeKey,
++            String opportunityTypeKey,
++            String opportunityStatusKey,
++            String opportunityLevelKey
++    ) {
++        this.opportunityId = opportunityId;
++        this.accountId = accountId;
++        this.displayName = displayName;
++        this.notes = notes;
++        this.maxApplicants = maxApplicants;
++        this.formSchema = formSchema;
++        this.urlCode = urlCode;
++        this.startDate = startDate;
++        this.endDate = endDate;
++        this.createdAt = createdAt;
++        this.updatedAt = updatedAt;
++        this.deletedAt = deletedAt;
++        this.feedbackPublicationDate = feedbackPublicationDate;
++        this.feedbackExpirationDate = feedbackExpirationDate;
++        this.description = description;
++        this.compensationAmount = compensationAmount;
++        this.compensationNote = compensationNote;
++        this.currencyCode = currencyCode;
++        this.territoryName = territoryName;
++        this.locationTypeKey = locationTypeKey;
++        this.opportunityTypeKey = opportunityTypeKey;
++        this.opportunityStatusKey = opportunityStatusKey;
++        this.opportunityLevelKey = opportunityLevelKey;
++    }
++
++    public static ResponseOpportunity mapToResponseOpportunity(Opportunity opportunity) {
++        return new ResponseOpportunity(
++                opportunity.getOpportunityId(),
++                opportunity.getAccount() != null ? opportunity.getAccount().getId() : null,
++                opportunity.getDisplayName(),
++                opportunity.getNotes(),
++                opportunity.getMaxApplicants(),
++                opportunity.getFormSchema(),
++                opportunity.getUrlCode(),
++                opportunity.getStartDate(),
++                opportunity.getEndDate(),
++                opportunity.getCreatedAt(),
++                opportunity.getUpdatedAt(),
++                opportunity.getDeletedAt(),
++                opportunity.getFeedbackPublicationDate(),
++                opportunity.getFeedbackExpirationDate(),
++                opportunity.getDescription(),
++                opportunity.getCompensationAmount(),
++                opportunity.getCompensationNote(),
++                opportunity.getCurrency() != null ? opportunity.getCurrency().getCode() : null,
++                opportunity.getTerritory() != null ? opportunity.getTerritory().getTerritoryName() : null,
++                opportunity.getLocationType() != null ? opportunity.getLocationType().getKey() : null,
++                opportunity.getOpportunityType() != null ? opportunity.getOpportunityType().getKey() : null,
++                opportunity.getOpportunityStatus() != null ? opportunity.getOpportunityStatus().getKey() : null,
++                opportunity.getOpportunityLevel() != null ? opportunity.getOpportunityLevel().getKey() : null
++        );
++    }
++}
+\ No newline at end of file
+diff --git a/src/main/java/com/candido/server/dto/v1/response/util/ResponsePaginated.java b/src/main/java/com/candido/server/dto/v1/response/util/ResponsePaginated.java
+new file mode 100644
+index 0000000..ab8fd79
+--- /dev/null
++++ b/src/main/java/com/candido/server/dto/v1/response/util/ResponsePaginated.java
+@@ -0,0 +1,104 @@
++package com.candido.server.dto.v1.response.util;
++
++import com.fasterxml.jackson.annotation.JsonProperty;
++import lombok.AllArgsConstructor;
++import lombok.Data;
++import lombok.NoArgsConstructor;
++import org.springframework.data.domain.Page;
++import org.springframework.data.domain.Pageable;
++import org.springframework.data.domain.Sort;
++
++import java.util.List;
++
++@Data
++@AllArgsConstructor
++@NoArgsConstructor
++public class ResponsePaginated<T> {
++
++    @JsonProperty("content")
++    private List<T> content;
++
++    @JsonProperty("page_number")
++    private int pageNumber;
++
++    @JsonProperty("size")
++    private int size;
++
++    @JsonProperty("total_pages")
++    private int totalPages;
++
++    @JsonProperty("total_elements")
++    private long totalElements;
++
++    @JsonProperty("first")
++    private boolean first;
++
++    @JsonProperty("last")
++    private boolean last;
++
++    @JsonProperty("empty")
++    private boolean empty;
++
++    @JsonProperty("number_of_elements")
++    private int numberOfElements;
++
++    @JsonProperty("sort")
++    private SortResponse sort;
++
++    @JsonProperty("pageable")
++    private PageableResponse pageable;
++
++    @Data
++    @AllArgsConstructor
++    @NoArgsConstructor
++    public static class SortResponse {
++        private boolean sorted;
++        private boolean unsorted;
++        private boolean empty;
++    }
++
++    @Data
++    @AllArgsConstructor
++    @NoArgsConstructor
++    public static class PageableResponse {
++        private int pageNumber;
++        private int pageSize;
++        private long offset;
++        private boolean paged;
++        private boolean unpaged;
++        private SortResponse sort;
++    }
++
++    public static <T> ResponsePaginated<T> fromPage(Page<T> page) {
++        Sort sort = page.getPageable().getSort();
++        SortResponse sortResponse = new SortResponse(
++                sort.isSorted(),
++                sort.isUnsorted(),
++                sort.isEmpty()
++        );
++
++        Pageable pageable = page.getPageable();
++        PageableResponse pageableResponse = new PageableResponse(
++                pageable.getPageNumber(),
++                pageable.getPageSize(),
++                pageable.getOffset(),
++                pageable.isPaged(),
++                pageable.isUnpaged(),
++                sortResponse
++        );
++
++        return new ResponsePaginated<>(
++                page.getContent(),
++                page.getNumber(),
++                page.getSize(),
++                page.getTotalPages(),
++                page.getTotalElements(),
++                page.isFirst(),
++                page.isLast(),
++                page.isEmpty(),
++                page.getNumberOfElements(),
++                sortResponse,
++                pageableResponse
++        );
++    }
++}
+diff --git a/src/main/java/com/candido/server/security/config/ApplicationConfig.java b/src/main/java/com/candido/server/security/config/ApplicationConfig.java
+index bebcf8f..d271d11 100644
+--- a/src/main/java/com/candido/server/security/config/ApplicationConfig.java
++++ b/src/main/java/com/candido/server/security/config/ApplicationConfig.java
+@@ -22,9 +22,9 @@ public class ApplicationConfig {
+     private final AccountRepository accountRepository;
+ 
+     /**
+-     * Si occupa di cercare lo username nel database in base al nome utente.
++     * Defines the UserDetailsService used to load user information by username (email).
+      *
+-     * @return l'istanza di UserDetailsService configurata.
++     * @return the configured UserDetailsService instance.
+      */
+     @Bean
+     public UserDetailsService userDetailsService() {
+@@ -32,20 +32,19 @@ public class ApplicationConfig {
+             var account = accountRepository.findByEmail(username)
+                     .orElseThrow(() -> new UsernameNotFoundException(EnumExceptionName.ERROR_BUSINESS_ACCOUNT_NOT_FOUND.name()));
+ 
+-            if (!account.isEnabled())
++            if (!account.isEnabled()) {
+                 throw new ExceptionAuth("Error.");
++            }
+ 
+             return account;
+         };
+     }
+ 
+     /**
+-     * Si occupa di configurare l'oggetto AuthenticationProvider per la gestione dell'autenticazione.
+-     * Utilizza una implementazione di AuthenticationProvider tramite la classe DaoAuthenticationProvider.
+-     * Viene creata questa implementazione specificando i dettagli dell'utente e la funzione per
+-     * codificare la password.
++     * Configures the AuthenticationProvider using a DaoAuthenticationProvider implementation.
++     * It sets the user details service and the password encoder used for authentication.
+      *
+-     * @return l'istanza di AuthenticationProvider configurata.
++     * @return the configured AuthenticationProvider instance.
+      */
+     @Bean
+     public AuthenticationProvider authenticationProvider() {
+@@ -56,11 +55,11 @@ public class ApplicationConfig {
+     }
+ 
+     /**
+-     * Si occupa di gestire l'autenticazione fornendo dei metodi necessari per aiutarci ad autenticare
+-     * un utente solo con username e password.
++     * Provides the AuthenticationManager used for processing authentication requests.
+      *
+-     * @param config l'oggetto che detiene AuthenticationManager.
+-     * @return l'istanza di AuthenticationManager configurata.
++     * @param config the authentication configuration containing the manager.
++     * @return the configured AuthenticationManager instance.
++     * @throws Exception in case of error during retrieval.
+      */
+     @Bean
+     public AuthenticationManager authenticationManager(AuthenticationConfiguration config) throws Exception {
+@@ -68,9 +67,9 @@ public class ApplicationConfig {
+     }
+ 
+     /**
+-     * Si occupa di fornire il metodo di codifica della password.
++     * Provides the password encoder used to hash and verify user passwords.
+      *
+-     * @return l'istanza di PasswordEncoder configurata.
++     * @return the configured PasswordEncoder instance.
+      */
+     @Bean
+     public PasswordEncoder passwordEncoder() {
+diff --git a/src/main/java/com/candido/server/service/base/_common/pagination/PageRequestBuilder.java b/src/main/java/com/candido/server/service/base/_common/pagination/PageRequestBuilder.java
+new file mode 100644
+index 0000000..88c1a9b
+--- /dev/null
++++ b/src/main/java/com/candido/server/service/base/_common/pagination/PageRequestBuilder.java
+@@ -0,0 +1,17 @@
++package com.candido.server.service.base._common.pagination;
++
++import com.candido.server.dto.v1.request.util.RequestPagination;
++import org.springframework.data.domain.PageRequest;
++import org.springframework.data.domain.Pageable;
++import org.springframework.data.domain.Sort;
++
++public class PageRequestBuilder {
++    public static Pageable from(RequestPagination request) {
++        Sort.Direction direction = Sort.Direction.fromString(request.getDirection());
++        return PageRequest.of(
++                request.getPage(),
++                request.getSize(),
++                Sort.by(direction, request.getSortBy())
++        );
++    }
++}
+diff --git a/src/main/java/com/candido/server/service/base/account/AccountService.java b/src/main/java/com/candido/server/service/base/account/AccountService.java
+index afc07b8..f744bbc 100644
+--- a/src/main/java/com/candido/server/service/base/account/AccountService.java
++++ b/src/main/java/com/candido/server/service/base/account/AccountService.java
+@@ -7,10 +7,10 @@ import com.candido.server.dto.v1.util.AccountUserPairDto;
+ import java.util.Optional;
+ 
+ public interface AccountService {
+-    Optional<Account> findById(int accountId);
++    Optional<Account> findById(Long accountId);
+     Optional<Account> findByEmail(String email);
+     Account findAccountByEmailOrThrow(String email);
+-    Account findAccountByIdOrThrow(int accountId);
++    Account findAccountByIdOrThrow(Long accountId);
+     Account save(Account account);
+     Account activateAccount(Account account);
+ 
+diff --git a/src/main/java/com/candido/server/service/base/account/AccountServiceImpl.java b/src/main/java/com/candido/server/service/base/account/AccountServiceImpl.java
+index 1d2a191..9c7e39b 100644
+--- a/src/main/java/com/candido/server/service/base/account/AccountServiceImpl.java
++++ b/src/main/java/com/candido/server/service/base/account/AccountServiceImpl.java
+@@ -62,7 +62,7 @@ public class AccountServiceImpl implements AccountService {
+     }
+ 
+     @Override
+-    public Optional<Account> findById(int accountId) {
++    public Optional<Account> findById(Long accountId) {
+         return accountRepository.findById(accountId);
+     }
+ 
+@@ -84,7 +84,7 @@ public class AccountServiceImpl implements AccountService {
+     }
+ 
+     @Override
+-    public Account findAccountByIdOrThrow(int accountId) {
++    public Account findAccountByIdOrThrow(Long accountId) {
+         var account = findById(accountId).orElseThrow(() ->
+                 new ExceptionAccountNotFound(EnumExceptionName.ERROR_BUSINESS_ACCOUNT_NOT_FOUND.name(), "ID: " + accountId)
+         );
+diff --git a/src/main/java/com/candido/server/service/base/account/AccountSettingsService.java b/src/main/java/com/candido/server/service/base/account/AccountSettingsService.java
+index 9726559..c533b75 100644
+--- a/src/main/java/com/candido/server/service/base/account/AccountSettingsService.java
++++ b/src/main/java/com/candido/server/service/base/account/AccountSettingsService.java
+@@ -8,8 +8,8 @@ import java.util.Optional;
+ 
+ public interface AccountSettingsService {
+     Optional<AccountSettings> byKey(String key);
+-    List<XrefAccountSettings> getAllAccountSettings(int accountId);
+-    <T> void saveAccountSetting(int accountId, String key, T value);
++    List<XrefAccountSettings> getAllAccountSettings(Long accountId);
++    <T> void saveAccountSetting(Long accountId, String key, T value);
+     Optional<XrefAccountSettings> getAccountSetting(int accountId, String key);
+     void deleteAccountSetting(int accountId, String key);
+     void deleteAllAccountSettings(int accountId);
+diff --git a/src/main/java/com/candido/server/service/base/account/AccountSettingsServiceImpl.java b/src/main/java/com/candido/server/service/base/account/AccountSettingsServiceImpl.java
+index 90d5382..5dc06a0 100644
+--- a/src/main/java/com/candido/server/service/base/account/AccountSettingsServiceImpl.java
++++ b/src/main/java/com/candido/server/service/base/account/AccountSettingsServiceImpl.java
+@@ -44,7 +44,7 @@ public class AccountSettingsServiceImpl implements AccountSettingsService{
+     }
+ 
+     @Override
+-    public List<XrefAccountSettings> getAllAccountSettings(int accountId) {
++    public List<XrefAccountSettings> getAllAccountSettings(Long accountId) {
+         Specification<XrefAccountSettings> byAccountId = (root, query, criteriaBuilder) ->
+                 criteriaBuilder.equal(root.get(XrefAccountSettings_.ACCOUNT_ID), accountId);
+ 
+@@ -52,7 +52,7 @@ public class AccountSettingsServiceImpl implements AccountSettingsService{
+     }
+ 
+     @Override
+-    public <T> void saveAccountSetting(int accountId, String key, T value) {
++    public <T> void saveAccountSetting(Long accountId, String key, T value) {
+         Optional<AccountSettings> accountSettings = byKey(key);
+         if (accountSettings.isEmpty()) {
+             throw new ExceptionAccountSettingsKeyNotFound(
+diff --git a/src/main/java/com/candido/server/service/base/application/ApplicationService.java b/src/main/java/com/candido/server/service/base/application/ApplicationService.java
+index d52a2dd..d7ed0b3 100644
+--- a/src/main/java/com/candido/server/service/base/application/ApplicationService.java
++++ b/src/main/java/com/candido/server/service/base/application/ApplicationService.java
+@@ -1,14 +1,14 @@
+ package com.candido.server.service.base.application;
+ 
+ import com.candido.server.domain.v1.application.Application;
+-import com.candido.server.dto.v1.response.application.ResponseApplicationForm;
++import com.candido.server.dto.v1.response.opportunity.ResponseOpportunity;
+ import com.candido.server.dto.v1.response.application.ResponseUserApplication;
+ 
+ import java.util.List;
+ 
+ public interface ApplicationService {
+-    List<Application> getUserApplicationsByStatus(int accountId, int statusId);
+-    List<ResponseUserApplication> findAllByAccountId(int accountId, Integer statusId);
+-    List<ResponseApplicationForm> findAllApplicationsSavedByAccountId(int accountId);
+-    boolean userHasOpenApplications(int accountId);
++    List<Application> getUserApplicationsByStatus(Long accountId, int statusId);
++    List<ResponseUserApplication> findAllByAccountId(Long accountId, Integer statusId);
++    List<ResponseOpportunity> findAllApplicationsSavedByAccountId(Long accountId);
++    boolean userHasOpenApplications(Long accountId);
+ }
+diff --git a/src/main/java/com/candido/server/service/base/application/ApplicationServiceImpl.java b/src/main/java/com/candido/server/service/base/application/ApplicationServiceImpl.java
+index 8218805..0c3acc9 100644
+--- a/src/main/java/com/candido/server/service/base/application/ApplicationServiceImpl.java
++++ b/src/main/java/com/candido/server/service/base/application/ApplicationServiceImpl.java
+@@ -1,7 +1,8 @@
+ package com.candido.server.service.base.application;
+ 
+ import com.candido.server.domain.v1.application.*;
+-import com.candido.server.dto.v1.response.application.ResponseApplicationForm;
++import com.candido.server.domain.v1.opportunity.XrefAccountOpportunitySavedRepository;
++import com.candido.server.dto.v1.response.opportunity.ResponseOpportunity;
+ import com.candido.server.dto.v1.response.application.ResponseUserApplication;
+ import org.springframework.beans.factory.annotation.Autowired;
+ import org.springframework.data.jpa.domain.Specification;
+@@ -13,19 +14,19 @@ import java.util.List;
+ public class ApplicationServiceImpl implements ApplicationService {
+ 
+     private final ApplicationRepository applicationRepository;
+-    private final XrefAccountApplicationSavedRepository xrefAccountApplicationSavedRepository;
++    private final XrefAccountOpportunitySavedRepository xrefAccountOpportunitySavedRepository;
+ 
+     @Autowired
+     public ApplicationServiceImpl(
+             ApplicationRepository applicationRepository,
+-            XrefAccountApplicationSavedRepository xrefAccountApplicationSavedRepository
++            XrefAccountOpportunitySavedRepository xrefAccountOpportunitySavedRepository
+     ) {
+         this.applicationRepository = applicationRepository;
+-        this.xrefAccountApplicationSavedRepository = xrefAccountApplicationSavedRepository;
++        this.xrefAccountOpportunitySavedRepository = xrefAccountOpportunitySavedRepository;
+     }
+ 
+     @Override
+-    public List<Application> getUserApplicationsByStatus(int accountId, int statusId) {
++    public List<Application> getUserApplicationsByStatus(Long accountId, int statusId) {
+         Specification<Application> byStatus = (root, query, criteriaBuilder) -> criteriaBuilder.and(
+                 criteriaBuilder.equal(root.get(Application_.ACCOUNT_ID), accountId),
+                 criteriaBuilder.equal(root.get(Application_.APPLICATION_STATUS_ID), statusId)
+@@ -34,7 +35,7 @@ public class ApplicationServiceImpl implements ApplicationService {
+     }
+ 
+     @Override
+-    public List<ResponseUserApplication> findAllByAccountId(int accountId, Integer statusId) {
++    public List<ResponseUserApplication> findAllByAccountId(Long accountId, Integer statusId) {
+         if(statusId != null) {
+             return getUserApplicationsByStatus(accountId, statusId)
+                     .stream().map(ResponseUserApplication::mapToResponseUserApplication).toList();
+@@ -43,18 +44,18 @@ public class ApplicationServiceImpl implements ApplicationService {
+     }
+ 
+     @Override
+-    public List<ResponseApplicationForm> findAllApplicationsSavedByAccountId(int accountId) {
+-        return xrefAccountApplicationSavedRepository.findAllByAccountId(accountId)
++    public List<ResponseOpportunity> findAllApplicationsSavedByAccountId(Long accountId) {
++        return xrefAccountOpportunitySavedRepository.findAllByIdAccountId(accountId)
+                 .stream()
+                 .map(xrefAccountApplicationSaved ->
+-                        ResponseApplicationForm.mapToResponseApplicationForm(
+-                                xrefAccountApplicationSaved.getApplicationForm()
++                        ResponseOpportunity.mapToResponseOpportunity(
++                                xrefAccountApplicationSaved.getOpportunity()
+                         )
+                 ).toList();
+     }
+ 
+     @Override
+-    public boolean userHasOpenApplications(int accountId) {
++    public boolean userHasOpenApplications(Long accountId) {
+         return !getUserApplicationsByStatus(accountId, EnumApplicationStatus.IN_PROGRESS.getStatusId()).isEmpty();
+     }
+ }
+diff --git a/src/main/java/com/candido/server/service/base/auth/provider/AuthProviderService.java b/src/main/java/com/candido/server/service/base/auth/provider/AuthProviderService.java
+index f61d75c..45b4ad5 100644
+--- a/src/main/java/com/candido/server/service/base/auth/provider/AuthProviderService.java
++++ b/src/main/java/com/candido/server/service/base/auth/provider/AuthProviderService.java
+@@ -1,5 +1,5 @@
+ package com.candido.server.service.base.auth.provider;
+ 
+ public interface AuthProviderService {
+-    void addProviderToAccount(int providerId, int accountId);
++    void addProviderToAccount(int providerId, Long accountId);
+ }
+diff --git a/src/main/java/com/candido/server/service/base/auth/provider/AuthProviderServiceImpl.java b/src/main/java/com/candido/server/service/base/auth/provider/AuthProviderServiceImpl.java
+index 9567580..a688cd8 100644
+--- a/src/main/java/com/candido/server/service/base/auth/provider/AuthProviderServiceImpl.java
++++ b/src/main/java/com/candido/server/service/base/auth/provider/AuthProviderServiceImpl.java
+@@ -14,7 +14,7 @@ public class AuthProviderServiceImpl implements AuthProviderService {
+     }
+ 
+     @Override
+-    public void addProviderToAccount(int providerId, int accountId) {
++    public void addProviderToAccount(int providerId, Long accountId) {
+         var providerRelation = XrefAccountProvider
+                 .builder()
+                 .providerId(providerId)
+diff --git a/src/main/java/com/candido/server/service/base/auth/token/TokenService.java b/src/main/java/com/candido/server/service/base/auth/token/TokenService.java
+index 1179591..3b969f7 100644
+--- a/src/main/java/com/candido/server/service/base/auth/token/TokenService.java
++++ b/src/main/java/com/candido/server/service/base/auth/token/TokenService.java
+@@ -13,7 +13,7 @@ public interface TokenService {
+     Optional<Token> findByAccessToken(String accessToken);
+     Optional<Token> findByRefreshToken(String refreshToken);
+     Optional<Token> findByUUIDAndTokenScopeCategoryId(String uuid, int tokenScopeCategoryId);
+-    Optional<Token> findByAccountIdAndTokenScopeCategoryId(int accountId, int tokenScopeCategoryId);
++    Optional<Token> findByAccountIdAndTokenScopeCategoryId(Long accountId, int tokenScopeCategoryId);
+     Optional<Token> findByAccessTokenAndTokenScopeCategoryId(String accessToken, int tokenScopeCategoryId);
+ 
+     Token findTokenByUUIDAndTokenScopeCategoryIdOrThrow(String uuid, int tokenScopeCategoryId);
+@@ -31,7 +31,7 @@ public interface TokenService {
+ 
+     void delete(Token token);
+ 
+-    List<Token> findAllValidTokenByUser(Integer accountId);
++    List<Token> findAllValidTokenByUser(Long accountId);
+ 
+     void revokeAllAccountTokens(Account account);
+     void revokeAllAccountTokensByTokenScopeCategoryId(Account account, int tokenScopeCategoryId);
+diff --git a/src/main/java/com/candido/server/service/base/auth/token/TokenServiceImpl.java b/src/main/java/com/candido/server/service/base/auth/token/TokenServiceImpl.java
+index 321feb4..e4280f9 100644
+--- a/src/main/java/com/candido/server/service/base/auth/token/TokenServiceImpl.java
++++ b/src/main/java/com/candido/server/service/base/auth/token/TokenServiceImpl.java
+@@ -28,7 +28,7 @@ import java.util.concurrent.locks.ReentrantLock;
+ @Transactional(isolation = Isolation.SERIALIZABLE)
+ public class TokenServiceImpl implements TokenService {
+ 
+-    private final ConcurrentHashMap<Integer, ReentrantLock> userLocks = new ConcurrentHashMap<>();
++    private final ConcurrentHashMap<Long, ReentrantLock> userLocks = new ConcurrentHashMap<>();
+ 
+     private final JwtService jwtService;
+ 
+@@ -66,7 +66,7 @@ public class TokenServiceImpl implements TokenService {
+     }
+ 
+     @Override
+-    public Optional<Token> findByAccountIdAndTokenScopeCategoryId(int accountId, int tokenScopeCategoryId) {
++    public Optional<Token> findByAccountIdAndTokenScopeCategoryId(Long accountId, int tokenScopeCategoryId) {
+         return tokenRepository.findByAccountIdAndTokenScopeCategoryId(accountId, tokenScopeCategoryId);
+     }
+ 
+@@ -149,7 +149,7 @@ public class TokenServiceImpl implements TokenService {
+     }
+ 
+     @Override
+-    public List<Token> findAllValidTokenByUser(Integer accountId) {
++    public List<Token> findAllValidTokenByUser(Long accountId) {
+         return tokenRepository.findAllByAccountId(accountId);
+     }
+ 
+diff --git a/src/main/java/com/candido/server/service/base/geo/AddressService.java b/src/main/java/com/candido/server/service/base/geo/AddressService.java
+index 252234c..adee30b 100644
+--- a/src/main/java/com/candido/server/service/base/geo/AddressService.java
++++ b/src/main/java/com/candido/server/service/base/geo/AddressService.java
+@@ -10,10 +10,10 @@ import java.util.Optional;
+ public interface AddressService {
+     Optional<Address> findActiveAddressBySpecification(Specification<Address> specification);
+     List<Address> findAllActiveAddressBySpecification(Specification<Address> specification);
+-    List<Address> getAllActiveAddressesByUserId(Integer userId);
++    List<Address> getAllActiveAddressesByUserId(Long userId);
+     Optional<Address> getActiveAddressById(Integer addressId);
+-    Address getActiveAddressByIdAndUserIdOrThrow(Integer addressId, Integer userId);
+-    Address saveAddress(int userId, Integer addressId, RequestAddress requestAddress);
++    Address getActiveAddressByIdAndUserIdOrThrow(Integer addressId, Long userId);
++    Address saveAddress(Long userId, Integer addressId, RequestAddress requestAddress);
+     void deleteAddress(Integer addressId);
+-    Address setPrimaryAddress(Integer userId, Integer addressId);
++    Address setPrimaryAddress(Long userId, Integer addressId);
+ }
+diff --git a/src/main/java/com/candido/server/service/base/geo/AddressServiceImpl.java b/src/main/java/com/candido/server/service/base/geo/AddressServiceImpl.java
+index 5518537..2a5d146 100644
+--- a/src/main/java/com/candido/server/service/base/geo/AddressServiceImpl.java
++++ b/src/main/java/com/candido/server/service/base/geo/AddressServiceImpl.java
+@@ -50,7 +50,7 @@ public class AddressServiceImpl implements AddressService {
+     }
+ 
+     @Override
+-    public List<Address> getAllActiveAddressesByUserId(Integer userId) {
++    public List<Address> getAllActiveAddressesByUserId(Long userId) {
+         return userId != null ? findAllActiveAddressBySpecification(
+                 AddressSpecifications.byUserId(userId)
+         ) : List.of();
+@@ -64,7 +64,7 @@ public class AddressServiceImpl implements AddressService {
+     }
+ 
+     @Override
+-    public Address getActiveAddressByIdAndUserIdOrThrow(Integer addressId, Integer userId) {
++    public Address getActiveAddressByIdAndUserIdOrThrow(Integer addressId, Long userId) {
+         if (addressId == null || addressId == 0 || userId == null || userId == 0)
+             throw new ExceptionAddressNotFound(EnumExceptionName.ERROR_BUSINESS_ADDRESS_NOT_FOUND.name());
+ 
+@@ -74,7 +74,7 @@ public class AddressServiceImpl implements AddressService {
+ 
+     @Override
+     @Transactional
+-    public Address saveAddress(int userId, Integer addressId, RequestAddress request) {
++    public Address saveAddress(Long userId, Integer addressId, RequestAddress request) {
+         validateRequest(request);
+         LocalDateTime now = LocalDateTime.now();
+ 
+@@ -109,7 +109,7 @@ public class AddressServiceImpl implements AddressService {
+     }
+ 
+     @Override
+-    public Address setPrimaryAddress(Integer userId, Integer addressId) {
++    public Address setPrimaryAddress(Long userId, Integer addressId) {
+         Address address = getActiveAddressById(addressId).orElseThrow(() -> new ExceptionAddressNotFound(
+                 EnumExceptionName.ERROR_BUSINESS_ADDRESS_NOT_FOUND.name()
+         ));
+@@ -129,7 +129,7 @@ public class AddressServiceImpl implements AddressService {
+      * @param addressId The ID of the address being updated, or null if creating a new one.
+      * @param isPrimary Whether the address should be set as primary.
+      */
+-    private void enforcePrimaryConsistency(int userId, Address address, Integer addressId, boolean isPrimary) {
++    private void enforcePrimaryConsistency(Long userId, Address address, Integer addressId, boolean isPrimary) {
+         List<Address> userAddresses = getAllActiveAddressesByUserId(userId);
+         boolean hasOtherPrimary = userAddresses.stream()
+                 .filter(a -> addressId == null || a.getAddressId() != addressId)
+@@ -168,7 +168,7 @@ public class AddressServiceImpl implements AddressService {
+      *
+      * @param userId The ID of the user whose addresses are being managed.
+      */
+-    private void promoteAnotherPrimary(int userId) {
++    private void promoteAnotherPrimary(Long userId) {
+         getAllActiveAddressesByUserId(userId).stream()
+                 .filter(a -> !a.getIsPrimary())
+                 .findFirst()
+@@ -206,7 +206,7 @@ public class AddressServiceImpl implements AddressService {
+      * @param request The RequestAddress DTO containing the data.
+      * @param userId  The ID of the user associated with this address.
+      */
+-    private void mapRequestToAddress(Address address, RequestAddress request, int userId) {
++    private void mapRequestToAddress(Address address, RequestAddress request, Long userId) {
+         address.setUserId(userId);
+         address.setTerritoryId(request.territoryId());
+         address.setStreet(request.street());
+diff --git a/src/main/java/com/candido/server/service/base/geo/specifications/AddressSpecifications.java b/src/main/java/com/candido/server/service/base/geo/specifications/AddressSpecifications.java
+index f11c7c5..d100ccc 100644
+--- a/src/main/java/com/candido/server/service/base/geo/specifications/AddressSpecifications.java
++++ b/src/main/java/com/candido/server/service/base/geo/specifications/AddressSpecifications.java
+@@ -10,7 +10,7 @@ public class AddressSpecifications {
+         return (root, query, cb) -> cb.equal(root.get(Address_.ADDRESS_ID), addressId);
+     }
+ 
+-    public static Specification<Address> byUserId(Integer userId) {
++    public static Specification<Address> byUserId(Long userId) {
+         return (root, query, cb) -> cb.equal(root.get(Address_.USER_ID), userId);
+     }
+ 
+@@ -22,11 +22,11 @@ public class AddressSpecifications {
+         return (root, query, cb) -> cb.isNull(root.get(Address_.DELETED_AT));
+     }
+ 
+-    public static Specification<Address> byIdAndUserId(Integer addressId, Integer userId) {
++    public static Specification<Address> byIdAndUserId(Integer addressId, Long userId) {
+         return Specification.where(byId(addressId)).and(byUserId(userId));
+     }
+ 
+-    public static Specification<Address> byUserIdAndIsPrimary(Integer userId) {
++    public static Specification<Address> byUserIdAndIsPrimary(Long userId) {
+         return Specification.where(byUserId(userId)).and(isPrimary());
+     }
+ }
+diff --git a/src/main/java/com/candido/server/service/base/opportunity/OpportunityService.java b/src/main/java/com/candido/server/service/base/opportunity/OpportunityService.java
+new file mode 100644
+index 0000000..873624f
+--- /dev/null
++++ b/src/main/java/com/candido/server/service/base/opportunity/OpportunityService.java
+@@ -0,0 +1,9 @@
++package com.candido.server.service.base.opportunity;
++
++import com.candido.server.domain.v1.opportunity.Opportunity;
++import org.springframework.data.domain.Page;
++import org.springframework.data.domain.Pageable;
++
++public interface OpportunityService {
++    Page<Opportunity> findAll(Pageable pageable);
++}
+\ No newline at end of file
+diff --git a/src/main/java/com/candido/server/service/base/opportunity/OpportunityServiceImpl.java b/src/main/java/com/candido/server/service/base/opportunity/OpportunityServiceImpl.java
+new file mode 100644
+index 0000000..635bee4
+--- /dev/null
++++ b/src/main/java/com/candido/server/service/base/opportunity/OpportunityServiceImpl.java
+@@ -0,0 +1,25 @@
++package com.candido.server.service.base.opportunity;
++
++import com.candido.server.domain.v1.opportunity.Opportunity;
++import com.candido.server.domain.v1.opportunity.OpportunityRepository;
++import org.springframework.beans.factory.annotation.Autowired;
++import org.springframework.data.domain.Page;
++import org.springframework.data.domain.Pageable;
++import org.springframework.stereotype.Service;
++
++@Service
++public class OpportunityServiceImpl implements OpportunityService {
++
++    private final OpportunityRepository opportunityRepository;
++
++    @Autowired
++    public OpportunityServiceImpl(OpportunityRepository opportunityRepository) {
++        this.opportunityRepository = opportunityRepository;
++    }
++
++    @Override
++    public Page<Opportunity> findAll(Pageable pageable) {
++        return opportunityRepository.findAll(pageable);
++    }
++}
++
+diff --git a/src/main/java/com/candido/server/service/base/user/UserService.java b/src/main/java/com/candido/server/service/base/user/UserService.java
+index 2929e7e..3cefc93 100644
+--- a/src/main/java/com/candido/server/service/base/user/UserService.java
++++ b/src/main/java/com/candido/server/service/base/user/UserService.java
+@@ -8,8 +8,8 @@ import java.util.Optional;
+ 
+ public interface UserService {
+     User getAuthenticatedUser(Authentication authentication);
+-    Optional<User> findUserByAccountId(int accountId);
+-    User findUserByAccountIdOrThrow(int accountId);
++    Optional<User> findUserByAccountId(Long accountId);
++    User findUserByAccountIdOrThrow(Long accountId);
+     User save(User user);
+     User save(User user, RequestUpdateUser requestUpdateUser, boolean canChangeName);
+ }
+diff --git a/src/main/java/com/candido/server/service/base/user/UserServiceImpl.java b/src/main/java/com/candido/server/service/base/user/UserServiceImpl.java
+index 607b448..a5f9cb0 100644
+--- a/src/main/java/com/candido/server/service/base/user/UserServiceImpl.java
++++ b/src/main/java/com/candido/server/service/base/user/UserServiceImpl.java
+@@ -37,14 +37,14 @@ public class UserServiceImpl implements UserService {
+     }
+ 
+     @Override
+-    public Optional<User> findUserByAccountId(int accountId) {
++    public Optional<User> findUserByAccountId(Long accountId) {
+         Specification<User> byAccountId = ((root, query, criteriaBuilder) ->
+                 criteriaBuilder.equal(root.get(User_.ACCOUNT_ID), accountId));
+         return userRepository.findOne(byAccountId);
+     }
+ 
+     @Override
+-    public User findUserByAccountIdOrThrow(int accountId) {
++    public User findUserByAccountIdOrThrow(Long accountId) {
+         return findUserByAccountId(accountId)
+                 .orElseThrow(() -> new ExceptionAccountNotFound(EnumExceptionName.ERROR_BUSINESS_USER_NOT_FOUND.name()));
+     }
+diff --git a/src/main/java/com/candido/server/service/business/opportunity/BusinessOpportunityService.java b/src/main/java/com/candido/server/service/business/opportunity/BusinessOpportunityService.java
+new file mode 100644
+index 0000000..33020a8
+--- /dev/null
++++ b/src/main/java/com/candido/server/service/business/opportunity/BusinessOpportunityService.java
+@@ -0,0 +1,9 @@
++package com.candido.server.service.business.opportunity;
++
++import com.candido.server.dto.v1.response.opportunity.ResponseOpportunity;
++import com.candido.server.dto.v1.request.util.RequestPagination;
++import com.candido.server.dto.v1.response.util.ResponsePaginated;
++
++public interface BusinessOpportunityService {
++    ResponsePaginated<ResponseOpportunity> getAllOpportunities(RequestPagination paginationRequest);
++}
+diff --git a/src/main/java/com/candido/server/service/business/opportunity/BusinessOpportunityServiceImpl.java b/src/main/java/com/candido/server/service/business/opportunity/BusinessOpportunityServiceImpl.java
+new file mode 100644
+index 0000000..d7c502b
+--- /dev/null
++++ b/src/main/java/com/candido/server/service/business/opportunity/BusinessOpportunityServiceImpl.java
+@@ -0,0 +1,32 @@
++package com.candido.server.service.business.opportunity;
++
++import com.candido.server.domain.v1.opportunity.Opportunity;
++import com.candido.server.dto.v1.response.opportunity.ResponseOpportunity;
++import com.candido.server.dto.v1.request.util.RequestPagination;
++import com.candido.server.dto.v1.response.util.ResponsePaginated;
++import com.candido.server.service.base._common.pagination.PageRequestBuilder;
++import com.candido.server.service.base.opportunity.OpportunityService;
++import org.springframework.beans.factory.annotation.Autowired;
++import org.springframework.data.domain.Page;
++import org.springframework.data.domain.PageRequest;
++import org.springframework.data.domain.Pageable;
++import org.springframework.data.domain.Sort;
++import org.springframework.stereotype.Service;
++
++@Service
++public class BusinessOpportunityServiceImpl implements BusinessOpportunityService {
++
++    private final OpportunityService opportunityService;
++
++    @Autowired
++    public BusinessOpportunityServiceImpl(OpportunityService opportunityService) {
++        this.opportunityService = opportunityService;
++    }
++
++    @Override
++    public ResponsePaginated<ResponseOpportunity> getAllOpportunities(RequestPagination paginationRequest) {
++        Pageable pageable = PageRequestBuilder.from(paginationRequest);
++        Page<Opportunity> page = opportunityService.findAll(pageable);
++        return ResponsePaginated.fromPage(page.map(ResponseOpportunity::mapToResponseOpportunity));
++    }
++}
+diff --git a/src/main/java/com/candido/server/validation/annotations/ownership/OwnershipAspect.java b/src/main/java/com/candido/server/validation/annotations/ownership/OwnershipAspect.java
+index 7ec112a..bcabd82 100644
+--- a/src/main/java/com/candido/server/validation/annotations/ownership/OwnershipAspect.java
++++ b/src/main/java/com/candido/server/validation/annotations/ownership/OwnershipAspect.java
+@@ -43,13 +43,13 @@ public class OwnershipAspect {
+         OwnershipLoader<?> loader = applicationContext.getBean(loaderClass);
+         Ownable entity = loader.loadById(id);
+ 
+-        Integer currentUserId = getCurrentUserId();
++        Long currentUserId = getCurrentUserId();
+         if (!entity.getOwnerId().equals(currentUserId)) {
+             throw new ExceptionForbidden(EnumExceptionName.ERROR_AUTH_FORBIDDEN.name());
+         }
+     }
+ 
+-    private Integer getCurrentUserId() {
++    private Long getCurrentUserId() {
+         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+         Account account = (Account) auth.getPrincipal();
+         return account.getId();
+diff --git a/src/main/resources/application-dev.yml b/src/main/resources/application-dev.yml
+index 3f2a42d..b239667 100644
+--- a/src/main/resources/application-dev.yml
++++ b/src/main/resources/application-dev.yml
+@@ -87,7 +87,7 @@ spring:
+         show-sql: true
+         properties:
+             hibernate:
+-                generate_statistics: true
++                generate_statistics: false
+ 
+                 # PLEASE, DO NOT CHANGE THIS PROPERTY - DEFAULT SCHEMA IS PUBLIC, but we are using a custom schema
+                 default_schema: ${DB_NAME}
+@@ -110,5 +110,6 @@ management:
+         distribution:
+             percentiles-histogram:
+                 all: true
++                hibernate.query.execution.max: false
+             percentiles:
+                 all: [0.5, 0.75, 0.95, 0.99]
+\ No newline at end of file
+diff --git a/src/main/resources/db/dummy-data/R__dev_dummy_data.sql b/src/main/resources/db/dummy-data/R__dev_dummy_data.sql
+new file mode 100644
+index 0000000..7b38adc
+--- /dev/null
++++ b/src/main/resources/db/dummy-data/R__dev_dummy_data.sql
+@@ -0,0 +1,171 @@
++-- Insert dummy accounts
++INSERT INTO candido.account (
++    fk_account_role_id,
++    fk_account_status_id,
++    email,
++    password,
++    created_at,
++    deleted_at
++)
++VALUES
++    (2, 2, 'admin@candidocorp.com', '', now(), null),
++    (2, 2, 'client@candidocorp.com', '', now(), null)
++ON CONFLICT (email) DO NOTHING;
++
++
++DO $$
++    DECLARE
++        account_id_admin BIGINT;
++        currency_id_eur BIGINT;
++        opportunity_type_job BIGINT;
++        opportunity_status_published BIGINT;
++        location_type_remote BIGINT;
++        opportunity_level_entry BIGINT;
++    BEGIN
++        -- Account admin
++        SELECT account_id INTO account_id_admin FROM candido.account WHERE email = 'admin@candidocorp.com';
++
++        -- Foreign keys
++        SELECT currency_id INTO currency_id_eur FROM currency WHERE code = 'EUR';
++        SELECT opportunity_type_id INTO opportunity_type_job FROM opportunity_type WHERE key = 'job';
++        SELECT opportunity_status_id INTO opportunity_status_published FROM opportunity_status WHERE key = 'published';
++        SELECT location_type_id INTO location_type_remote FROM location_type WHERE key = 'remote';
++        SELECT opportunity_level_id INTO opportunity_level_entry FROM opportunity_level WHERE key = 'entry';
++
++        -- Dummy data
++        INSERT INTO opportunity (
++            fk_account_id,
++            display_name,
++            notes,
++            max_applicants,
++            form_schema,
++            url_code,
++            start_date,
++            end_date,
++            created_at,
++            updated_at,
++            deleted_at,
++            feedback_publication_date,
++            feedback_expiration_date,
++            description,
++            compensation_amount,
++            compensation_note,
++            fk_currency_id,
++            fk_territory_id,
++            fk_location_type_id,
++            fk_opportunity_type_id,
++            fk_opportunity_status_id,
++            fk_opportunity_level_id
++        ) VALUES
++              (account_id_admin, 'Software Engineer Intern', 'Entry internship', 10, '{"fields":[{"label":"CV","type":"file"}]}', 'ABCD', '2024-01-01', '2024-01-31', now(), now(), null, '2024-02-10', '2024-02-20', 'Internship in software development.', 800.00, 'Monthly stipend', currency_id_eur, 1, location_type_remote, opportunity_type_job, opportunity_status_published, opportunity_level_entry),
++              (account_id_admin, 'Backend Developer', 'Looking for backend devs', 5, '{"fields":[{"label":"GitHub","type":"text"}]}', 'EFGH', '2024-02-01', '2024-02-15', now(), now(), null, '2024-02-20', '2024-03-01', 'Develop backend APIs in Java.', 3000.00, 'Full-time compensation', currency_id_eur, 1, location_type_remote, opportunity_type_job, opportunity_status_published, opportunity_level_entry),
++              (account_id_admin, 'Frontend Developer', 'Vue/React needed', 7, '{"fields":[{"label":"Portfolio","type":"url"}]}', 'IJKL', '2024-02-05', '2024-02-25', now(), now(), null, '2024-03-01', '2024-03-15', 'Frontend UI/UX engineer role.', 2800.00, 'Salary + bonus', currency_id_eur, 1, location_type_remote, opportunity_type_job, opportunity_status_published, opportunity_level_entry),
++              (account_id_admin, 'Full Stack Bootcamp', 'Training opportunity', 25, '{"fields":[{"label":"Motivation","type":"text"}]}', 'MNOP', '2024-03-01', '2024-03-20', now(), now(), null, '2024-03-30', '2024-04-15', 'Join our full-stack bootcamp and get hired.', 0.00, 'Free training', currency_id_eur, 1, location_type_remote, opportunity_type_job, opportunity_status_published, opportunity_level_entry),
++              (account_id_admin, 'DevOps Role', 'Kubernetes + CI/CD', 3, '{"fields":[{"label":"Experience","type":"textarea"}]}', 'QRST', '2024-03-10', '2024-03-25', now(), now(), null, '2024-03-28', '2024-04-10', 'We need a skilled DevOps engineer.', 3500.00, 'Includes relocation', currency_id_eur, 1, location_type_remote, opportunity_type_job, opportunity_status_published, opportunity_level_entry),
++              (account_id_admin, 'AI Challenge 2024', 'Competition format', 100, '{"fields":[{"label":"Team Name","type":"text"}]}', 'UVWX', '2024-04-01', '2024-04-15', now(), now(), null, '2024-04-30', '2024-05-15', 'Compete in solving real-world AI problems.', 5000.00, 'Prize money', currency_id_eur, 1, location_type_remote, opportunity_type_job, opportunity_status_published, opportunity_level_entry),
++              (account_id_admin, 'Data Science Intern', 'Data internship', 4, '{"fields":[{"label":"Why Data?","type":"text"}]}', 'YZ12', '2024-05-01', '2024-05-20', now(), now(), null, '2024-05-30', '2024-06-10', 'Analyze datasets, build ML models.', 900.00, 'Monthly stipend', currency_id_eur, 1, location_type_remote, opportunity_type_job, opportunity_status_published, opportunity_level_entry),
++              (account_id_admin, 'Cybersecurity Role', 'Security analyst', 2, '{"fields":[{"label":"Certifications","type":"text"}]}', '3456', '2024-06-01', '2024-06-15', now(), now(), null, '2024-06-20', '2024-07-01', 'Protect infrastructure and monitor threats.', 4000.00, 'High responsibility', currency_id_eur, 1, location_type_remote, opportunity_type_job, opportunity_status_published, opportunity_level_entry),
++              (account_id_admin, 'UX/UI Designer', 'Design-focused', 6, '{"fields":[{"label":"Design samples","type":"file"}]}', '7890', '2024-06-10', '2024-06-30', now(), now(), null, '2024-07-05', '2024-07-20', 'Focus on UI/UX improvements.', 2700.00, 'Plus hardware budget', currency_id_eur, 1, location_type_remote, opportunity_type_job, opportunity_status_published, opportunity_level_entry),
++              (account_id_admin, 'Product Manager', 'Junior PM wanted', 1, '{"fields":[{"label":"PM Experience","type":"textarea"}]}', '1122', '2024-07-01', '2024-07-20', now(), now(), null, '2024-07-25', '2024-08-10', 'Assist in product lifecycle and roadmap.', 3200.00, 'Flexible hours', currency_id_eur, 1, location_type_remote, opportunity_type_job, opportunity_status_published, opportunity_level_entry)
++        ON CONFLICT DO NOTHING;
++    END;
++$$ LANGUAGE plpgsql;
++
++
++DO $$
++    DECLARE
++        accountId_client bigint;
++        opportunityIdOne bigint;
++        opportunityIdTwo bigint;
++        opportunityIdThree bigint;
++    BEGIN
++        SELECT account_id INTO accountId_client FROM candido.account WHERE email = 'client@candidocorp.com';
++
++        SELECT opportunity_id INTO opportunityIdOne FROM candido.opportunity WHERE url_code = 'ABCD';
++        SELECT opportunity_id INTO opportunityIdTwo FROM candido.opportunity WHERE url_code = 'EFGH';
++        SELECT opportunity_id INTO opportunityIdThree FROM candido.opportunity WHERE url_code = 'IJKL';
++
++        IF opportunityIdOne IS NOT NULL AND opportunityIdTwo IS NOT NULL AND opportunityIdThree IS NOT NULL THEN
++            INSERT INTO candido.application (
++                application_id,
++                fk_account_id,
++                fk_opportunity_id,
++                fk_application_status_id,
++                filled_body,
++                progress,
++                created_at,
++                updated_at,
++                deleted_at,
++                sent_at
++            )
++            VALUES
++                (1, accountId_client, opportunityIdOne, 1, '{}', 50, '2023-05-13 10:15:00', '2023-05-14 11:20:00', NULL, NULL),
++                (2, accountId_client, opportunityIdTwo, 2, '{}', 100, '2023-09-22 09:30:00', '2024-01-10 14:45:00', NULL, '2024-01-10 14:45:00'),
++                (3, accountId_client, opportunityIdThree, 3, '{}', 100, '2024-03-01 09:00:00', '2024-03-02 10:00:00', NULL, '2024-03-02 10:00:00'),
++                (4, accountId_client, opportunityIdOne, 4, '{}', 100, '2024-07-15 08:00:00', '2024-07-15 15:00:00', NULL, '2024-07-15 15:00:00'),
++                (5, accountId_client, opportunityIdTwo, 5, '{}', 98, '2025-01-28 07:00:00', '2025-01-29 08:00:00', NULL, NULL)
++            ON CONFLICT (application_id) DO NOTHING;
++        END IF;
++    END;
++$$ LANGUAGE plpgsql;
++
++
++DO $$
++    DECLARE
++        accountId_admin   bigint;
++        accountId_client  bigint;
++    BEGIN
++        -- Fetch account IDs
++        SELECT account_id INTO accountId_admin FROM candido.account WHERE email = 'admin@candidocorp.com';
++        SELECT account_id INTO accountId_client FROM candido.account WHERE email = 'client@candidocorp.com';
++
++-- Insert users
++        INSERT INTO candido."user" (
++            fk_account_id,
++            fk_gender_id,
++            first_name,
++            last_name,
++            birth_date,
++            mobile_number,
++            phone_number,
++            last_modified_name,
++            created_at,
++            deleted_at
++        )
++        VALUES
++            (accountId_admin, 1, 'Admin', 'Doe', '1998-04-15', '12345678', '', NULL, now(), NULL),
++            (accountId_client, 1, 'Client', 'Ino', '1975-10-22', '999999999', '3458483720', NULL, now(), NULL)
++        ON CONFLICT DO NOTHING;
++    END;
++$$ LANGUAGE plpgsql;
++
++
++DO $$
++    DECLARE
++        accountId_client bigint;
++        opportunityIdOne bigint;
++        opportunityIdTwo bigint;
++        opportunityIdThree bigint;
++    BEGIN
++        -- Get account ID
++        SELECT account_id INTO accountId_client FROM candido.account WHERE email = 'client@candidocorp.com';
++
++        -- Get opportunity IDs by url_code
++        SELECT opportunity_id INTO opportunityIdOne FROM candido.opportunity WHERE url_code = 'ABCD';
++        SELECT opportunity_id INTO opportunityIdTwo FROM candido.opportunity WHERE url_code = 'EFGH';
++        SELECT opportunity_id INTO opportunityIdThree FROM candido.opportunity WHERE url_code = 'IJKL';
++
++        -- Insert saved opportunities
++        INSERT INTO candido.xref_account_opportunity_saved (
++            fk_account_id,
++            fk_opportunity_id,
++            saved_at
++        )
++        VALUES
++            (accountId_client, opportunityIdOne, '2023-05-13 10:15:00'),
++            (accountId_client, opportunityIdTwo, '2023-09-22 09:30:00'),
++            (accountId_client, opportunityIdThree, '2024-03-01 09:00:00')
++        ON CONFLICT DO NOTHING;
++    END;
++$$ LANGUAGE plpgsql;
++
+diff --git a/src/main/resources/db/dummy-data/R__insert_accounts.sql b/src/main/resources/db/dummy-data/R__insert_accounts.sql
+deleted file mode 100644
+index 64e3d2a..0000000
+--- a/src/main/resources/db/dummy-data/R__insert_accounts.sql
++++ /dev/null
+@@ -1,13 +0,0 @@
+--- Insert dummy accounts
+-INSERT INTO candido.account (
+-    fk_account_role_id,
+-    fk_account_status_id,
+-    email,
+-    password,
+-    created_at,
+-    deleted_at
+-)
+-VALUES
+-    (2, 2, 'admin@candidocorp.com', '', now(), null),
+-    (2, 2, 'client@candidocorp.com', '', now(), null)
+-    ON CONFLICT (email) DO NOTHING;
+diff --git a/src/main/resources/db/dummy-data/R__insert_application_forms.sql b/src/main/resources/db/dummy-data/R__insert_application_forms.sql
+deleted file mode 100644
+index 14bfe77..0000000
+--- a/src/main/resources/db/dummy-data/R__insert_application_forms.sql
++++ /dev/null
+@@ -1,28 +0,0 @@
+-DO $$
+-DECLARE
+-accountId_admin bigint;
+-BEGIN
+-SELECT account_id INTO accountId_admin FROM candido.account WHERE email = 'admin@candidocorp.com';
+-
+-INSERT INTO candido.application_form (
+-    fk_account_id,
+-    display_name,
+-    notes,
+-    max_applicants,
+-    application_form_body,
+-    url_code,
+-    start_date,
+-    end_date,
+-    created_at,
+-    updated_at,
+-    deleted_at,
+-    feedback_publication_date,
+-    feedback_expiration_date
+-)
+-VALUES
+-    (accountId_admin, 'Modulo di iscrizione', 'Note iniziali del modulo di iscrizione', 10, 'Corpo del form 1', 'ABCD', '2024-01-01 09:00:00', '2024-01-10 18:00:00', current_timestamp, current_timestamp, NULL, '2024-02-01 09:00:00', '2024-03-01 09:00:00'),
+-    (accountId_admin, 'Modulo di feedback', 'Note sul modulo di feedback', 5, 'Corpo del form 2', 'EFGH', '2024-02-01 09:00:00', '2024-02-15 17:00:00', current_timestamp, current_timestamp, NULL, '2024-03-01 09:00:00', '2024-04-01 09:00:00'),
+-    (accountId_admin, 'Modulo avanzato', 'Note sul modulo avanzato', 20, 'Corpo del form 3', 'WXYZ', '2024-03-01 00:00:00', '2024-03-15 23:59:59', current_timestamp, current_timestamp, NULL, '2024-05-01 00:00:00', '2024-06-01 00:00:00')
+-    ON CONFLICT (url_code) DO NOTHING;
+-END;
+-$$ LANGUAGE plpgsql;
+diff --git a/src/main/resources/db/dummy-data/R__insert_applications.sql b/src/main/resources/db/dummy-data/R__insert_applications.sql
+deleted file mode 100644
+index 0b2175e..0000000
+--- a/src/main/resources/db/dummy-data/R__insert_applications.sql
++++ /dev/null
+@@ -1,33 +0,0 @@
+-DO $$
+-DECLARE
+-accountId_client bigint;
+-    formIdOne bigint;
+-    formIdTwo bigint;
+-    formIdThree bigint;
+-BEGIN
+-SELECT account_id INTO accountId_client FROM candido.account WHERE email = 'client@candidocorp.com';
+-SELECT application_form_id INTO formIdOne FROM candido.application_form WHERE url_code = 'ABCD';
+-SELECT application_form_id INTO formIdTwo FROM candido.application_form WHERE url_code = 'EFGH';
+-SELECT application_form_id INTO formIdThree FROM candido.application_form WHERE url_code = 'WXYZ';
+-
+-INSERT INTO candido.application (
+-    application_id,
+-    fk_account_id,
+-    fk_application_form_id,
+-    fk_application_status_id,
+-    filled_body,
+-    progress,
+-    created_at,
+-    updated_at,
+-    deleted_at,
+-    sent_at
+-)
+-VALUES
+-    (1, accountId_client, formIdOne, 1, '{}', 50, '2023-05-13 10:15:00', '2023-05-14 11:20:00', NULL, NULL),
+-    (2, accountId_client, formIdTwo, 2, '{}', 100, '2023-09-22 09:30:00', '2024-01-10 14:45:00', NULL, '2024-01-10 14:45:00'),
+-    (3, accountId_client, formIdThree, 3, '{}', 100, '2024-03-01 09:00:00', '2024-03-02 10:00:00', NULL, '2024-03-02 10:00:00'),
+-    (4, accountId_client, formIdOne, 4, '{}', 100, '2024-07-15 08:00:00', '2024-07-15 15:00:00', NULL, '2024-07-15 15:00:00'),
+-    (5, accountId_client, formIdTwo, 5, '{}', 98, '2025-01-28 07:00:00', '2025-01-29 08:00:00', NULL, NULL)
+-    ON CONFLICT (application_id) DO NOTHING;
+-END;
+-$$ LANGUAGE plpgsql;
+diff --git a/src/main/resources/db/dummy-data/R__insert_users.sql b/src/main/resources/db/dummy-data/R__insert_users.sql
+deleted file mode 100644
+index e8eff36..0000000
+--- a/src/main/resources/db/dummy-data/R__insert_users.sql
++++ /dev/null
+@@ -1,28 +0,0 @@
+-DO $$
+-DECLARE
+-accountId_admin   bigint;
+-    accountId_client  bigint;
+-BEGIN
+-    -- Fetch account IDs
+-SELECT account_id INTO accountId_admin FROM candido.account WHERE email = 'admin@candidocorp.com';
+-SELECT account_id INTO accountId_client FROM candido.account WHERE email = 'client@candidocorp.com';
+-
+--- Insert users
+-INSERT INTO candido."user" (
+-    fk_account_id,
+-    fk_gender_id,
+-    first_name,
+-    last_name,
+-    birth_date,
+-    mobile_number,
+-    phone_number,
+-    last_modified_name,
+-    created_at,
+-    deleted_at
+-)
+-VALUES
+-    (accountId_admin, 1, 'Admin', 'Doe', '1998-04-15', '12345678', '', NULL, now(), NULL),
+-    (accountId_client, 1, 'Client', 'Ino', '1975-10-22', '999999999', '3458483720', NULL, now(), NULL)
+-    ON CONFLICT DO NOTHING;
+-END;
+-$$ LANGUAGE plpgsql;
+diff --git a/src/main/resources/db/dummy-data/R__insert_xref_account_application_saved.sql b/src/main/resources/db/dummy-data/R__insert_xref_account_application_saved.sql
+deleted file mode 100644
+index 593e9cf..0000000
+--- a/src/main/resources/db/dummy-data/R__insert_xref_account_application_saved.sql
++++ /dev/null
+@@ -1,24 +0,0 @@
+-DO $$
+-DECLARE
+-accountId_client bigint;
+-    formIdOne bigint;
+-    formIdTwo bigint;
+-    formIdThree bigint;
+-BEGIN
+-SELECT account_id INTO accountId_client FROM candido.account WHERE email = 'client@candidocorp.com';
+-SELECT application_form_id INTO formIdOne FROM candido.application_form WHERE url_code = 'ABCD';
+-SELECT application_form_id INTO formIdTwo FROM candido.application_form WHERE url_code = 'EFGH';
+-SELECT application_form_id INTO formIdThree FROM candido.application_form WHERE url_code = 'WXYZ';
+-
+-INSERT INTO candido.xref_account_application_saved (
+-    fk_account_id,
+-    fk_application_form_id,
+-    saved_at
+-)
+-VALUES
+-    (accountId_client, formIdOne, '2023-05-13 10:15:00'),
+-    (accountId_client, formIdTwo, '2023-09-22 09:30:00'),
+-    (accountId_client, formIdThree, '2024-03-01 09:00:00')
+-    ON CONFLICT DO NOTHING;
+-END;
+-$$ LANGUAGE plpgsql;
+diff --git a/src/main/resources/db/migration/V5__rename_application_form_to_opportunity.sql b/src/main/resources/db/migration/V5__rename_application_form_to_opportunity.sql
+new file mode 100644
+index 0000000..cea60b7
+--- /dev/null
++++ b/src/main/resources/db/migration/V5__rename_application_form_to_opportunity.sql
+@@ -0,0 +1,11 @@
++ALTER TABLE application_form RENAME TO opportunity;
++ALTER TABLE xref_account_application_saved RENAME TO xref_account_opportunity_saved;
++ALTER TABLE xref_account_opportunity_saved RENAME COLUMN fk_application_form_id TO fk_opportunity_id;
++
++ALTER TABLE opportunity RENAME COLUMN application_form_id TO opportunity_id;
++ALTER TABLE opportunity RENAME COLUMN application_form_body TO form_schema;
++
++ALTER TABLE application RENAME COLUMN fk_application_form_id TO fk_opportunity_id;
++ALTER TABLE application_form_admin RENAME COLUMN fk_application_form_id TO fk_opportunity_id;
++
++ALTER TABLE opportunity ALTER COLUMN form_schema TYPE JSONB USING form_schema::jsonb;
+diff --git a/src/main/resources/db/migration/V6__create_opportunity_reference_tables.sql b/src/main/resources/db/migration/V6__create_opportunity_reference_tables.sql
+new file mode 100644
+index 0000000..33880db
+--- /dev/null
++++ b/src/main/resources/db/migration/V6__create_opportunity_reference_tables.sql
+@@ -0,0 +1,197 @@
++CREATE TABLE opportunity_type (
++    opportunity_type_id BIGSERIAL PRIMARY KEY,
++    key VARCHAR(64) UNIQUE NOT NULL,
++    label VARCHAR(128)
++);
++
++CREATE TABLE opportunity_status (
++    opportunity_status_id BIGSERIAL PRIMARY KEY,
++    key VARCHAR(64) UNIQUE NOT NULL,
++    label VARCHAR(128)
++);
++
++CREATE TABLE location_type (
++    location_type_id BIGSERIAL PRIMARY KEY,
++    key VARCHAR(32) UNIQUE NOT NULL,
++    label VARCHAR(128)
++);
++
++CREATE TABLE currency (
++    currency_id BIGSERIAL PRIMARY KEY,
++    code VARCHAR(3) UNIQUE NOT NULL,
++    name VARCHAR(64) NOT NULL,
++    symbol VARCHAR(8),
++    enabled BOOLEAN DEFAULT TRUE
++);
++
++CREATE TABLE tag (
++    tag_id BIGSERIAL PRIMARY KEY,
++    key VARCHAR(64) UNIQUE NOT NULL,
++    label VARCHAR(128) NOT NULL
++);
++
++CREATE TABLE opportunity_tag (
++    fk_opportunity_id BIGINT NOT NULL REFERENCES opportunity(opportunity_id) ON DELETE CASCADE,
++    fk_tag_id BIGINT NOT NULL REFERENCES tag(tag_id) ON DELETE CASCADE,
++    PRIMARY KEY (fk_opportunity_id, fk_tag_id)
++);
++
++CREATE TABLE opportunity_level (
++    opportunity_level_id BIGSERIAL PRIMARY KEY,
++    key VARCHAR(32) UNIQUE NOT NULL,
++    label VARCHAR(64) NOT NULL
++);
++
++INSERT INTO opportunity_type (key, label) VALUES
++    ('bootcamp', 'Bootcamp'),
++    ('internship', 'Internship'),
++    ('challenge', 'Challenge'),
++    ('job', 'Job'),
++    ('thesis', 'Thesis'),
++    ('volunteering', 'Volunteering'),
++    ('research', 'Research Collaboration');
++
++INSERT INTO opportunity_status (key, label) VALUES
++    ('draft', 'Draft'),
++    ('published', 'Published'),
++    ('closed', 'Closed'),
++    ('archived', 'Archived');
++
++INSERT INTO location_type (key, label) VALUES
++    ('remote', 'Remote'),
++    ('on-site', 'On-site'),
++    ('hybrid', 'Hybrid');
++
++INSERT INTO currency (code, name, symbol) VALUES
++    ('EUR', 'Euro', '€'),
++    ('USD', 'US Dollar', '$'),
++    ('GBP', 'British Pound', '£'),
++    ('JPY', 'Japanese Yen', '¥'),
++    ('CHF', 'Swiss Franc', 'CHF');
++
++INSERT INTO tag (key, label) VALUES
++    ('python', 'Python'),
++    ('java', 'Java'),
++    ('javascript', 'JavaScript'),
++    ('web-development', 'Web Development'),
++    ('data-analysis', 'Data Analysis'),
++    ('machine-learning', 'Machine Learning'),
++    ('cloud-computing', 'Cloud Computing'),
++    ('cybersecurity', 'Cybersecurity'),
++    ('mobile-development', 'Mobile Development'),
++    ('devops', 'DevOps'),
++    ('agile', 'Agile'),
++    ('full-stack', 'Full Stack'),
++    ('backend', 'Backend'),
++    ('frontend', 'Frontend'),
++    ('open-source', 'Open Source'),
++    ('artificial-intelligence', 'Artificial Intelligence'),
++    ('blockchain', 'Blockchain'),
++    ('big-data', 'Big Data'),
++    ('software-engineering', 'Software Engineering'),
++    ('data-visualization', 'Data Visualization'),
++    ('user-experience', 'User Experience'),
++    ('product-management', 'Product Management'),
++    ('business-intelligence', 'Business Intelligence'),
++    ('quality-assurance', 'Quality Assurance'),
++    ('agile-methodologies', 'Agile Methodologies'),
++    ('scrum', 'Scrum'),
++    ('kotlin', 'Kotlin'),
++    ('swift', 'Swift'),
++    ('ruby', 'Ruby'),
++    ('php', 'PHP'),
++    ('c-sharp', 'C#'),
++    ('c-plus-plus', 'C++'),
++    ('golang', 'Go'),
++    ('rust', 'Rust'),
++    ('sql', 'SQL'),
++    ('no-sql', 'NoSQL'),
++    ('data-engineering', 'Data Engineering'),
++    ('machine-learning-engineering', 'Machine Learning Engineering'),
++    ('artificial-intelligence-engineering', 'Artificial Intelligence Engineering'),
++    ('cloud-architecture', 'Cloud Architecture'),
++    ('cybersecurity-engineering', 'Cybersecurity Engineering'),
++    ('mobile-app-development', 'Mobile App Development'),
++    ('web-design', 'Web Design'),
++    ('user-interface', 'User Interface'),
++    ('user-research', 'User Research'),
++    ('data-mining', 'Data Mining'),
++    ('data-wrangling', 'Data Wrangling'),
++    ('data-engineering-tools', 'Data Engineering Tools'),
++    ('data-science-tools', 'Data Science Tools'),
++    ('business-analytics', 'Business Analytics'),
++    ('digital-marketing', 'Digital Marketing'),
++    ('seo', 'SEO'),
++    ('content-creation', 'Content Creation'),
++    ('social-media-management', 'Social Media Management'),
++    ('project-management', 'Project Management'),
++    ('agile-project-management', 'Agile Project Management'),
++    ('scrum-master', 'Scrum Master'),
++    ('product-owner', 'Product Owner'),
++    ('business-development', 'Business Development'),
++    ('sales', 'Sales'),
++    ('customer-support', 'Customer Support'),
++    ('technical-support', 'Technical Support'),
++    ('network-administration', 'Network Administration'),
++    ('system-administration', 'System Administration'),
++    ('database-administration', 'Database Administration'),
++    ('it-security', 'IT Security'),
++    ('it-auditing', 'IT Auditing'),
++    ('it-compliance', 'IT Compliance'),
++    ('it-governance', 'IT Governance'),
++    ('it-service-management', 'IT Service Management'),
++    ('it-operations', 'IT Operations'),
++    ('it-project-management', 'IT Project Management'),
++    ('it-consulting', 'IT Consulting'),
++    ('it-training', 'IT Training'),
++    ('it-certification', 'IT Certification'),
++    ('it-research', 'IT Research'),
++    ('it-development', 'IT Development'),
++    ('it-architecture', 'IT Architecture'),
++    ('it-infrastructure', 'IT Infrastructure'),
++    ('it-innovation', 'IT Innovation'),
++    ('it-strategy', 'IT Strategy'),
++    ('it-business-alignment', 'IT Business Alignment'),
++    ('it-risk-management', 'IT Risk Management'),
++    ('it-change-management', 'IT Change Management'),
++    ('it-service-delivery', 'IT Service Delivery'),
++    ('it-service-support', 'IT Service Support'),
++    ('it-service-design', 'IT Service Design'),
++    ('it-service-transition', 'IT Service Transition'),
++    ('it-service-operation', 'IT Service Operation'),
++    ('it-service-improvement', 'IT Service Improvement'),
++    ('it-service-automation', 'IT Service Automation'),
++    ('it-service-orchestration', 'IT Service Orchestration'),
++    ('it-service-monitoring', 'IT Service Monitoring'),
++    ('it-service-reporting', 'IT Service Reporting'),
++    ('it-service-analytics', 'IT Service Analytics'),
++    ('it-service-performance', 'IT Service Performance'),
++    ('it-service-quality', 'IT Service Quality'),
++    ('it-service-security', 'IT Service Security'),
++    ('it-service-compliance', 'IT Service Compliance'),
++    ('it-service-governance', 'IT Service Governance'),
++    ('it-service-architecture', 'IT Service Architecture'),
++    ('it-service-integration', 'IT Service Integration'),
++    ('it-service-delivery-models', 'IT Service Delivery Models'),
++    ('it-service-management-tools', 'IT Service Management Tools'),
++    ('it-service-management-processes', 'IT Service Management Processes'),
++    ('it-service-management-frameworks', 'IT Service Management Frameworks'),
++    ('it-service-management-standards', 'IT Service Management Standards'),
++    ('it-service-management-best-practices', 'IT Service Management Best Practices'),
++    ('it-service-management-certifications', 'IT Service Management Certifications'),
++    ('it-service-management-training', 'IT Service Management Training'),
++    ('it-service-management-consulting', 'IT Service Management Consulting'),
++    ('it-service-management-research', 'IT Service Management Research'),
++    ('it-service-management-innovation', 'IT Service Management Innovation'),
++    ('it-service-management-strategy', 'IT Service Management Strategy'),
++    ('data-science', 'Data Science');
++
++INSERT INTO opportunity_level (key, label) VALUES
++    ('internship', 'Internship'),
++    ('entry', 'Entry Level'),
++    ('mid', 'Mid Level'),
++    ('senior', 'Senior Level'),
++    ('lead', 'Lead / Principal'),
++    ('manager', 'Manager'),
++    ('director', 'Director'),
++    ('executive', 'Executive / C-Level');
+diff --git a/src/main/resources/db/migration/V7__recreate_opportunity_table.sql b/src/main/resources/db/migration/V7__recreate_opportunity_table.sql
+new file mode 100644
+index 0000000..bb90b1f
+--- /dev/null
++++ b/src/main/resources/db/migration/V7__recreate_opportunity_table.sql
+@@ -0,0 +1,41 @@
++DROP TABLE IF EXISTS opportunity CASCADE;
++
++CREATE TABLE opportunity (
++    opportunity_id BIGSERIAL PRIMARY KEY,
++
++    -- Owner
++    fk_account_id BIGINT NOT NULL REFERENCES account(account_id),
++
++    -- Identifiers
++    display_name VARCHAR(128) NOT NULL,
++    url_code VARCHAR(4) NOT NULL,
++
++    -- Configuration
++    form_schema JSONB NOT NULL,
++    max_applicants BIGINT,
++
++    -- Content
++    description TEXT,
++    notes VARCHAR(255),
++
++    -- Compensation (all optional)
++    compensation_amount NUMERIC(10,2),
++    compensation_note VARCHAR(255),
++    fk_currency_id BIGINT REFERENCES currency(currency_id),
++
++    -- Location & classification
++    fk_territory_id BIGINT NOT NULL REFERENCES territory(territory_id),
++    fk_location_type_id BIGINT NOT NULL REFERENCES location_type(location_type_id),
++    fk_opportunity_type_id BIGINT NOT NULL REFERENCES opportunity_type(opportunity_type_id),
++    fk_opportunity_status_id BIGINT NOT NULL REFERENCES opportunity_status(opportunity_status_id),
++    fk_opportunity_level_id BIGINT NOT NULL REFERENCES opportunity_level(opportunity_level_id),
++
++    -- Dates
++    start_date TIMESTAMPTZ,
++    end_date TIMESTAMPTZ,
++    feedback_publication_date TIMESTAMPTZ,
++    feedback_expiration_date TIMESTAMPTZ,
++    created_at TIMESTAMPTZ DEFAULT now(),
++    updated_at TIMESTAMPTZ,
++    deleted_at TIMESTAMPTZ
++);
